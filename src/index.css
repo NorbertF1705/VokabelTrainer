@@ -1,0 +1,102 @@
+:root {
+  --c-primary: #FF6B6B;
+  --c-secondary: #4ECDC4;
+  --c-accent: #FFE66D;
+  --c-purple: #A78BFA;
+  --c-success: #2ECC71;
+  --c-danger: #FF4757;
+  --c-bg: #F0EAFF;
+  --c-card: #FFFFFF;
+  --c-text: #2D1B69;
+  --c-muted: #8A7FB0;
+  --c-light: #FFFFFF;
+  --c-border: #E0D9F7;
+  --c-tab: #2D1B69;
+  --c-tab-active: #FFE66D;
+  --c-tab-inactive: #8A7FB0;
+  --tab-height: 64px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--c-bg);
+  color: var(--c-text);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  outline: none;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 2px; }
+
+/* Flashcard 3D flip */
+.fc-scene {
+  width: 100%;
+  height: clamp(220px, 42vh, 340px);
+  perspective: 1200px;
+  cursor: pointer;
+}
+
+.fc-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+
+.fc-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.fc-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: 0 8px 32px rgba(45,27,105,0.18);
+  background: #fff;
+  user-select: none;
+}
+
+.fc-face.fc-back {
+  transform: rotateY(180deg);
+  background: #FAFAFA;
+}
