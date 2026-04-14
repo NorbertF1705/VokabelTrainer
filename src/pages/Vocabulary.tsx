@@ -9,21 +9,24 @@ export default function Vocabulary() {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'Alle'>('Alle');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [form, setForm] = useState({ german: '', english: '', spanish: '', emoji: '📝', category: 'Diverses' as Category, inflections: '' });
+  const [form, setForm] = useState({ german: '', translation: '', emoji: '📝', category: 'Diverses' as Category, inflections: '' });
 
   const filtered = useMemo(() => allVocabulary.filter(v => {
-    const matchesSearch = !search || [v.german, v.english, v.spanish].some(t => t.toLowerCase().includes(search.toLowerCase()));
+    const matchesSearch = !search || [v.german, v.translation].some(t => t.toLowerCase().includes(search.toLowerCase()));
     const matchesCat = selectedCategory === 'Alle' || v.category === selectedCategory;
     return matchesSearch && matchesCat;
   }), [allVocabulary, search, selectedCategory]);
 
+  const foreignLabel = selectedLanguage === 'english' ? 'Englisch *' : 'Spanisch *';
+  const foreignPlaceholder = selectedLanguage === 'english' ? 'English word' : 'Palabra en español';
+
   const handleAdd = () => {
-    if (!form.german.trim() || !form.english.trim() || !form.spanish.trim()) {
-      alert('Bitte alle Pflichtfelder ausfüllen (DE, EN, ES).');
+    if (!form.german.trim() || !form.translation.trim()) {
+      alert(`Bitte Deutsch und ${selectedLanguage === 'english' ? 'Englisch' : 'Spanisch'} ausfüllen.`);
       return;
     }
-    addCustomVocabulary({ german: form.german.trim(), english: form.english.trim(), spanish: form.spanish.trim(), emoji: form.emoji.trim() || '📝', category: form.category, inflections: form.inflections.trim() || undefined });
-    setForm({ german: '', english: '', spanish: '', emoji: '📝', category: 'Diverses', inflections: '' });
+    addCustomVocabulary({ german: form.german.trim(), translation: form.translation.trim(), emoji: form.emoji.trim() || '📝', category: form.category, inflections: form.inflections.trim() || undefined });
+    setForm({ german: '', translation: '', emoji: '📝', category: 'Diverses', inflections: '' });
     setShowAddModal(false);
   };
 
@@ -81,14 +84,13 @@ export default function Vocabulary() {
         {filtered.map(item => {
           const prog = getCardProgress(item.id, selectedLanguage);
           const boxColor = Colors.boxColors[Math.min(prog.box - 1, 5)];
-          const foreignWord = selectedLanguage === 'english' ? item.english : item.spanish;
           return (
             <div key={item.id} style={{ display: 'flex', alignItems: 'center', background: Colors.card, borderRadius: 12, padding: '12px 14px', marginBottom: 8, gap: 12, boxShadow: '0 2px 6px rgba(45,27,105,0.06)' }}>
               <span style={{ fontSize: 28, width: 36, textAlign: 'center' }}>{item.emoji}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 16, fontWeight: 800, color: Colors.text }}>{item.german}</div>
                 <div style={{ fontSize: 14, color: Colors.secondary, fontWeight: 600 }}>
-                  {foreignWord}
+                  {item.translation}
                   {item.inflections && <span style={{ fontSize: 12, color: Colors.textMuted, fontStyle: 'italic', fontWeight: 400 }}> {item.inflections}</span>}
                 </div>
                 <div style={{ fontSize: 11, color: Colors.textMuted, fontWeight: 500, marginTop: 2 }}>{item.category}</div>
@@ -112,11 +114,10 @@ export default function Vocabulary() {
             <h3 style={{ fontSize: 22, fontWeight: 900, color: Colors.text, marginBottom: 16 }}>Neue Vokabel</h3>
 
             {[
-              { label: 'Emoji', key: 'emoji', placeholder: '📝', type: 'text' },
-              { label: 'Deutsch *', key: 'german', placeholder: 'Deutsches Wort', type: 'text' },
-              { label: 'Englisch *', key: 'english', placeholder: 'English word', type: 'text' },
-              { label: 'Spanisch *', key: 'spanish', placeholder: 'Palabra en español', type: 'text' },
-              { label: 'Beugungsformen (optional)', key: 'inflections', placeholder: 'z.B. [dogs] oder [lief, gelaufen]', type: 'text' },
+              { label: 'Emoji', key: 'emoji', placeholder: '📝' },
+              { label: 'Deutsch *', key: 'german', placeholder: 'Deutsches Wort' },
+              { label: foreignLabel, key: 'translation', placeholder: foreignPlaceholder },
+              { label: 'Beugungsformen (optional)', key: 'inflections', placeholder: 'z.B. [dogs] oder [lief, gelaufen]' },
             ].map(({ label, key, placeholder }) => (
               <div key={key} style={{ marginBottom: 12 }}>
                 <label style={{ fontSize: 12, fontWeight: 700, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 4 }}>{label}</label>

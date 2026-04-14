@@ -51,9 +51,8 @@ export default function Learn() {
   const dueCards = useMemo(() => getDueCards(selectedLanguage), [selectedLanguage]);
 
   const answerField: keyof VocabularyItem = useMemo(() => {
-    if (queryDirection === 'de-to-foreign') return selectedLanguage === 'english' ? 'english' : 'spanish';
-    return 'german';
-  }, [queryDirection, selectedLanguage]);
+    return queryDirection === 'de-to-foreign' ? 'translation' : 'german';
+  }, [queryDirection]);
 
   const currentCard = sessionCards?.[currentIndex];
 
@@ -67,15 +66,11 @@ export default function Learn() {
   const progress = sessionCards ? currentIndex / sessionCards.length : 0;
 
   const frontText = currentCard
-    ? queryDirection === 'de-to-foreign'
-      ? currentCard.german
-      : selectedLanguage === 'english' ? currentCard.english : currentCard.spanish
+    ? queryDirection === 'de-to-foreign' ? currentCard.german : currentCard.translation
     : '';
 
   const backText = currentCard
-    ? queryDirection === 'de-to-foreign'
-      ? selectedLanguage === 'english' ? currentCard.english : currentCard.spanish
-      : currentCard.german
+    ? queryDirection === 'de-to-foreign' ? currentCard.translation : currentCard.german
     : '';
 
   const startSession = useCallback((mode: SessionMode) => {
@@ -103,9 +98,10 @@ export default function Learn() {
   const speakWord = () => {
     if (!currentCard) return;
     const text = isFlipped ? backText : frontText;
+    const foreignLang = selectedLanguage === 'english' ? 'en-US' : 'es-ES';
     const lang = isFlipped
-      ? (queryDirection === 'de-to-foreign' ? (selectedLanguage === 'english' ? 'en-US' : 'es-ES') : 'de-DE')
-      : (queryDirection === 'de-to-foreign' ? 'de-DE' : (selectedLanguage === 'english' ? 'en-US' : 'es-ES'));
+      ? (queryDirection === 'de-to-foreign' ? foreignLang : 'de-DE')
+      : (queryDirection === 'de-to-foreign' ? 'de-DE' : foreignLang);
     speak(text, lang);
   };
 
@@ -260,6 +256,7 @@ export default function Learn() {
             <span style={{ fontSize: 13, color: Colors.textMuted, fontWeight: 600 }}>
               {queryDirection === 'de-to-foreign' ? (selectedLanguage === 'english' ? '→ Englisch' : '→ Spanisch') : '→ Deutsch'}
             </span>
+
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {quizOptions.map((option, idx) => {

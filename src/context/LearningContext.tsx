@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { BUILT_IN_VOCABULARY, VocabularyItem } from '../data/vocabulary';
+import { VOCABULARY_EN, VOCABULARY_ES, VocabularyItem } from '../data/vocabulary';
 import { BOX_INTERVALS } from '../constants/theme';
 
 export type Language = 'english' | 'spanish';
@@ -19,7 +19,8 @@ interface LearningState {
   selectedLanguage: Language;
   queryDirection: QueryDirection;
   progress: ProgressMap;
-  customVocabulary: VocabularyItem[];
+  customVocabularyEN: VocabularyItem[];
+  customVocabularyES: VocabularyItem[];
   dailyCardLimit: number;
   dailyStats: { date: string; count: number };
 }
@@ -37,6 +38,21 @@ interface LearningContextType extends LearningState {
   getBoxCounts: (lang: Language) => number[];
   resetProgress: () => void;
   getTotalStats: (lang: Language) => { total: number; learned: number; dueToday: number; successRate: number };
+}
+
+// Hilfsfunktion: migriert altes Format (customVocabulary mit english+spanish) ins neue Format
+function migrateOldCustomVocab(raw: Record<string, unknown>): { en: VocabularyItem[]; es: VocabularyItem[] } {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const old: any[] = (raw as any).customVocabulary ?? [];
+  const en: VocabularyItem[] = old.map((v: any) => ({
+    id: v.id, german: v.german, translation: v.english ?? v.translation ?? '',
+    emoji: v.emoji, category: v.category, inflections: v.inflections, isCustom: true,
+  }));
+  const es: VocabularyItem[] = old.map((v: any) => ({
+    id: v.id + '_es', german: v.german, translation: v.spanish ?? v.translation ?? '',
+    emoji: v.emoji, category: v.category, inflections: v.inflections, isCustom: true,
+  }));
+  return { en, es };
 }
 
 const STORAGE_KEY = 'vokabeltrainer_state';
@@ -77,7 +93,8 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     selectedLanguage: 'english',
     queryDirection: 'de-to-foreign',
     progress: {},
-    customVocabulary: [],
+    customVocabularyEN: [],
+    customVocabularyES: [],
     dailyCardLimit: 20,
     dailyStats: { date: '', count: 0 },
   });
@@ -88,10 +105,18 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     if (raw) {
       try {
         const parsed = JSON.parse(raw);
-        // Rückwärtskompatibilität: dailyStats fehlt in alten Saves
-        if (!parsed.dailyStats) {
-          parsed.dailyStats = { date: '', count: 0 };
+        if (!parsed.dailyStats) parsed.dailyStats = { date: '', count: 0 };
+
+        // Migration: altes Format hatte customVocabulary (mit english + spanish)
+        if (parsed.customVocabulary !== undefined && parsed.customVocabularyEN === undefined) {
+          const { en, es } = migrateOldCustomVocab(parsed);
+          parsed.customVocabularyEN = en;
+          parsed.customVocabularyES = es;
+          delete parsed.customVocabulary;
         }
+        if (!parsed.customVocabularyEN) parsed.customVocabularyEN = [];
+        if (!parsed.customVocabularyES) parsed.customVocabularyES = [];
+
         setState(parsed);
       } catch {
         // ignore parse errors
@@ -106,7 +131,12 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state, loaded]);
 
-  const allVocabulary = [...BUILT_IN_VOCABULARY, ...state.customVocabulary];
+  const getVocabForLang = (lang: Language): VocabularyItem[] =>
+    lang === 'english'
+      ? [...VOCABULARY_EN, ...state.customVocabularyEN]
+      : [...VOCABULARY_ES, ...state.customVocabularyES];
+
+  const allVocabulary = getVocabForLang(state.selectedLanguage);
 
   const setLanguage = (lang: Language) => setState(s => ({ ...s, selectedLanguage: lang }));
   const setQueryDirection = (dir: QueryDirection) => setState(s => ({ ...s, queryDirection: dir }));
@@ -163,11 +193,19 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
 
   const addCustomVocabulary = (item: Omit<VocabularyItem, 'id' | 'isCustom'>) => {
     const newItem: VocabularyItem = { ...item, id: `custom_${Date.now()}`, isCustom: true };
-    setState(s => ({ ...s, customVocabulary: [...s.customVocabulary, newItem] }));
+    if (state.selectedLanguage === 'english') {
+      setState(s => ({ ...s, customVocabularyEN: [...s.customVocabularyEN, newItem] }));
+    } else {
+      setState(s => ({ ...s, customVocabularyES: [...s.customVocabularyES, newItem] }));
+    }
   };
 
   const deleteCustomVocabulary = (id: string) => {
-    setState(s => ({ ...s, customVocabulary: s.customVocabulary.filter(v => v.id !== id) }));
+    setState(s => ({
+      ...s,
+      customVocabularyEN: s.customVocabularyEN.filter(v => v.id !== id),
+      customVocabularyES: s.customVocabularyES.filter(v => v.id !== id),
+    }));
   };
 
   const getDueCards = (lang: Language): VocabularyItem[] => {
@@ -179,7 +217,7 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
 
     if (effectiveLimit === 0) return [];
 
-    const due = allVocabulary
+    const due = getVocabForLang(lang)
       .filter(v => isCardDue(getCardProgress(v.id, lang)))
       .sort((a, b) => {
         const pa = getCardProgress(a.id, lang);
@@ -197,7 +235,7 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
 
   const getBoxCounts = (lang: Language): number[] => {
     const counts = [0, 0, 0, 0, 0, 0];
-    allVocabulary.forEach(v => {
+    getVocabForLang(lang).forEach(v => {
       const prog = getCardProgress(v.id, lang);
       counts[Math.min(Math.max(prog.box - 1, 0), 5)]++;
     });
@@ -207,9 +245,10 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
   const resetProgress = () => setState(s => ({ ...s, progress: {} }));
 
   const getTotalStats = (lang: Language) => {
-    const total = allVocabulary.length;
+    const vocab = getVocabForLang(lang);
+    const total = vocab.length;
     let correct = 0, incorrect = 0, learned = 0;
-    allVocabulary.forEach(v => {
+    vocab.forEach(v => {
       const prog = getCardProgress(v.id, lang);
       correct += prog.correctCount;
       incorrect += prog.incorrectCount;

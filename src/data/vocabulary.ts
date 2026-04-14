@@ -13,18 +13,29 @@ export type Category =
   | 'Verben'
   | 'Diverses';
 
-export interface VocabularyItem {
+// Internes Format mit beiden Sprachen – nur für die Rohdaten
+interface RawEntry {
   id: string;
   german: string;
   english: string;
   spanish: string;
   emoji: string;
   category: Category;
-  inflections?: string; // z.B. "[dogs]" oder "[lief, gelaufen]"
+  inflections?: string;
+}
+
+// Öffentlicher Typ: eine Übersetzung pro Instanz
+export interface VocabularyItem {
+  id: string;
+  german: string;
+  translation: string;
+  emoji: string;
+  category: Category;
+  inflections?: string;
   isCustom?: boolean;
 }
 
-export const BUILT_IN_VOCABULARY: VocabularyItem[] = [
+const RAW_VOCABULARY: RawEntry[] = [
   // ── TIERE (60) ──────────────────────────────────────────
   { id: 'a001', german: 'Hund', english: 'dog', spanish: 'perro', emoji: '🐶', category: 'Tiere' },
   { id: 'a002', german: 'Katze', english: 'cat', spanish: 'gato', emoji: '🐱', category: 'Tiere' },
@@ -551,6 +562,16 @@ export const BUILT_IN_VOCABULARY: VocabularyItem[] = [
   { id: 'd044', german: 'Trophäe', english: 'trophy', spanish: 'trofeo', emoji: '🏆', category: 'Diverses' },
   { id: 'd045', german: 'Würfel', english: 'dice', spanish: 'dado', emoji: '🎲', category: 'Diverses' },
 ];
+
+export const VOCABULARY_EN: VocabularyItem[] = RAW_VOCABULARY.map(
+  ({ id, german, english, emoji, category, inflections }) =>
+    ({ id, german, translation: english, emoji, category, inflections })
+);
+
+export const VOCABULARY_ES: VocabularyItem[] = RAW_VOCABULARY.map(
+  ({ id, german, spanish, emoji, category, inflections }) =>
+    ({ id, german, translation: spanish, emoji, category, inflections })
+);
 
 export const ALL_CATEGORIES: Category[] = [
   'Tiere',
