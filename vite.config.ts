@@ -24,7 +24,47 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Precache alle statischen App-Assets → Workbox bedient diese automatisch CacheFirst
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+
+        // SW übernimmt sofort die Kontrolle über alle offenen Tabs (wichtig auf iOS)
+        clientsClaim: true,
+        skipWaiting: true,
+
+        // SPA-Navigation: immer index.html aus dem Precache liefern (Offline-fähig)
+        navigateFallback: 'index.html',
+        // Nur lokale Navigation-Requests abfangen, keine externen URLs
+        navigateFallbackDenylist: [/^\/api\//, /^\/cdn-cgi\//],
+
+        runtimeCaching: [
+          {
+            // JS / CSS / Fonts / Bilder → CacheFirst: zuerst Cache, Netz nur wenn fehlt
+            urlPattern: /\.(?:js|css|woff2?|ttf|otf|eot|png|svg|ico|jpg|jpeg|webp|gif)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'static-assets-v1',
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 Jahr
+              },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // HTML-Dokumente → NetworkFirst: aktuelle Version bevorzugen, Cache als Fallback
+            urlPattern: /\.html$/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'html-cache-v1',
+              networkTimeoutSeconds: 5, // Nach 5s auf Cache zurückfallen (iOS offline/schlechtes Netz)
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 Tage
+              },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
       },
     }),
   ],

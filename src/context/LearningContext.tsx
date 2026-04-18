@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { VOCABULARY_EN, VOCABULARY_ES, VocabularyItem } from '../data/vocabulary';
 import { BOX_INTERVALS } from '../constants/theme';
+import { storageGet, storageSet, migrateFromLocalStorage } from '../utils/storage';
 
 export type Language = 'english' | 'spanish';
-export type QueryDirection = 'de-to-foreign' | 'foreign-to-de';
+export type QueryDirection = 'de-to-foreign' | 'foreign-to-de' | 'random';
 
 export interface CardProgress {
   box: number;
@@ -22,7 +23,10 @@ interface LearningState {
   customVocabularyEN: VocabularyItem[];
   customVocabularyES: VocabularyItem[];
   dailyCardLimit: number;
-  dailyStats: { date: string; count: number };
+  dailyStats: Record<Language, { date: string; count: number }>;
+  quizAutoSpeak: boolean;
+  flashcardAutoSpeak: boolean;
+  trainingLog: Record<Language, string[]>; // per-language YYYY-MM-DD dates of completed due-card sessions
 }
 
 interface LearningContextType extends LearningState {
@@ -30,14 +34,18 @@ interface LearningContextType extends LearningState {
   setLanguage: (lang: Language) => void;
   setQueryDirection: (dir: QueryDirection) => void;
   setDailyCardLimit: (limit: number) => void;
+  setQuizAutoSpeak: (enabled: boolean) => void;
+  setFlashcardAutoSpeak: (enabled: boolean) => void;
   getCardProgress: (vocabId: string, lang: Language) => CardProgress;
   markCard: (vocabId: string, lang: Language, correct: boolean) => void;
-  addCustomVocabulary: (item: Omit<VocabularyItem, 'id' | 'isCustom'>) => void;
+  addCustomVocabulary: (item: Omit<VocabularyItem, 'id' | 'isCustom'>, lang: Language) => void;
   deleteCustomVocabulary: (id: string) => void;
   getDueCards: (lang: Language) => VocabularyItem[];
   getBoxCounts: (lang: Language) => number[];
   resetProgress: () => void;
   getTotalStats: (lang: Language) => { total: number; learned: number; dueToday: number; successRate: number };
+  recordTrainingDay: (lang: Language) => void;
+  getTrainingConsistency: (lang: Language, days: number) => { rate: number; daysActive: number; totalDays: number };
 }
 
 // Hilfsfunktion: migriert altes Format (customVocabulary mit english+spanish) ins neue Format
@@ -67,6 +75,10 @@ const defaultProgress = (): CardProgress => ({
 
 const LearningContext = createContext<LearningContextType | null>(null);
 
+function localDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 function todayDate(): Date {
   const d = new Date();
   d.setHours(0, 0, 0, 0);
@@ -75,9 +87,8 @@ function todayDate(): Date {
 
 function isCardDue(progress: CardProgress): boolean {
   if (progress.box >= 6) return false;
-  // Neues Feld: nextDate hat Vorrang
   if (progress.nextDate != null) {
-    return todayDate() >= new Date(progress.nextDate);
+    return localDateStr(new Date()) >= progress.nextDate;
   }
   // Rückwärtskompatibilität für Karten ohne nextDate
   if (!progress.lastReviewed) return true;
@@ -96,39 +107,69 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     customVocabularyEN: [],
     customVocabularyES: [],
     dailyCardLimit: 20,
-    dailyStats: { date: '', count: 0 },
+    dailyStats: { english: { date: '', count: 0 }, spanish: { date: '', count: 0 } },
+    quizAutoSpeak: false,
+    flashcardAutoSpeak: false,
+    trainingLog: { english: [], spanish: [] },
   });
   const [loaded, setLoaded] = useState(false);
+  // Track pending saves to avoid write-after-unmount issues
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        if (!parsed.dailyStats) parsed.dailyStats = { date: '', count: 0 };
+    (async () => {
+      // Migrate any existing localStorage data to IndexedDB on first run
+      await migrateFromLocalStorage(STORAGE_KEY);
 
-        // Migration: altes Format hatte customVocabulary (mit english + spanish)
-        if (parsed.customVocabulary !== undefined && parsed.customVocabularyEN === undefined) {
-          const { en, es } = migrateOldCustomVocab(parsed);
-          parsed.customVocabularyEN = en;
-          parsed.customVocabularyES = es;
-          delete parsed.customVocabulary;
+      const raw = await storageGet(STORAGE_KEY);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          // Migrate old flat dailyStats format to per-language
+          if (!parsed.dailyStats || !parsed.dailyStats.english) {
+            const old = parsed.dailyStats ?? { date: '', count: 0 };
+            parsed.dailyStats = {
+              english: { date: old.date ?? '', count: old.count ?? 0 },
+              spanish: { date: '', count: 0 },
+            };
+          }
+          // Migrate old flat array format to per-language record
+          if (!parsed.trainingLog || Array.isArray(parsed.trainingLog)) {
+            const old: string[] = Array.isArray(parsed.trainingLog) ? parsed.trainingLog : [];
+            parsed.trainingLog = { english: old, spanish: [] };
+          }
+          if (!parsed.trainingLog.english) parsed.trainingLog.english = [];
+          if (!parsed.trainingLog.spanish) parsed.trainingLog.spanish = [];
+
+          // Migration: altes Format hatte customVocabulary (mit english + spanish)
+          if (parsed.customVocabulary !== undefined && parsed.customVocabularyEN === undefined) {
+            const { en, es } = migrateOldCustomVocab(parsed);
+            parsed.customVocabularyEN = en;
+            parsed.customVocabularyES = es;
+            delete parsed.customVocabulary;
+          }
+          if (!parsed.customVocabularyEN) parsed.customVocabularyEN = [];
+          if (!parsed.customVocabularyES) parsed.customVocabularyES = [];
+
+          setState(parsed);
+        } catch {
+          // ignore parse errors
         }
-        if (!parsed.customVocabularyEN) parsed.customVocabularyEN = [];
-        if (!parsed.customVocabularyES) parsed.customVocabularyES = [];
-
-        setState(parsed);
-      } catch {
-        // ignore parse errors
       }
-    }
-    setLoaded(true);
+      setLoaded(true);
+    })();
   }, []);
 
   useEffect(() => {
-    if (loaded) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
+    if (!loaded) return;
+    // Debounce writes to avoid hammering IndexedDB on rapid state changes
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      storageSet(STORAGE_KEY, JSON.stringify(state));
+    }, 300);
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    };
   }, [state, loaded]);
 
   const getVocabForLang = (lang: Language): VocabularyItem[] =>
@@ -141,6 +182,8 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
   const setLanguage = (lang: Language) => setState(s => ({ ...s, selectedLanguage: lang }));
   const setQueryDirection = (dir: QueryDirection) => setState(s => ({ ...s, queryDirection: dir }));
   const setDailyCardLimit = (limit: number) => setState(s => ({ ...s, dailyCardLimit: limit }));
+  const setQuizAutoSpeak = (enabled: boolean) => setState(s => ({ ...s, quizAutoSpeak: enabled }));
+  const setFlashcardAutoSpeak = (enabled: boolean) => setState(s => ({ ...s, flashcardAutoSpeak: enabled }));
 
   const progressKey = (vocabId: string, lang: Language) => `${vocabId}_${lang}`;
 
@@ -154,13 +197,13 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       const newBox = correct ? Math.min(current.box + 1, 6) : 1;
 
       const today = todayDate();
-      const todayStr = today.toISOString().split('T')[0];
+      const todayStr = localDateStr(today);
       let nextDate: string | null;
       if (!correct) {
         // Falsch → Phase 1, morgen wieder fällig
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
-        nextDate = tomorrow.toISOString().split('T')[0];
+        nextDate = localDateStr(tomorrow);
       } else if (newBox >= 6) {
         // Phase 6 = gelernt, nie wieder fällig
         nextDate = null;
@@ -168,15 +211,16 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
         const intervalDays = BOX_INTERVALS[newBox - 1] as number;
         const next = new Date(today);
         next.setDate(next.getDate() + intervalDays);
-        nextDate = next.toISOString().split('T')[0];
+        nextDate = localDateStr(next);
       }
 
-      const prevDaily = s.dailyStats?.date === todayStr ? s.dailyStats : { date: todayStr, count: 0 };
-      const newDailyStats = { date: todayStr, count: prevDaily.count + 1 };
+      const langStats = s.dailyStats?.[lang];
+      const prevDaily = langStats?.date === todayStr ? langStats : { date: todayStr, count: 0 };
+      const newLangStats = { date: todayStr, count: prevDaily.count + 1 };
 
       return {
         ...s,
-        dailyStats: newDailyStats,
+        dailyStats: { ...s.dailyStats, [lang]: newLangStats },
         progress: {
           ...s.progress,
           [key]: {
@@ -191,9 +235,9 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const addCustomVocabulary = (item: Omit<VocabularyItem, 'id' | 'isCustom'>) => {
+  const addCustomVocabulary = (item: Omit<VocabularyItem, 'id' | 'isCustom'>, lang: Language) => {
     const newItem: VocabularyItem = { ...item, id: `custom_${Date.now()}`, isCustom: true };
-    if (state.selectedLanguage === 'english') {
+    if (lang === 'english') {
       setState(s => ({ ...s, customVocabularyEN: [...s.customVocabularyEN, newItem] }));
     } else {
       setState(s => ({ ...s, customVocabularyES: [...s.customVocabularyES, newItem] }));
@@ -209,8 +253,9 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
   };
 
   const getDueCards = (lang: Language): VocabularyItem[] => {
-    const todayStr = todayDate().toISOString().split('T')[0];
-    const reviewedToday = state.dailyStats?.date === todayStr ? state.dailyStats.count : 0;
+    const todayStr = localDateStr(todayDate());
+    const langStats = state.dailyStats?.[lang];
+    const reviewedToday = langStats?.date === todayStr ? langStats.count : 0;
     const effectiveLimit = state.dailyCardLimit > 0
       ? Math.max(0, state.dailyCardLimit - reviewedToday)
       : Infinity;
@@ -242,6 +287,41 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     return counts;
   };
 
+  const recordTrainingDay = (lang: Language) => {
+    const todayStr = localDateStr(new Date());
+    setState(s => {
+      const log = s.trainingLog[lang] ?? [];
+      if (log.includes(todayStr)) return s;
+      return { ...s, trainingLog: { ...s.trainingLog, [lang]: [...log, todayStr] } };
+    });
+  };
+
+  const getTrainingConsistency = (lang: Language, days: number): { rate: number; daysActive: number; totalDays: number } => {
+    const log = state.trainingLog[lang] ?? [];
+    const today = new Date();
+
+    // Denominator: only count days since the first recorded training day (can't be absent before tracking started)
+    let effectiveDays = days;
+    if (log.length > 0) {
+      const firstEntry = [...log].sort()[0];
+      const [y, m, d] = firstEntry.split('-').map(Number);
+      const firstDate = new Date(y, m - 1, d);
+      const msPerDay = 1000 * 60 * 60 * 24;
+      const daysSinceFirst = Math.round((todayDate().getTime() - firstDate.getTime()) / msPerDay);
+      effectiveDays = Math.min(days, daysSinceFirst + 1);
+    }
+
+    let daysActive = 0;
+    for (let i = 0; i < days; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      if (log.includes(localDateStr(d))) daysActive++;
+    }
+
+    const rate = effectiveDays > 0 ? Math.round((daysActive / effectiveDays) * 100) : 0;
+    return { rate, daysActive, totalDays: effectiveDays };
+  };
+
   const resetProgress = () => setState(s => ({ ...s, progress: {} }));
 
   const getTotalStats = (lang: Language) => {
@@ -268,6 +348,8 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       setLanguage,
       setQueryDirection,
       setDailyCardLimit,
+      setQuizAutoSpeak,
+      setFlashcardAutoSpeak,
       getCardProgress,
       markCard,
       addCustomVocabulary,
@@ -276,6 +358,8 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       getBoxCounts,
       resetProgress,
       getTotalStats,
+      recordTrainingDay,
+      getTrainingConsistency,
     }}>
       {children}
     </LearningContext.Provider>

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useLearning } from '../context/LearningContext';
+import { Language } from '../context/LearningContext';
 import { ALL_CATEGORIES, Category, VocabularyItem } from '../data/vocabulary';
 import { Colors } from '../constants/theme';
 
@@ -9,6 +10,7 @@ export default function Vocabulary() {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'Alle'>('Alle');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [formLang, setFormLang] = useState<Language>(selectedLanguage);
   const [form, setForm] = useState({ german: '', translation: '', emoji: '📝', category: 'Diverses' as Category, inflections: '' });
 
   const filtered = useMemo(() => allVocabulary.filter(v => {
@@ -17,15 +19,21 @@ export default function Vocabulary() {
     return matchesSearch && matchesCat;
   }), [allVocabulary, search, selectedCategory]);
 
-  const foreignLabel = selectedLanguage === 'english' ? 'Englisch *' : 'Spanisch *';
-  const foreignPlaceholder = selectedLanguage === 'english' ? 'English word' : 'Palabra en español';
+  const foreignLabel = formLang === 'english' ? 'Englisch *' : 'Spanisch *';
+  const foreignPlaceholder = formLang === 'english' ? 'English word' : 'Palabra en español';
+
+  const openAddModal = () => {
+    setFormLang(selectedLanguage);
+    setForm({ german: '', translation: '', emoji: '📝', category: 'Diverses', inflections: '' });
+    setShowAddModal(true);
+  };
 
   const handleAdd = () => {
     if (!form.german.trim() || !form.translation.trim()) {
-      alert(`Bitte Deutsch und ${selectedLanguage === 'english' ? 'Englisch' : 'Spanisch'} ausfüllen.`);
+      alert(`Bitte Deutsch und ${formLang === 'english' ? 'Englisch' : 'Spanisch'} ausfüllen.`);
       return;
     }
-    addCustomVocabulary({ german: form.german.trim(), translation: form.translation.trim(), emoji: form.emoji.trim() || '📝', category: form.category, inflections: form.inflections.trim() || undefined });
+    addCustomVocabulary({ german: form.german.trim(), translation: form.translation.trim(), emoji: form.emoji.trim() || '📝', category: form.category, inflections: form.inflections.trim() || undefined }, formLang);
     setForm({ german: '', translation: '', emoji: '📝', category: 'Diverses', inflections: '' });
     setShowAddModal(false);
   };
@@ -44,7 +52,7 @@ export default function Vocabulary() {
       <div style={{ background: 'linear-gradient(135deg, #2D1B69, #5B2D8E)', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <span style={{ fontSize: 20, fontWeight: 800, color: '#fff' }}>📚 Vokabeln</span>
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={openAddModal}
           style={{ background: Colors.accent, border: 'none', borderRadius: 999, padding: '7px 16px', fontSize: 14, fontWeight: 800, color: Colors.text, cursor: 'pointer' }}
         >
           + Neu
@@ -111,7 +119,27 @@ export default function Vocabulary() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'flex-end', zIndex: 1000 }} onClick={e => e.target === e.currentTarget && setShowAddModal(false)}>
           <div style={{ background: Colors.card, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: '20px 20px 40px', width: '100%', maxHeight: '85vh', overflowY: 'auto' }}>
             <div style={{ width: 40, height: 4, background: Colors.border, borderRadius: 2, margin: '0 auto 20px' }} />
-            <h3 style={{ fontSize: 22, fontWeight: 900, color: Colors.text, marginBottom: 16 }}>Neue Vokabel</h3>
+            <h3 style={{ fontSize: 22, fontWeight: 900, color: Colors.text, marginBottom: 12 }}>Neue Vokabel</h3>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>Sprache *</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {(['english', 'spanish'] as Language[]).map(lang => (
+                  <button
+                    key={lang}
+                    onClick={() => setFormLang(lang)}
+                    style={{
+                      flex: 1, padding: '9px 0', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', border: '1.5px solid',
+                      background: formLang === lang ? '#EDE8FF' : Colors.background,
+                      borderColor: formLang === lang ? Colors.purple : Colors.border,
+                      color: formLang === lang ? Colors.purple : Colors.textMuted,
+                    }}
+                  >
+                    {lang === 'english' ? '🇬🇧 Englisch' : '🇪🇸 Spanisch'}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {[
               { label: 'Emoji', key: 'emoji', placeholder: '📝' },

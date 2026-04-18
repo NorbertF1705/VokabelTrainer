@@ -4,6 +4,8 @@ import { Colors, BOX_LABELS } from '../constants/theme';
 interface FlashCardProps {
   frontText: string;
   backText: string;
+  frontLang: string;
+  backLang: string;
   emoji: string;
   category: string;
   boxNumber: number;
@@ -14,7 +16,7 @@ interface FlashCardProps {
 }
 
 export default function FlashCard({
-  frontText, backText, emoji, category, boxNumber, inflections, onFlip, forceReset, flipKey,
+  frontText, backText, frontLang, backLang, emoji, category, boxNumber, inflections, onFlip, forceReset, flipKey,
 }: FlashCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const isFlippedRef = useRef(false);
@@ -73,6 +75,9 @@ export default function FlashCard({
           }}>
             Klicken zum Aufdecken
           </span>
+          <span style={{ position: 'absolute', bottom: 14, left: 14, fontSize: 11, fontWeight: 700, color: Colors.textMuted, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+            {frontLang}
+          </span>
         </div>
 
         {/* BACK */}
@@ -90,6 +95,9 @@ export default function FlashCard({
           <div style={{ width: 40, height: 2, backgroundColor: Colors.border, margin: '10px 0' }} />
           <span style={{ fontSize: 18, color: Colors.textMuted, fontWeight: 600, textAlign: 'center' }}>
             {frontText}
+          </span>
+          <span style={{ position: 'absolute', bottom: 14, left: 14, fontSize: 11, fontWeight: 700, color: Colors.textMuted, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+            {backLang}
           </span>
         </div>
       </div>

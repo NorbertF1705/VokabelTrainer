@@ -10,7 +10,7 @@ const CARD_LIMITS = [
 ];
 
 export default function Settings() {
-  const { selectedLanguage, setLanguage, queryDirection, setQueryDirection, dailyCardLimit, setDailyCardLimit, resetProgress } = useLearning();
+  const { selectedLanguage, setLanguage, queryDirection, setQueryDirection, dailyCardLimit, setDailyCardLimit, resetProgress, quizAutoSpeak, setQuizAutoSpeak, flashcardAutoSpeak, setFlashcardAutoSpeak } = useLearning();
 
   const handleReset = () => {
     if (window.confirm('Wirklich den gesamten Lernfortschritt löschen? Alle Karten werden auf Fach 1 zurückgesetzt. Eigene Vokabeln bleiben erhalten.')) {
@@ -59,6 +59,7 @@ export default function Settings() {
             {[
               { dir: 'de-to-foreign' as const, emoji: '🇩🇪', label: 'Deutsch → Fremdsprache' },
               { dir: 'foreign-to-de' as const, emoji: '🔄', label: 'Fremdsprache → Deutsch' },
+              { dir: 'random' as const, emoji: '🎲', label: 'Zufällig gemischt' },
             ].map(({ dir, emoji, label }, idx) => (
               <div key={dir}>
                 {idx > 0 && <div style={{ height: 1, background: Colors.border, margin: '0 16px' }} />}
@@ -76,6 +77,62 @@ export default function Settings() {
                 </button>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Quiz – Antwort vorlesen */}
+        <section style={{ marginBottom: 28 }}>
+          <p style={sectionTitle}>Quiz</p>
+          <div style={card}>
+            <button
+              onClick={() => setQuizAutoSpeak(!quizAutoSpeak)}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
+            >
+              <span style={{ fontSize: 22, width: 32, textAlign: 'center' }}>🔈</span>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <div style={{ fontSize: 16, fontWeight: 600, color: Colors.text }}>Lösung vorlesen</div>
+                <div style={{ fontSize: 12, color: Colors.textMuted, marginTop: 2 }}>Spricht die richtige Antwort beim Antippen vor</div>
+              </div>
+              <div style={{
+                width: 44, height: 26, borderRadius: 13,
+                background: quizAutoSpeak ? Colors.purple : Colors.border,
+                position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+              }}>
+                <div style={{
+                  position: 'absolute', top: 3, left: quizAutoSpeak ? 21 : 3,
+                  width: 20, height: 20, borderRadius: 10, background: '#fff',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.2)', transition: 'left 0.2s',
+                }} />
+              </div>
+            </button>
+          </div>
+        </section>
+
+        {/* Karteikarten – Antwort vorlesen */}
+        <section style={{ marginBottom: 28 }}>
+          <p style={sectionTitle}>Karteikarten</p>
+          <div style={card}>
+            <button
+              onClick={() => setFlashcardAutoSpeak(!flashcardAutoSpeak)}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
+            >
+              <span style={{ fontSize: 22, width: 32, textAlign: 'center' }}>🔈</span>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <div style={{ fontSize: 16, fontWeight: 600, color: Colors.text }}>Lösung vorlesen</div>
+                <div style={{ fontSize: 12, color: Colors.textMuted, marginTop: 2 }}>Spricht die Rückseite beim Umdrehen vor</div>
+              </div>
+              <div style={{
+                width: 44, height: 26, borderRadius: 13,
+                background: flashcardAutoSpeak ? Colors.purple : Colors.border,
+                position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+              }}>
+                <div style={{
+                  position: 'absolute', top: 3, left: flashcardAutoSpeak ? 21 : 3,
+                  width: 20, height: 20, borderRadius: 10, background: '#fff',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.2)', transition: 'left 0.2s',
+                }} />
+              </div>
+            </button>
           </div>
         </section>
 
@@ -113,16 +170,6 @@ export default function Settings() {
           <p style={{ fontSize: 12, color: Colors.textMuted, textAlign: 'center', marginTop: 8, fontWeight: 500 }}>Eigene Vokabeln bleiben erhalten</p>
         </section>
 
-        {/* App beenden */}
-        <section>
-          <p style={sectionTitle}>App</p>
-          <button
-            onClick={() => window.close()}
-            style={{ width: '100%', padding: '14px 0', background: '#F0F0F5', border: `2px solid ${Colors.border}`, borderRadius: 12, fontSize: 15, fontWeight: 700, color: Colors.textMuted, cursor: 'pointer' }}
-          >
-            ✕  App beenden
-          </button>
-        </section>
       </div>
     </div>
   );
