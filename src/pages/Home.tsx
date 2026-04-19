@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLearning, Language, QueryDirection } from '../context/LearningContext';
 import { Colors, BOX_LABELS } from '../constants/theme';
 import { LANGUAGE_CONFIG, ALL_LANGUAGES } from '../constants/languages';
+import { APP_VERSION } from '../version';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -48,6 +49,9 @@ export default function Home() {
           <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: -1, margin: 0, textAlign: 'center' }}>Norbert's VokabelTrainer</h1>
           <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 6, fontWeight: 500 }}>
             Lerne täglich – Schritt für Schritt
+          </p>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 4, fontWeight: 500 }}>
+            v{APP_VERSION}
           </p>
         </div>
       </div>
