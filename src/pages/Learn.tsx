@@ -3,6 +3,7 @@ import { useLearning } from '../context/LearningContext';
 import FlashCard from '../components/FlashCard';
 import { Colors } from '../constants/theme';
 import { VocabularyItem } from '../data/vocabulary';
+import { LANGUAGE_CONFIG } from '../constants/languages';
 
 type SessionMode = 'due' | 'all' | 'quiz';
 
@@ -112,7 +113,7 @@ export default function Learn() {
   const speakWord = () => {
     if (!currentCard) return;
     const text = isFlipped ? backText : frontText;
-    const foreignLang = selectedLanguage === 'english' ? 'en-US' : 'es-ES';
+    const foreignLang = LANGUAGE_CONFIG[selectedLanguage].speechCode;
     const lang = isFlipped
       ? (effectiveDirection === 'de-to-foreign' ? foreignLang : 'de-DE')
       : (effectiveDirection === 'de-to-foreign' ? 'de-DE' : foreignLang);
@@ -174,7 +175,7 @@ export default function Learn() {
     setQuizFlipKey(k => k + 1);
     if (quizAutoSpeak) {
       const textToSpeak = currentCard[answerField] as string;
-      const foreignLang = selectedLanguage === 'english' ? 'en-US' : 'es-ES';
+      const foreignLang = LANGUAGE_CONFIG[selectedLanguage].speechCode;
       const lang = answerField === 'translation' ? foreignLang : 'de-DE';
       speak(textToSpeak, lang);
     }
@@ -281,8 +282,8 @@ export default function Learn() {
             <FlashCard
               frontText={frontText}
               backText={backText}
-              frontLang={effectiveDirection === 'de-to-foreign' ? 'Deutsch' : (selectedLanguage === 'english' ? 'Englisch' : 'Spanisch')}
-              backLang={effectiveDirection === 'de-to-foreign' ? (selectedLanguage === 'english' ? 'Englisch' : 'Spanisch') : 'Deutsch'}
+              frontLang={effectiveDirection === 'de-to-foreign' ? 'Deutsch' : (LANGUAGE_CONFIG[selectedLanguage].label)}
+              backLang={effectiveDirection === 'de-to-foreign' ? (LANGUAGE_CONFIG[selectedLanguage].label) : 'Deutsch'}
               emoji={currentCard!.emoji}
               category={currentCard!.category}
               boxNumber={boxNumber}
@@ -350,8 +351,8 @@ export default function Learn() {
           <FlashCard
             frontText={frontText}
             backText={backText}
-            frontLang={effectiveDirection === 'de-to-foreign' ? 'Deutsch' : (selectedLanguage === 'english' ? 'Englisch' : 'Spanisch')}
-            backLang={effectiveDirection === 'de-to-foreign' ? (selectedLanguage === 'english' ? 'Englisch' : 'Spanisch') : 'Deutsch'}
+            frontLang={effectiveDirection === 'de-to-foreign' ? 'Deutsch' : (LANGUAGE_CONFIG[selectedLanguage].label)}
+            backLang={effectiveDirection === 'de-to-foreign' ? (LANGUAGE_CONFIG[selectedLanguage].label) : 'Deutsch'}
             emoji={currentCard!.emoji}
             category={currentCard!.category}
             boxNumber={boxNumber}
@@ -359,7 +360,7 @@ export default function Learn() {
             onFlip={(flipped) => {
               setIsFlipped(flipped);
               if (flipped && flashcardAutoSpeak && currentCard) {
-                const foreignLang = selectedLanguage === 'english' ? 'en-US' : 'es-ES';
+                const foreignLang = LANGUAGE_CONFIG[selectedLanguage].speechCode;
                 const lang = effectiveDirection === 'de-to-foreign' ? foreignLang : 'de-DE';
                 speak(backText, lang);
               }

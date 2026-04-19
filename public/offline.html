@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#2D1B69">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Offline – VokabelTrainer</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #F0EAFF;
+      color: #2D1B69;
+      text-align: center;
+      padding: 2rem;
+      box-sizing: border-box;
+    }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    p  { font-size: 1rem; line-height: 1.6; max-width: 360px; margin: 0; }
+    button {
+      margin-top: 2rem;
+      padding: .75rem 2rem;
+      background: #2D1B69;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Keine Verbindung</h1>
+  <p>Die App konnte nicht geladen werden. Bitte stelle eine Internetverbindung her
+     und versuche es erneut, damit die App neu gespeichert wird.</p>
+  <button onclick="window.location.reload()">Erneut versuchen</button>
+</body>
+</html>

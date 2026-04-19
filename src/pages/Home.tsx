@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useLearning, Language, QueryDirection } from '../context/LearningContext';
 import { Colors, BOX_LABELS } from '../constants/theme';
+import { LANGUAGE_CONFIG, ALL_LANGUAGES } from '../constants/languages';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -8,14 +9,18 @@ export default function Home() {
 
   const boxCounts = getBoxCounts(selectedLanguage);
 
-  const langConfig: { lang: Language; label: string; flag: string }[] = [
-    { lang: 'english', label: 'Englisch', flag: '🇬🇧' },
-    { lang: 'spanish', label: 'Spanisch', flag: '🇪🇸' },
-  ];
+  const langConfig = ALL_LANGUAGES.map(lang => ({
+    lang,
+    label: LANGUAGE_CONFIG[lang].label,
+    flag: LANGUAGE_CONFIG[lang].flag,
+  }));
 
-  const dirConfig: { dir: QueryDirection; label: string }[] = selectedLanguage === 'english'
-    ? [{ dir: 'de-to-foreign', label: 'DE → EN' }, { dir: 'foreign-to-de', label: 'EN → DE' }, { dir: 'random', label: '🎲 Zufall' }]
-    : [{ dir: 'de-to-foreign', label: 'DE → ES' }, { dir: 'foreign-to-de', label: 'ES → DE' }, { dir: 'random', label: '🎲 Zufall' }];
+  const abbr = LANGUAGE_CONFIG[selectedLanguage].abbr;
+  const dirConfig: { dir: QueryDirection; label: string }[] = [
+    { dir: 'de-to-foreign', label: `DE → ${abbr}` },
+    { dir: 'foreign-to-de', label: `${abbr} → DE` },
+    { dir: 'random', label: '🎲 Zufall' },
+  ];
 
   return (
     <div style={{ background: Colors.background, minHeight: '100%' }}>
@@ -147,7 +152,7 @@ export default function Home() {
 
         {/* Phase 6 Boxes */}
         <section style={{ marginTop: 24 }}>
-          <p style={sectionTitle}>Lernkartei – Status {selectedLanguage === 'english' ? 'Englisch' : 'Spanisch'}</p>
+          <p style={sectionTitle}>Lernkartei – Status {LANGUAGE_CONFIG[selectedLanguage].label}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             {BOX_LABELS.map((label, i) => (
               <div key={i} style={{

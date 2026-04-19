@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useLearning, Language } from '../context/LearningContext';
-import { VOCABULARY_EN, VOCABULARY_ES, ALL_CATEGORIES, VocabularyItem } from '../data/vocabulary';
+import { ALL_CATEGORIES, VocabularyItem } from '../data/vocabulary';
 import { Colors, BOX_LABELS } from '../constants/theme';
+import { LANGUAGE_CONFIG, ALL_LANGUAGES } from '../constants/languages';
 
 function localDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -20,23 +21,21 @@ function getLast7Days(trainingLog: string[]): { date: string; trained: boolean; 
   return days;
 }
 
-const langConfig: { lang: Language; label: string; flag: string }[] = [
-  { lang: 'english', label: 'Englisch', flag: '🇬🇧' },
-  { lang: 'spanish', label: 'Spanisch', flag: '🇪🇸' },
-];
+const langConfig = ALL_LANGUAGES.map(lang => ({
+  lang,
+  label: LANGUAGE_CONFIG[lang].label,
+  flag: LANGUAGE_CONFIG[lang].flag,
+}));
 
 export default function Statistics() {
   const {
     selectedLanguage, getTotalStats, getBoxCounts, getDueCards, getCardProgress,
-    resetProgress, getTrainingConsistency, trainingLog, customVocabularyEN, customVocabularyES,
+    resetProgress, getTrainingConsistency, trainingLog, getVocabularyForLang,
   } = useLearning();
 
   const [detailLang, setDetailLang] = useState<Language>(selectedLanguage);
 
-  const getVocab = (lang: Language): VocabularyItem[] =>
-    lang === 'english'
-      ? [...VOCABULARY_EN, ...customVocabularyEN]
-      : [...VOCABULARY_ES, ...customVocabularyES];
+  const getVocab = (lang: Language): VocabularyItem[] => getVocabularyForLang(lang);
 
   const stats = getTotalStats(detailLang);
   const boxCounts = getBoxCounts(detailLang);

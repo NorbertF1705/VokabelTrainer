@@ -1,5 +1,7 @@
 import { useLearning } from '../context/LearningContext';
 import { Colors } from '../constants/theme';
+import { LANGUAGE_CONFIG, ALL_LANGUAGES } from '../constants/languages';
+import SWStatusPanel from '../components/SWStatusPanel';
 
 const CARD_LIMITS = [
   { label: '10', value: 10 },
@@ -29,10 +31,9 @@ export default function Settings() {
         <section style={{ marginBottom: 28 }}>
           <p style={sectionTitle}>Lernsprache</p>
           <div style={card}>
-            {[
-              { lang: 'english' as const, emoji: '🇬🇧', label: 'Englisch' },
-              { lang: 'spanish' as const, emoji: '🇪🇸', label: 'Spanisch' },
-            ].map(({ lang, emoji, label }, idx) => (
+            {ALL_LANGUAGES.map((lang, idx) => {
+              const { flag: emoji, label } = LANGUAGE_CONFIG[lang];
+              return (
               <div key={lang}>
                 {idx > 0 && <div style={{ height: 1, background: Colors.border, margin: '0 16px' }} />}
                 <button
@@ -48,7 +49,7 @@ export default function Settings() {
                   {selectedLanguage === lang && <span style={{ fontSize: 16, color: Colors.purple, fontWeight: 900 }}>✓</span>}
                 </button>
               </div>
-            ))}
+            );})}
           </div>
         </section>
 
@@ -157,6 +158,8 @@ export default function Settings() {
             ))}
           </div>
         </section>
+
+        <SWStatusPanel />
 
         {/* Fortschritt zurücksetzen */}
         <section style={{ marginBottom: 28 }}>

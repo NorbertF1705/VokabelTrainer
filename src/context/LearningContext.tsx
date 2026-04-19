@@ -2,8 +2,9 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import { VOCABULARY_EN, VOCABULARY_ES, VocabularyItem } from '../data/vocabulary';
 import { BOX_INTERVALS } from '../constants/theme';
 import { storageGet, storageSet, migrateFromLocalStorage } from '../utils/storage';
+import { Language } from '../constants/languages';
 
-export type Language = 'english' | 'spanish';
+export type { Language } from '../constants/languages';
 export type QueryDirection = 'de-to-foreign' | 'foreign-to-de' | 'random';
 
 export interface CardProgress {
@@ -40,6 +41,7 @@ interface LearningContextType extends LearningState {
   markCard: (vocabId: string, lang: Language, correct: boolean) => void;
   addCustomVocabulary: (item: Omit<VocabularyItem, 'id' | 'isCustom'>, lang: Language) => void;
   deleteCustomVocabulary: (id: string) => void;
+  getVocabularyForLang: (lang: Language) => VocabularyItem[];
   getDueCards: (lang: Language) => VocabularyItem[];
   getBoxCounts: (lang: Language) => number[];
   resetProgress: () => void;
@@ -345,6 +347,7 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     <LearningContext.Provider value={{
       ...state,
       allVocabulary,
+      getVocabularyForLang: getVocabForLang,
       setLanguage,
       setQueryDirection,
       setDailyCardLimit,

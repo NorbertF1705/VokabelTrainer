@@ -1,36 +1,44 @@
 import { useState, useMemo } from 'react';
 import { useLearning } from '../context/LearningContext';
 import { Language } from '../context/LearningContext';
+import { LANGUAGE_CONFIG, ALL_LANGUAGES } from '../constants/languages';
 import { ALL_CATEGORIES, Category, VocabularyItem } from '../data/vocabulary';
 import { Colors } from '../constants/theme';
 
-export default function Vocabulary() {
-  const { allVocabulary, selectedLanguage, getCardProgress, addCustomVocabulary, deleteCustomVocabulary } = useLearning();
+const BOX_FILTER = ['Alle', 1, 2, 3, 4, 5, 6] as const;
+type BoxFilter = typeof BOX_FILTER[number];
 
+export default function Vocabulary() {
+  const { selectedLanguage, getCardProgress, addCustomVocabulary, deleteCustomVocabulary, getVocabularyForLang } = useLearning();
+
+  const [viewLang, setViewLang] = useState<Language>(selectedLanguage);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'Alle'>('Alle');
+  const [selectedBox, setSelectedBox] = useState<BoxFilter>('Alle');
   const [showAddModal, setShowAddModal] = useState(false);
   const [formLang, setFormLang] = useState<Language>(selectedLanguage);
   const [form, setForm] = useState({ german: '', translation: '', emoji: '📝', category: 'Diverses' as Category, inflections: '' });
 
-  const filtered = useMemo(() => allVocabulary.filter(v => {
+  const allViewVocabulary = getVocabularyForLang(viewLang);
+
+  const filtered = useMemo(() => allViewVocabulary.filter(v => {
     const matchesSearch = !search || [v.german, v.translation].some(t => t.toLowerCase().includes(search.toLowerCase()));
     const matchesCat = selectedCategory === 'Alle' || v.category === selectedCategory;
-    return matchesSearch && matchesCat;
-  }), [allVocabulary, search, selectedCategory]);
+    const matchesBox = selectedBox === 'Alle' || getCardProgress(v.id, viewLang).box === selectedBox;
+    return matchesSearch && matchesCat && matchesBox;
+  }), [allViewVocabulary, search, selectedCategory, selectedBox, viewLang]);
 
-  const foreignLabel = formLang === 'english' ? 'Englisch *' : 'Spanisch *';
-  const foreignPlaceholder = formLang === 'english' ? 'English word' : 'Palabra en español';
+  const langCfg = LANGUAGE_CONFIG[formLang];
 
   const openAddModal = () => {
-    setFormLang(selectedLanguage);
+    setFormLang(viewLang);
     setForm({ german: '', translation: '', emoji: '📝', category: 'Diverses', inflections: '' });
     setShowAddModal(true);
   };
 
   const handleAdd = () => {
     if (!form.german.trim() || !form.translation.trim()) {
-      alert(`Bitte Deutsch und ${formLang === 'english' ? 'Englisch' : 'Spanisch'} ausfüllen.`);
+      alert(`Bitte Deutsch und ${LANGUAGE_CONFIG[formLang].label} ausfüllen.`);
       return;
     }
     addCustomVocabulary({ german: form.german.trim(), translation: form.translation.trim(), emoji: form.emoji.trim() || '📝', category: form.category, inflections: form.inflections.trim() || undefined }, formLang);
@@ -59,6 +67,25 @@ export default function Vocabulary() {
         </button>
       </div>
 
+      {/* Language Switcher */}
+      <div style={{ display: 'flex', gap: 8, padding: '10px 20px 0', flexShrink: 0 }}>
+        {ALL_LANGUAGES.map(lang => (
+          <button
+            key={lang}
+            onClick={() => setViewLang(lang)}
+            style={{
+              flex: 1, padding: '9px 0', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer',
+              border: '1.5px solid',
+              background: viewLang === lang ? '#EDE8FF' : Colors.card,
+              borderColor: viewLang === lang ? Colors.purple : Colors.border,
+              color: viewLang === lang ? Colors.purple : Colors.textMuted,
+            }}
+          >
+            {LANGUAGE_CONFIG[lang].flag} {LANGUAGE_CONFIG[lang].label}
+          </button>
+        ))}
+      </div>
+
       {/* Search */}
       <div style={{ padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
         <input
@@ -70,7 +97,7 @@ export default function Vocabulary() {
       </div>
 
       {/* Category Filter */}
-      <div style={{ overflowX: 'auto', paddingBottom: 6, flexShrink: 0, WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
+      <div style={{ overflowX: 'auto', paddingBottom: 4, flexShrink: 0, WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
         <div style={{ display: 'flex', gap: 8, padding: '0 20px', width: 'max-content' }}>
           {categories.map(cat => (
             <button
@@ -87,10 +114,34 @@ export default function Vocabulary() {
         </div>
       </div>
 
+      {/* Box Filter */}
+      <div style={{ overflowX: 'auto', paddingBottom: 8, flexShrink: 0, WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
+        <div style={{ display: 'flex', gap: 8, padding: '4px 20px', width: 'max-content' }}>
+          {BOX_FILTER.map(box => {
+            const isActive = selectedBox === box;
+            const boxColor = box === 'Alle' ? Colors.purple : Colors.boxColors[(box as number) - 1];
+            return (
+              <button
+                key={box}
+                onClick={() => setSelectedBox(box)}
+                style={{
+                  padding: '5px 14px', borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: '1.5px solid',
+                  background: isActive ? '#EDE8FF' : Colors.card,
+                  borderColor: isActive ? boxColor : 'transparent',
+                  color: isActive ? boxColor : Colors.textMuted,
+                }}
+              >
+                {box === 'Alle' ? 'Alle Fächer' : `Fach ${box}`}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* List */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 20px 24px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '4px 20px 24px' }}>
         {filtered.map(item => {
-          const prog = getCardProgress(item.id, selectedLanguage);
+          const prog = getCardProgress(item.id, viewLang);
           const boxColor = Colors.boxColors[Math.min(prog.box - 1, 5)];
           return (
             <div key={item.id} style={{ display: 'flex', alignItems: 'center', background: Colors.card, borderRadius: 12, padding: '12px 14px', marginBottom: 8, gap: 12, boxShadow: '0 2px 6px rgba(45,27,105,0.06)' }}>
@@ -124,7 +175,7 @@ export default function Vocabulary() {
             <div style={{ marginBottom: 16 }}>
               <label style={{ fontSize: 12, fontWeight: 700, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>Sprache *</label>
               <div style={{ display: 'flex', gap: 8 }}>
-                {(['english', 'spanish'] as Language[]).map(lang => (
+                {ALL_LANGUAGES.map(lang => (
                   <button
                     key={lang}
                     onClick={() => setFormLang(lang)}
@@ -135,7 +186,7 @@ export default function Vocabulary() {
                       color: formLang === lang ? Colors.purple : Colors.textMuted,
                     }}
                   >
-                    {lang === 'english' ? '🇬🇧 Englisch' : '🇪🇸 Spanisch'}
+                    {LANGUAGE_CONFIG[lang].flag} {LANGUAGE_CONFIG[lang].label}
                   </button>
                 ))}
               </div>
@@ -144,7 +195,7 @@ export default function Vocabulary() {
             {[
               { label: 'Emoji', key: 'emoji', placeholder: '📝' },
               { label: 'Deutsch *', key: 'german', placeholder: 'Deutsches Wort' },
-              { label: foreignLabel, key: 'translation', placeholder: foreignPlaceholder },
+              { label: `${langCfg.label} *`, key: 'translation', placeholder: langCfg.placeholder },
               { label: 'Beugungsformen (optional)', key: 'inflections', placeholder: 'z.B. [dogs] oder [lief, gelaufen]' },
             ].map(({ label, key, placeholder }) => (
               <div key={key} style={{ marginBottom: 12 }}>
