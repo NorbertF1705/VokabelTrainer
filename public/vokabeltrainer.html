@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VokabelTrainer v2.0</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vokabeln">
+<style>
+:root {
+  --bg: #0A1628;
+  --bg2: #111f35;
+  --surface: #172336;
+  --surface2: #1e2f47;
+  --surface3: #263a57;
+  --accent: #3ecfbb;
+  --accent-dim: rgba(62,207,187,0.15);
+  --red: #f4645f;
+  --red-dim: rgba(244,100,95,0.15);
+  --yellow: #f5c842;
+  --yellow-dim: rgba(245,200,66,0.12);
+  --green: #5bcf87;
+  --green-dim: rgba(91,207,135,0.15);
+  --blue: #5b9cf6;
+  --text: #e8eef6;
+  --text-muted: #6b84a0;
+  --text-dim: #3d5570;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --nav-h: 72px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{
+  font-family:'SF Pro Text',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  color:var(--text);
+  overscroll-behavior:none;
+  -webkit-font-smoothing:antialiased;
+}
+#app{display:flex;flex-direction:column;height:100%;max-width:430px;margin:0 auto;position:relative;overflow:hidden}
+
+/* ── HEADER ─────────────────────────────────── */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;
+  padding-top:max(14px,env(safe-area-inset-top));
+  background:var(--bg);
+  z-index:10;border-bottom:1px solid rgba(255,255,255,0.04);
+  flex-shrink:0;
+}
+.header-title{font-size:1.1rem;font-weight:700;letter-spacing:-0.02em}
+.version-tag{
+  font-size:0.65rem;font-weight:700;letter-spacing:0.08em;
+  background:var(--accent-dim);color:var(--accent);
+  padding:3px 8px;border-radius:100px;
+}
+
+/* ── SCREENS ─────────────────────────────────── */
+.screen-wrap{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--nav-h) + 16px)}
+.screen{display:none;padding:18px 20px;animation:fadeUp .22s ease}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── BOTTOM NAV ──────────────────────────────── */
+#bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  background:rgba(10,22,40,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,0.06);
+  display:flex;z-index:100;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:10px 0;background:none;border:none;
+  color:var(--text-dim);font-size:0.6rem;font-weight:600;letter-spacing:0.04em;
+  cursor:pointer;transition:color .2s;min-height:var(--nav-h);
+  font-family:inherit;
+}
+.nav-btn .nav-icon{font-size:1.3rem;line-height:1;transition:transform .2s}
+.nav-btn.active{color:var(--accent)}
+.nav-btn.active .nav-icon{transform:scale(1.1)}
+
+/* ── CARD ────────────────────────────────────── */
+.card{
+  background:var(--surface);border-radius:var(--radius);
+  padding:20px;margin-bottom:14px;
+  border:1px solid rgba(255,255,255,0.04);
+}
+.card-inset{background:var(--surface2);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px}
+
+/* ── BUTTONS ─────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:15px 24px;border-radius:var(--radius-sm);border:none;
+  font-size:0.95rem;font-weight:700;cursor:pointer;
+  transition:opacity .15s,transform .1s;min-height:52px;width:100%;
+  font-family:inherit;letter-spacing:-0.01em;
+}
+.btn:active{transform:scale(0.97);opacity:0.88}
+.btn-primary{background:var(--accent);color:#0A1628}
+.btn-danger{background:var(--red);color:#fff}
+.btn-success{background:var(--green);color:#0A1628}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid rgba(255,255,255,0.06)}
+.btn-outline{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.btn-sm{padding:10px 16px;font-size:0.82rem;min-height:40px}
+.btn-icon{width:52px;min-height:52px;padding:0;flex-shrink:0}
+
+/* ── QUIZ OPTIONS ────────────────────────────── */
+.quiz-grid{display:grid;gap:10px;grid-template-columns:1fr 1fr;margin-top:16px}
+.quiz-opt{
+  background:var(--surface2);border:1.5px solid rgba(255,255,255,0.06);
+  border-radius:var(--radius-sm);padding:18px 12px;
+  font-size:0.95rem;font-weight:600;cursor:pointer;text-align:center;
+  transition:all .18s;min-height:64px;color:var(--text);font-family:inherit;
+  display:flex;align-items:center;justify-content:center;
+}
+.quiz-opt:active{transform:scale(0.97)}
+.quiz-opt.correct{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+.quiz-opt.wrong{background:var(--red-dim);border-color:var(--red);color:var(--red)}
+.quiz-opt:disabled{cursor:default}
+
+/* ── INPUTS ──────────────────────────────────── */
+.igroup{margin-bottom:14px}
+.igroup label{display:block;font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;letter-spacing:0.04em;text-transform:uppercase}
+.ifield{
+  width:100%;background:var(--surface2);
+  border:1.5px solid rgba(255,255,255,0.07);
+  border-radius:var(--radius-sm);padding:13px 15px;
+  color:var(--text);font-size:0.95rem;font-family:inherit;outline:none;
+  transition:border-color .2s;
+}
+.ifield:focus{border-color:var(--accent)}
+textarea.ifield{resize:none;min-height:72px;line-height:1.5}
+.ifield::placeholder{color:var(--text-dim)}
+
+/* ── BADGE ───────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;letter-spacing:0.03em}
+.b0{background:var(--red-dim);color:var(--red)}
+.b1{background:var(--yellow-dim);color:var(--yellow)}
+.b2{background:var(--accent-dim);color:var(--accent)}
+.b3{background:var(--green-dim);color:var(--green)}
+
+/* ── LEARN CARD ──────────────────────────────── */
+.learn-wrap{
+  background:var(--surface);border-radius:22px;
+  padding:30px 24px;text-align:center;
+  border:1px solid rgba(255,255,255,0.05);
+  margin-bottom:16px;min-height:210px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+}
+.learn-word{font-size:2.2rem;font-weight:800;color:var(--accent);letter-spacing:-0.03em}
+.learn-translation{font-size:1.4rem;font-weight:600;color:var(--text)}
+.learn-sub{font-size:0.82rem;color:var(--text-muted);font-weight:500}
+.learn-img{max-width:110px;max-height:110px;border-radius:14px;object-fit:cover}
+.learn-emoji{font-size:3.5rem;line-height:1}
+.mnemonic-box{
+  background:var(--yellow-dim);border-left:3px solid var(--yellow);
+  padding:11px 14px;border-radius:0 10px 10px 0;
+  font-size:0.87rem;line-height:1.5;text-align:left;width:100%;color:var(--text)
+}
+.example-text{font-style:italic;font-size:0.82rem;color:var(--text-muted);line-height:1.5}
+.flip-hint{font-size:0.75rem;color:var(--text-dim);display:flex;align-items:center;gap:4px}
+
+/* ── PROGRESS BAR ────────────────────────────── */
+.prog-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.prog-bar-track{height:5px;background:var(--surface);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.prog-bar-fill{height:100%;border-radius:3px;background:var(--accent);transition:width .4s ease}
+
+/* ── STATS BARS ──────────────────────────────── */
+.sbar-row{margin-bottom:13px}
+.sbar-meta{display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:5px}
+.sbar-track{height:7px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:4px;transition:width .7s ease}
+
+/* ── VOCAB ITEM ──────────────────────────────── */
+.vocab-item{
+  display:flex;align-items:center;gap:13px;
+  padding:13px 0;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;
+  transition:background .15s;
+}
+.vocab-item:last-child{border-bottom:none}
+.vocab-thumb{
+  width:46px;height:46px;border-radius:10px;
+  background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;flex-shrink:0;overflow:hidden;
+}
+.vocab-thumb img{width:100%;height:100%;object-fit:cover}
+.vocab-info{flex:1;min-width:0}
+.vocab-frage{font-weight:700;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vocab-antwort{color:var(--text-muted);font-size:0.8rem;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── MODAL ───────────────────────────────────── */
+#modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.65);z-index:200;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+#modal-overlay.open{display:block}
+.modal-sheet{
+  background:var(--surface);
+  border-radius:24px 24px 0 0;padding:10px 20px 24px;
+  padding-bottom:max(24px,env(safe-area-inset-bottom));
+  position:absolute;bottom:0;left:0;right:0;
+  max-height:94vh;overflow-y:auto;
+  animation:slideUp .28s ease;
+}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:36px;height:4px;background:var(--surface3);border-radius:2px;margin:0 auto 20px}
+.modal-title{font-size:1.2rem;font-weight:800;margin-bottom:18px;letter-spacing:-0.02em}
+
+/* ── TOAST ───────────────────────────────────── */
+#toast{
+  position:fixed;bottom:calc(var(--nav-h) + 14px);left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:var(--surface3);color:var(--text);
+  padding:11px 20px;border-radius:100px;font-size:0.85rem;font-weight:600;
+  opacity:0;transition:all .25s;z-index:500;
+  white-space:nowrap;border:1px solid rgba(255,255,255,0.08);
+  pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── SEGMENT ─────────────────────────────────── */
+.seg{display:flex;background:var(--surface2);border-radius:11px;padding:3px;gap:2px}
+.seg-btn{
+  flex:1;padding:9px 6px;text-align:center;border-radius:8px;
+  font-size:0.78rem;font-weight:700;cursor:pointer;
+  transition:all .2s;color:var(--text-muted);
+  border:none;background:none;font-family:inherit;letter-spacing:0.01em;
+}
+.seg-btn.active{background:var(--accent);color:#0A1628}
+
+/* ── SETTING ROW ─────────────────────────────── */
+.set-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:15px 0;border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.set-row:last-child{border-bottom:none}
+.set-label{font-weight:600;font-size:0.92rem}
+.set-desc{font-size:0.76rem;color:var(--text-muted);margin-top:3px}
+.toggle{
+  width:50px;height:30px;background:var(--surface3);border-radius:15px;
+  position:relative;cursor:pointer;transition:background .25s;border:none;flex-shrink:0;
+}
+.toggle.on{background:var(--accent)}
+.toggle::after{
+  content:'';position:absolute;
+  width:24px;height:24px;background:white;border-radius:50%;
+  top:3px;left:3px;transition:transform .25s;box-shadow:0 2px 6px rgba(0,0,0,0.3);
+}
+.toggle.on::after{transform:translateX(20px)}
+
+/* ── DIVIDER ─────────────────────────────────── */
+.divider{font-size:0.7rem;font-weight:800;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;margin:20px 0 10px}
+
+/* ── EMPTY STATE ─────────────────────────────── */
+.empty{text-align:center;padding:50px 20px;color:var(--text-muted)}
+.empty .e-icon{font-size:3rem;margin-bottom:14px}
+.empty p{font-size:0.88rem;line-height:1.6}
+
+/* ── STAT GRID ───────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-tile{background:var(--surface);border-radius:var(--radius);padding:16px;text-align:center;border:1px solid rgba(255,255,255,0.04)}
+.stat-num{font-size:2rem;font-weight:800;letter-spacing:-0.03em}
+.stat-lbl{font-size:0.72rem;color:var(--text-muted);margin-top:3px;font-weight:600}
+
+/* ── SESSION DONE ────────────────────────────── */
+.done-screen{text-align:center;padding:40px 0}
+.done-icon{font-size:4rem;margin-bottom:16px;display:block}
+.done-screen h2{font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:8px}
+.done-screen p{color:var(--text-muted);font-size:0.9rem;margin-bottom:24px;line-height:1.5}
+
+/* ── IMG UPLOAD ──────────────────────────────── */
+.upload-area{
+  border:2px dashed rgba(255,255,255,0.12);border-radius:var(--radius-sm);
+  padding:20px;text-align:center;cursor:pointer;
+  transition:border-color .2s;color:var(--text-muted);font-size:0.85rem;
+}
+.upload-area:hover{border-color:var(--accent)}
+.upload-area img{max-width:100%;max-height:140px;border-radius:10px;margin-top:10px}
+
+/* ── RING ────────────────────────────────────── */
+.ring-wrap{display:flex;justify-content:center;margin:8px 0 20px}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="header">
+    <div class="header-title" id="header-title">VokabelTrainer</div>
+    <div class="version-tag">v2.0</div>
+  </header>
+
+  <div class="screen-wrap">
+    <div id="s-dashboard" class="screen active"></div>
+    <div id="s-learn"     class="screen"></div>
+    <div id="s-cards"     class="screen"></div>
+    <div id="s-stats"     class="screen"></div>
+    <div id="s-settings"  class="screen"></div>
+  </div>
+
+  <nav id="bottom-nav">
+    <button class="nav-btn active" data-s="dashboard"><span class="nav-icon">🏠</span>Start</button>
+    <button class="nav-btn"        data-s="learn">    <span class="nav-icon">🎓</span>Lernen</button>
+    <button class="nav-btn"        data-s="cards">    <span class="nav-icon">📋</span>Karten</button>
+    <button class="nav-btn"        data-s="stats">    <span class="nav-icon">📊</span>Statistik</button>
+    <button class="nav-btn"        data-s="settings"> <span class="nav-icon">⚙️</span>Einstellungen</button>
+  </nav>
+
+  <div id="modal-overlay">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+  <div id="toast"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════
+const VER = '2.0';
+const DB_NAME = 'vokabeltrainer_v2';
+const DB_VER  = 1;
+const PHASE_DAYS = [0,1,2,4,8,16,32]; // index = phase number
+const STUFE_LABELS = ['Neu','Erkennen','Reproduzieren','Spaced Rep.'];
+const STUFE_CLS    = ['b0','b1','b2','b3'];
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let db = null;
+let cfg = { lernModus:'gestuft', tagesLimit:20, eingabeToleranz:true };
+let session = [];
+let sIdx = 0;
+let flipped = false;
+let editId = null;
+let pendingImg = null; // base64 or null
+
+// ═══════════════════════════════════════════════
+// DB HELPERS
+// ═══════════════════════════════════════════════
+function openDB(){
+  return new Promise((ok,fail)=>{
+    const r=indexedDB.open(DB_NAME,DB_VER);
+    r.onupgradeneeded=e=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains('cards')){
+        const s=d.createObjectStore('cards',{keyPath:'id',autoIncrement:true});
+        s.createIndex('due','due');
+        s.createIndex('stufe','stufe');
+      }
+      if(!d.objectStoreNames.contains('cfg')){
+        d.createObjectStore('cfg',{keyPath:'k'});
+      }
+    };
+    r.onsuccess=e=>{db=e.target.result;ok()};
+    r.onerror=()=>fail(r.error);
+  });
+}
+function store(name,mode='readonly'){return db.transaction(name,mode).objectStore(name)}
+function dbAll(s){return new Promise((ok,f)=>{const r=store(s).getAll();r.onsuccess=()=>ok(r.result);r.onerror=()=>f()})}
+function dbGet(s,k){return new Promise((ok,f)=>{const r=store(s).get(k);r.onsuccess=()=>ok(r.result);r.onerror=()=>f()})}
+function dbPut(s,v){return new Promise((ok,f)=>{const r=store(s,'readwrite').put(v);r.onsuccess=()=>ok(r.result);r.onerror=()=>f()})}
+function dbDel(s,k){return new Promise((ok,f)=>{const r=store(s,'readwrite').delete(k);r.onsuccess=()=>ok();r.onerror=()=>f()})}
+
+async function loadCfg(){
+  const all=await dbAll('cfg');
+  all.forEach(({k,v})=>cfg[k]=v);
+}
+async function setCfg(k,v){cfg[k]=v;await dbPut('cfg',{k,v})}
+
+// ═══════════════════════════════════════════════
+// DEMO DATA
+// ═══════════════════════════════════════════════
+async function seedDemo(){
+  const ex=await dbAll('cards');
+  if(ex.length>0)return;
+  const t=todayStr();
+  const demo=[
+    {frage:'hola',     antwort:'Hallo',     beispiel:'¡Hola! ¿Cómo estás?',                  mnemonic:'Klingt wie „holla!" – jemand begrüßt dich lautstark!', bild:'👋',istBild:false},
+    {frage:'casa',     antwort:'Haus',      beispiel:'La casa es muy grande.',                mnemonic:'Ein Kasten (casa) steht für dein Haus!',                bild:'🏠',istBild:false},
+    {frage:'perro',    antwort:'Hund',      beispiel:'El perro es muy simpático.',            mnemonic:'Der Hund trägt eine Perrücke – Perro!',                  bild:'🐕',istBild:false},
+    {frage:'gato',     antwort:'Katze',     beispiel:'El gato duerme todo el día.',           mnemonic:'Die Katze schleicht durchs Gate – Gato!',               bild:'🐱',istBild:false},
+    {frage:'agua',     antwort:'Wasser',    beispiel:'Necesito agua, por favor.',             mnemonic:'Agua – Achtung, der Gulli läuft über mit Wasser!',      bild:'💧',istBild:false},
+    {frage:'comer',    antwort:'essen',     beispiel:'Me gusta comer pizza.',                 mnemonic:'Comer – Komm her! Wir essen gemeinsam.',                bild:'🍽️',istBild:false},
+    {frage:'grande',   antwort:'groß',      beispiel:'Tienes una familia muy grande.',        mnemonic:'Grande – grandios und groß!',                           bild:'🔭',istBild:false},
+    {frage:'bueno',    antwort:'gut',       beispiel:'¡Muy bueno! Muchas gracias.',           mnemonic:'Bueno – Buen-Oh! Das ist wirklich gut!',                bild:'👍',istBild:false},
+    {frage:'libro',    antwort:'Buch',      beispiel:'El libro es muy interesante.',          mnemonic:'Ein Libretto (libro) ist ein kleines Buch für die Oper.',bild:'📚',istBild:false},
+    {frage:'ciudad',   antwort:'Stadt',     beispiel:'Madrid es una ciudad bonita.',          mnemonic:'Ciudad – Situation in der Stadt: überall Menschen!',     bild:'🏙️',istBild:false},
+  ];
+  for(const d of demo){
+    await dbPut('cards',{...d,stufe:0,phase:1,streak:0,lastDate:null,due:t});
+  }
+}
+
+// ═══════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════
+function todayStr(){return new Date().toISOString().split('T')[0]}
+function addDays(base,n){const d=new Date(base||todayStr());d.setDate(d.getDate()+n);return d.toISOString().split('T')[0]}
+function isDue(c){return !c.due||c.due<=todayStr()}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function toast(msg,ms=2000){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms)}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b}
+function lev(a,b){
+  const m=a.length,n=b.length;
+  const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)
+    dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+function checkAns(input,correct){
+  const a=input.toLowerCase().trim(),b=correct.toLowerCase().trim();
+  if(a===b)return true;
+  if(cfg.eingabeToleranz&&lev(a,b)<=Math.max(1,Math.floor(b.length*0.18)))return true;
+  return false;
+}
+
+// ═══════════════════════════════════════════════
+// ROUTING
+// ═══════════════════════════════════════════════
+const TITLES={dashboard:'VokabelTrainer',learn:'Lernen',cards:'Meine Karten',stats:'Statistik',settings:'Einstellungen'};
+async function go(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('s-'+name).classList.add('active');
+  var nb=document.querySelector('.nav-btn[data-s="'+name+'"]');
+  if(nb) nb.classList.add('active');
+  document.getElementById('header-title').textContent=TITLES[name]||'VokabelTrainer';
+  var fns={dashboard:renderDash,learn:renderLearn,cards:renderCards,stats:renderStats,settings:renderSettings};
+  if(fns[name]) await fns[name]();
+}
+
+// ═══════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════
+async function renderDash(){
+  const all=await dbAll('cards');
+  const s0=all.filter(c=>c.stufe===0);
+  const s1=all.filter(c=>c.stufe===1);
+  const s2=all.filter(c=>c.stufe===2);
+  const s3=all.filter(c=>c.stufe===3&&isDue(c));
+  const modus=cfg.lernModus;
+  let totalDue=0;
+  if(modus==='gestuft') totalDue=Math.min(s0.length,cfg.tagesLimit)+s1.length+s2.length+s3.length;
+  else if(modus==='phase6') totalDue=s3.length;
+  else totalDue=all.length;
+  const total=all.length;
+  const pct=total?Math.min(100,(totalDue/total*100)):0;
+  const hr=new Date().getHours();
+  const greet=hr<12?'☀️ Guten Morgen':'🌙 Guten Abend';
+  document.getElementById('s-dashboard').innerHTML=`
+    <div style="margin-bottom:4px">
+      <div style="font-size:1.3rem;font-weight:800;letter-spacing:-0.02em">${greet}!</div>
+      <div style="color:var(--text-muted);font-size:0.88rem;margin-top:4px">
+        ${totalDue>0?`${totalDue} Karte${totalDue!==1?'n':''} warte${totalDue!==1?'n':''} auf dich`:'Heute alles erledigt! 🎉'}
+      </div>
+    </div>
+    <div class="ring-wrap">
+      <svg width="155" height="155" viewBox="0 0 155 155">
+        <circle cx="77.5" cy="77.5" r="62" fill="none" stroke="var(--surface2)" stroke-width="14"/>
+        <circle cx="77.5" cy="77.5" r="62" fill="none" stroke="var(--accent)" stroke-width="14"
+          stroke-linecap="round" transform="rotate(-90 77.5 77.5)"
+          stroke-dasharray="${2*Math.PI*62}"
+          stroke-dashoffset="${2*Math.PI*62*(1-pct/100)}"
+          style="transition:stroke-dashoffset .8s ease"/>
+        <text x="77.5" y="70" text-anchor="middle" fill="var(--text)" font-size="30" font-weight="800" font-family="-apple-system,sans-serif">${totalDue}</text>
+        <text x="77.5" y="90" text-anchor="middle" fill="var(--text-muted)" font-size="12" font-weight="600" font-family="-apple-system,sans-serif">fällig</text>
+      </svg>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-tile"><div class="stat-num" style="color:var(--red)">${s0.length}</div><div class="stat-lbl">Neue Karten</div></div>
+      <div class="stat-tile"><div class="stat-num" style="color:var(--yellow)">${s1.length+s2.length}</div><div class="stat-lbl">In Übung</div></div>
+      <div class="stat-tile"><div class="stat-num" style="color:var(--green)">${all.filter(c=>c.stufe===3).length}</div><div class="stat-lbl">Spaced Rep.</div></div>
+      <div class="stat-tile"><div class="stat-num" style="color:var(--text)">${total}</div><div class="stat-lbl">Gesamt</div></div>
+    </div>
+    <button class="btn btn-primary" onclick="go('learn')">${totalDue>0?'🎓 Jetzt lernen':'🔁 Üben'}</button>
+    ${total===0?'<p style="text-align:center;margin-top:12px;font-size:0.82rem;color:var(--text-muted)">Füge Vokabeln unter „Karten" hinzu</p>':''}
+  `;
+}
+
+// ═══════════════════════════════════════════════
+// SESSION BUILD
+// ═══════════════════════════════════════════════
+async function buildSession(){
+  const all=await dbAll('cards');
+  const modus=cfg.lernModus;
+  if(modus==='gestuft'){
+    const s0=all.filter(c=>c.stufe===0).slice(0,cfg.tagesLimit);
+    const s1=all.filter(c=>c.stufe===1);
+    const s2=all.filter(c=>c.stufe===2);
+    const s3=all.filter(c=>c.stufe===3&&isDue(c));
+    return [...s0,...s1,...s2,...s3];
+  }else if(modus==='phase6'){
+    return all.filter(c=>c.stufe===3&&isDue(c));
+  }else{
+    // quiz: shuffle all, max 20
+    return shuffle(all).slice(0,Math.min(all.length,20));
+  }
+}
+
+// ═══════════════════════════════════════════════
+// LEARN SCREEN
+// ═══════════════════════════════════════════════
+async function renderLearn(){
+  session=await buildSession();
+  if(session.length===0){
+    document.getElementById('s-learn').innerHTML=`
+      <div class="done-screen">
+        <span class="done-icon">🎉</span>
+        <h2>Alles erledigt!</h2>
+        <p>Keine fälligen Karten heute.<br>Komm morgen wieder!</p>
+        <button class="btn btn-ghost" onclick="go('dashboard')">← Zurück</button>
+      </div>`;
+    return;
+  }
+  sIdx=0;flipped=false;
+  await renderCard();
+}
+
+async function renderCard(){
+  const el=document.getElementById('s-learn');
+  if(sIdx>=session.length){renderDone();return}
+  const card=session[sIdx];
+  flipped=false;
+
+  const modus=cfg.lernModus;
+  let mode;
+  if(modus==='quiz') mode='quiz';
+  else if(modus==='phase6') mode='flip';
+  else mode=['show','quiz','text','flip'][card.stufe]||'flip';
+
+  const pPct=Math.round(sIdx/session.length*100);
+  const prog=`
+    <div class="prog-row">
+      <span style="font-size:0.78rem;color:var(--text-muted)">${sIdx+1} / ${session.length}</span>
+      <span class="badge ${STUFE_CLS[card.stufe]}">${STUFE_LABELS[card.stufe]}</span>
+    </div>
+    <div class="prog-bar-track"><div class="prog-bar-fill" style="width:${pPct}%"></div></div>`;
+
+  const imgHtml=card.bild?(card.istBild?`<img src="${card.bild}" class="learn-img" alt="">`:`<div class="learn-emoji">${card.bild}</div>`):'';
+
+  if(mode==='show'){
+    el.innerHTML=prog+`
+      <div class="learn-wrap">
+        ${imgHtml}
+        <div class="learn-word">${esc(card.frage)}</div>
+        <div class="learn-translation">${esc(card.antwort)}</div>
+        ${card.mnemonic?`<div class="mnemonic-box">💡 ${esc(card.mnemonic)}</div>`:''}
+        ${card.beispiel?`<div class="example-text">"${esc(card.beispiel)}"</div>`:''}
+      </div>
+      <button class="btn btn-primary" onclick="doShow()">✅ Verstanden – weiter</button>
+      <button class="btn btn-ghost" style="margin-top:10px" onclick="skipCard()">Überspringen →</button>`;
+  }
+  else if(mode==='quiz'){
+    const all=await dbAll('cards');
+    const wrong=shuffle(all.filter(c=>c.id!==card.id)).slice(0,3).map(c=>c.antwort);
+    const opts=shuffle([card.antwort,...wrong]);
+    window._qCorrect=card.antwort;
+    el.innerHTML=prog+`
+      <div class="learn-wrap">
+        ${imgHtml}
+        <div class="learn-sub">Wie lautet die Übersetzung?</div>
+        <div class="learn-word">${esc(card.frage)}</div>
+      </div>
+      <div class="quiz-grid" id="qopts">
+        ${opts.map(o=>`<button class="quiz-opt" data-ans="${esc(o)}" onclick="doQuiz(this)">${esc(o)}</button>`).join('')}
+      </div>`;
+  }
+  else if(mode==='text'){
+    el.innerHTML=prog+`
+      <div class="learn-wrap">
+        ${imgHtml}
+        <div class="learn-sub">Übersetze ins Deutsche:</div>
+        <div class="learn-word">${esc(card.frage)}</div>
+        ${card.beispiel?`<div class="example-text">"${esc(card.beispiel)}"</div>`:''}
+      </div>
+      ${card.mnemonic?`<div class="mnemonic-box" style="margin-bottom:12px">💡 ${esc(card.mnemonic)}</div>`:''}
+      <div class="igroup">
+        <input type="text" class="ifield" id="text-ans" placeholder="Deine Antwort…"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+          onkeydown="if(event.key==='Enter')doText()">
+      </div>
+      <button class="btn btn-primary" onclick="doText()">Prüfen ✓</button>`;
+    setTimeout(()=>{var ti=document.getElementById('text-ans');if(ti)ti.focus();},120);
+  }
+  else{ // flip
+    el.innerHTML=prog+`
+      <div class="learn-wrap" id="flip-card" onclick="doFlip()" style="cursor:pointer;min-height:230px">
+        ${imgHtml}
+        <div class="learn-word">${esc(card.frage)}</div>
+        <div id="flip-reveal" style="display:none;width:100%;text-align:center">
+          <div style="width:36px;height:2px;background:rgba(255,255,255,0.15);margin:10px auto"></div>
+          <div class="learn-translation">${esc(card.antwort)}</div>
+          ${card.beispiel?`<div class="example-text" style="margin-top:8px">"${esc(card.beispiel)}"</div>`:''}
+        </div>
+        <div class="flip-hint" id="flip-hint"><span>👆</span> Tippen zum Aufdecken</div>
+      </div>
+      <div id="flip-btns" style="display:none;flex-direction:column;gap:10px">
+        <button class="btn btn-success" onclick="doFlipAns(true)">✅ Richtig</button>
+        <button class="btn btn-danger" onclick="doFlipAns(false)">❌ Falsch</button>
+      </div>`;
+  }
+}
+
+// ── ANSWER HANDLERS ───────────────────────────
+async function doShow(){
+  const card=session[sIdx];
+  card.stufe=1;card.streak=0;
+  await dbPut('cards',card);
+  nextCard();
+}
+
+async function doQuiz(btn){
+  const qopts=document.querySelectorAll('.quiz-opt');
+  qopts.forEach(b=>b.disabled=true);
+  const sel=btn.dataset.ans,correct=window._qCorrect;
+  const ok=sel===correct;
+  btn.classList.add(ok?'correct':'wrong');
+  if(!ok) qopts.forEach(b=>{if(b.dataset.ans===correct)b.classList.add('correct')});
+  const card=session[sIdx];
+  if(cfg.lernModus==='gestuft'){
+    if(ok){card.streak=(card.streak||0)+1;if(card.streak>=2){card.stufe=2;card.streak=0}}
+    else{card.streak=0}
+    await dbPut('cards',card);
+  }
+  setTimeout(()=>nextCard(),ok?900:1600);
+}
+
+async function doText(){
+  const inp=document.getElementById('text-ans');
+  const card=session[sIdx];
+  const ok=checkAns(inp.value,card.antwort);
+  inp.style.borderColor=ok?'var(--green)':'var(--red)';
+  inp.disabled=true;
+  if(!ok){
+    const h=document.createElement('div');
+    h.style.cssText='color:var(--red);font-size:0.82rem;margin-top:6px;font-weight:600';
+    h.textContent='Richtig: '+card.antwort;
+    inp.parentNode.appendChild(h);
+  }
+  if(ok){card.streak=(card.streak||0)+1;if(card.streak>=2){card.stufe=3;card.phase=1;card.due=addDays(todayStr(),PHASE_DAYS[1]);card.streak=0}}
+  else{card.streak=0;card.stufe=1}
+  card.lastDate=todayStr();
+  await dbPut('cards',card);
+  setTimeout(()=>nextCard(),ok?700:1800);
+}
+
+function doFlip(){
+  if(flipped)return;
+  flipped=true;
+  document.getElementById('flip-reveal').style.display='block';
+  document.getElementById('flip-hint').style.display='none';
+  const btns=document.getElementById('flip-btns');
+  if(btns)btns.style.display='flex';
+}
+
+async function doFlipAns(ok){
+  const card=session[sIdx];
+  if(ok){
+    const np=Math.min((card.phase||1)+1,6);
+    card.phase=np;
+    card.due=addDays(todayStr(),PHASE_DAYS[np]);
+  }else{
+    card.phase=1;
+    card.due=addDays(todayStr(),1);
+  }
+  card.lastDate=todayStr();
+  card.stufe=3;
+  await dbPut('cards',card);
+  flipped=false;
+  nextCard();
+}
+
+function skipCard(){nextCard()}
+function nextCard(){sIdx++;flipped=false;renderCard()}
+function renderDone(){
+  document.getElementById('s-learn').innerHTML=`
+    <div class="done-screen">
+      <span class="done-icon">🏆</span>
+      <h2>Geschafft!</h2>
+      <p>${session.length} Karte${session.length!==1?'n':''} gelernt.<br>Gut gemacht!</p>
+      <button class="btn btn-primary" onclick="renderLearn()">🔁 Nochmal</button>
+      <button class="btn btn-ghost" style="margin-top:10px" onclick="go('dashboard')">← Zum Start</button>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// CARDS LIST
+// ═══════════════════════════════════════════════
+async function renderCards(){
+  const all=await dbAll('cards');
+  const el=document.getElementById('s-cards');
+  el.innerHTML=`
+    <button class="btn btn-primary" onclick="openEdit(null)" style="margin-bottom:18px">+ Neue Vokabel</button>
+    ${all.length===0?`
+      <div class="empty"><div class="e-icon">📭</div><p>Noch keine Vokabeln.<br>Lege deine erste Karte an!</p></div>
+    `:`
+    <div class="divider">Alle Karten (${all.length})</div>
+    <div class="card" style="padding:0 18px">
+      ${all.map(c=>`
+        <div class="vocab-item" onclick="openEdit(${c.id})">
+          <div class="vocab-thumb">
+            ${c.bild?(c.istBild?`<img src="${c.bild}" alt="">`:`${c.bild}`):'📝'}
+          </div>
+          <div class="vocab-info">
+            <div class="vocab-frage">${esc(c.frage)}</div>
+            <div class="vocab-antwort">${esc(c.antwort)}</div>
+          </div>
+          <span class="badge ${STUFE_CLS[c.stufe]}">${c.stufe<3?STUFE_LABELS[c.stufe]:'P'+c.phase}</span>
+        </div>`).join('')}
+    </div>`}`;
+}
+
+// ═══════════════════════════════════════════════
+// EDIT MODAL
+// ═══════════════════════════════════════════════
+async function openEdit(id){
+  editId=id;pendingImg=null;
+  let c={frage:'',antwort:'',beispiel:'',mnemonic:'',bild:'',istBild:false,stufe:0,phase:1,streak:0,due:todayStr(),lastDate:null};
+  if(id) c=await dbGet('cards',id)||c;
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-title">${id?'Vokabel bearbeiten':'Neue Vokabel'}</div>
+    <div class="igroup"><label>Vokabel (Fremdsprache)</label>
+      <input class="ifield" id="ef" value="${esc(c.frage)}" placeholder="z.B. casa" autocorrect="off">
+    </div>
+    <div class="igroup"><label>Übersetzung</label>
+      <input class="ifield" id="ea" value="${esc(c.antwort)}" placeholder="z.B. Haus" autocorrect="off">
+    </div>
+    <div class="igroup"><label>Beispielsatz (optional)</label>
+      <textarea class="ifield" id="eb" placeholder="z.B. La casa es grande.">${esc(c.beispiel||'')}</textarea>
+    </div>
+    <div class="igroup"><label>Mnemonic (optional)</label>
+      <textarea class="ifield" id="em" placeholder="Gedächtnishilfe…">${esc(c.mnemonic||'')}</textarea>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="genMnemonic()">✨ KI-Vorschlag generieren</button>
+    </div>
+    <div class="igroup"><label>Emoji / Bild</label>
+      <input class="ifield" id="ee" value="${!c.istBild?esc(c.bild||''):''}" placeholder="Emoji z.B. 🏠" style="margin-bottom:8px">
+      <div class="upload-area" onclick="document.getElementById('img-file').click()">
+        ${c.istBild&&c.bild?`<img src="${c.bild}" alt="">`:'📷 Bild hochladen (ersetzt Emoji)'}
+        <div id="img-prev-wrap"></div>
+      </div>
+      <input type="file" id="img-file" accept="image/*" style="display:none" onchange="handleImg(event)">
+    </div>
+    ${id?`<div class="igroup">
+      <button class="btn btn-ghost btn-sm" onclick="resetCard(${id})">🔄 Auf Stufe 0 zurücksetzen</button>
+    </div>`:''}
+    <div style="display:flex;gap:8px;margin-top:4px">
+      ${id?`<button class="btn btn-danger btn-icon" onclick="delCard(${id})">🗑️</button>`:''}
+      <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-primary" style="flex:1" onclick="saveCard()">Speichern</button>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  pendingImg=null;
+}
+
+function handleImg(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    pendingImg=ev.target.result;
+    const wrap=document.getElementById('img-prev-wrap');
+    wrap.innerHTML=`<img src="${pendingImg}" style="max-width:100%;max-height:130px;border-radius:10px;margin-top:10px">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function genMnemonic(){
+  const frage=document.getElementById('ef').value.trim();
+  const antwort=document.getElementById('ea').value.trim();
+  if(!frage||!antwort){toast('Bitte zuerst Vokabel und Übersetzung eingeben');return}
+  const btn=event.target;
+  btn.textContent='⏳ Generiere…';btn.disabled=true;
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:`Erstelle eine kurze, einprägsame Mnemonic auf Deutsch für die Vokabel "${frage}" mit der Bedeutung "${antwort}". Nutze die Keyword-Methode: Klangsimilarität oder visuelle Assoziation. Maximal 2 kurze Sätze. Nur die Mnemonic, keine Einleitung.`}]
+      })
+    });
+    const data=await resp.json();
+    document.getElementById('em').value=data.content[0].text.trim();
+    toast('Mnemonic generiert ✨');
+  }catch{toast('Fehler: Internetverbindung prüfen')}
+  btn.textContent='✨ KI-Vorschlag generieren';btn.disabled=false;
+}
+
+async function saveCard(){
+  const frage=document.getElementById('ef').value.trim();
+  const antwort=document.getElementById('ea').value.trim();
+  if(!frage||!antwort){toast('Vokabel und Übersetzung sind Pflichtfelder');return}
+  const emoji=document.getElementById('ee').value.trim();
+  let bild='',istBild=false;
+  if(pendingImg){bild=pendingImg;istBild=true}
+  else if(emoji){bild=emoji;istBild=false}
+  else if(editId){const ex=await dbGet('cards',editId);bild=(ex&&ex.bild)||'';istBild=(ex&&ex.istBild)||false}
+  const modus=cfg.lernModus;
+  const initStufe=modus==='gestuft'?0:3;
+  let card;
+  if(editId){
+    card=await dbGet('cards',editId);
+    Object.assign(card,{frage,antwort,beispiel:document.getElementById('eb').value.trim(),mnemonic:document.getElementById('em').value.trim(),bild,istBild});
+  }else{
+    card={frage,antwort,beispiel:document.getElementById('eb').value.trim(),mnemonic:document.getElementById('em').value.trim(),bild,istBild,stufe:initStufe,phase:1,streak:0,lastDate:null,due:todayStr()};
+  }
+  await dbPut('cards',card);
+  closeModal();
+  toast(editId?'Gespeichert ✓':'Vokabel hinzugefügt ✓');
+  renderCards();
+}
+
+async function delCard(id){
+  if(!confirm('Vokabel wirklich löschen?'))return;
+  await dbDel('cards',id);closeModal();toast('Gelöscht');renderCards();
+}
+
+async function resetCard(id){
+  const c=await dbGet('cards',id);
+  c.stufe=0;c.phase=1;c.streak=0;c.due=todayStr();
+  await dbPut('cards',c);toast('Auf Stufe 0 zurückgesetzt');
+}
+
+// ═══════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════
+async function renderStats(){
+  const all=await dbAll('cards');
+  const total=all.length;
+  const byStufe=[0,1,2,3].map(s=>all.filter(c=>c.stufe===s).length);
+  const sr=all.filter(c=>c.stufe===3);
+  const byPhase=[1,2,3,4,5,6].map(p=>sr.filter(c=>c.phase===p).length);
+  const due=all.filter(c=>isDue(c)).length;
+  const pColors=['#f4645f','#f5a142','#f5c842','#5bcf87','#5b9cf6','#9b7ef8'];
+  const sColors=['var(--red)','var(--yellow)','var(--accent)','var(--green)'];
+  document.getElementById('s-stats').innerHTML=`
+    <div class="stat-grid">
+      <div class="stat-tile"><div class="stat-num" style="color:var(--accent)">${total}</div><div class="stat-lbl">Gesamt</div></div>
+      <div class="stat-tile"><div class="stat-num" style="color:var(--yellow)">${due}</div><div class="stat-lbl">Heute fällig</div></div>
+    </div>
+    <div class="divider">Verteilung nach Lernstufe</div>
+    <div class="card">
+      ${[0,1,2,3].map(s=>`
+        <div class="sbar-row">
+          <div class="sbar-meta"><span>${STUFE_LABELS[s]}</span><span style="color:var(--text-muted)">${byStufe[s]}</span></div>
+          <div class="sbar-track"><div class="sbar-fill" style="width:${total?Math.round(byStufe[s]/total*100):0}%;background:${sColors[s]}"></div></div>
+        </div>`).join('')}
+    </div>
+    <div class="divider">Phase-6 Verteilung</div>
+    <div class="card">
+      ${[1,2,3,4,5,6].map((p,i)=>`
+        <div class="sbar-row">
+          <div class="sbar-meta"><span>Phase ${p} (${PHASE_DAYS[p]}d)</span><span style="color:var(--text-muted)">${byPhase[i]}</span></div>
+          <div class="sbar-track"><div class="sbar-fill" style="width:${sr.length?Math.round(byPhase[i]/sr.length*100):0}%;background:${pColors[i]}"></div></div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════
+const MODUS_DESC={
+  gestuft:'Neue Karten werden schrittweise eingeführt: anzeigen → Quiz → Texteingabe → Spaced Repetition.',
+  phase6: 'Neue Karten starten direkt in Phase 1 des Spaced-Repetition-Systems.',
+  quiz:   'Nur Multiple-Choice-Abfragen, kein Phasensystem – ideal zum schnellen Üben.'
+};
+async function renderSettings(){
+  document.getElementById('s-settings').innerHTML=`
+    <div class="divider">Lernmodus</div>
+    <div class="card">
+      <div class="seg" id="modus-seg" style="margin-bottom:12px">
+        <button class="seg-btn ${cfg.lernModus==='gestuft'?'active':''}" onclick="setModus('gestuft',this)">📈 Gestuft</button>
+        <button class="seg-btn ${cfg.lernModus==='phase6'?'active':''}" onclick="setModus('phase6',this)">🔄 Phase 6</button>
+        <button class="seg-btn ${cfg.lernModus==='quiz'?'active':''}" onclick="setModus('quiz',this)">❓ Quiz</button>
+      </div>
+      <div id="modus-desc" style="font-size:0.82rem;color:var(--text-muted);line-height:1.5">${MODUS_DESC[cfg.lernModus]}</div>
+    </div>
+    <div class="divider">Lernoptionen</div>
+    <div class="card" style="padding:0 18px">
+      <div class="set-row">
+        <div><div class="set-label">Tägliches Limit</div><div class="set-desc">Max. neue Karten pro Tag (Gestuft-Modus)</div></div>
+        <input type="number" class="ifield" id="lim-inp" value="${cfg.tagesLimit}" min="1" max="200"
+          style="width:68px;text-align:center;padding:8px"
+          onchange="setCfg('tagesLimit',Math.max(1,parseInt(this.value)||20))">
+      </div>
+      <div class="set-row">
+        <div><div class="set-label">Tipptolerant</div><div class="set-desc">Kleine Tippfehler bei Texteingabe ignorieren</div></div>
+        <button class="toggle ${cfg.eingabeToleranz?'on':''}" onclick="toggleBool('eingabeToleranz',this)"></button>
+      </div>
+    </div>
+    <div class="divider">Info</div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--text-muted)">Version</span><span style="font-weight:700">v${VER}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;margin-top:6px"><span style="color:var(--text-muted)">Speicher</span><span style="font-weight:700">IndexedDB (lokal)</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;margin-top:6px"><span style="color:var(--text-muted)">Mnemonic-KI</span><span style="font-weight:700">Claude Sonnet</span></div>
+    </div>
+    <div class="divider" style="color:var(--red)">Gefahrenzone</div>
+    <div class="card">
+      <button class="btn btn-danger" onclick="nukeAll()">🗑️ Alle Daten löschen</button>
+    </div>`;
+}
+
+async function setModus(m, btn){
+  const prev=cfg.lernModus;
+  await setCfg('lernModus',m);
+  document.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('modus-desc').textContent=MODUS_DESC[m];
+  // Migrate: if switching away from gestuft, promote stuck cards
+  if(prev==='gestuft'&&m!=='gestuft'){
+    const all=await dbAll('cards');
+    const low=all.filter(c=>c.stufe<3);
+    if(low.length){
+      for(const c of low){c.stufe=3;c.phase=1;c.due=todayStr();await dbPut('cards',c)}
+      toast(`${low.length} Karte${low.length!==1?'n':''} → Phase 1 gesetzt`);
+    }
+  }
+}
+
+async function toggleBool(k,btn){
+  const v=!cfg[k];
+  await setCfg(k,v);
+  btn.classList.toggle('on',v);
+}
+
+async function nukeAll(){
+  if(!confirm('Wirklich ALLE Vokabeln und Fortschritte unwiderruflich löschen?'))return;
+  const all=await dbAll('cards');
+  for(const c of all)await dbDel('cards',c.id);
+  toast('Alle Daten gelöscht');
+  renderSettings();
+}
+
+// ═══════════════════════════════════════════════
+// APPLE TOUCH ICON
+// ═══════════════════════════════════════════════
+function buildIcon(){
+  try{
+    const cv=document.createElement('canvas');
+    cv.width=180;cv.height=180;
+    const cx=cv.getContext('2d');
+    // bg
+    cx.fillStyle='#0A1628';
+    cx.beginPath();cx.roundRect(0,0,180,180,38);cx.fill();
+    // glow circle
+    const g=cx.createRadialGradient(90,82,10,90,82,58);
+    g.addColorStop(0,'rgba(62,207,187,0.35)');g.addColorStop(1,'rgba(62,207,187,0)');
+    cx.fillStyle=g;cx.beginPath();cx.arc(90,82,58,0,Math.PI*2);cx.fill();
+    // ring
+    cx.strokeStyle='#3ecfbb';cx.lineWidth=5;
+    cx.beginPath();cx.arc(90,82,50,0,Math.PI*2);cx.stroke();
+    // V
+    cx.fillStyle='#3ecfbb';cx.font='bold 76px -apple-system,sans-serif';
+    cx.textAlign='center';cx.textBaseline='middle';cx.fillText('V',90,82);
+    // label
+    cx.fillStyle='rgba(62,207,187,0.7)';cx.font='600 14px -apple-system,sans-serif';
+    cx.fillText('VOKABELN',90,152);
+    const lnk=document.createElement('link');
+    lnk.rel='apple-touch-icon';lnk.href=cv.toDataURL('image/png');
+    document.head.appendChild(lnk);
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════
+// SERVICE WORKER (offline caching)
+// ═══════════════════════════════════════════════
+function registerSW(){
+  if(!('serviceWorker'in navigator))return;
+  // sw.js muss als separate Datei im gleichen Verzeichnis liegen
+  // Minimal-Inhalt: cache-first strategy für Offline-Betrieb
+  navigator.serviceWorker.register('sw.js').catch(function(){});
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+async function init(){
+  await openDB();
+  await loadCfg();
+  await seedDemo();
+  buildIcon();
+  // Nav
+  document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
+  // Close modal on backdrop
+  document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target.id==='modal-overlay')closeModal()});
+  registerSW();
+  go('dashboard');
+}
+
+init();
+</script>
+</body>
+</html>
