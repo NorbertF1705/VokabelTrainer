@@ -27,6 +27,9 @@ interface LearningState {
   dailyStats: Record<Language, { date: string; count: number }>;
   quizAutoSpeak: boolean;
   flashcardAutoSpeak: boolean;
+  typingTolerant: boolean;
+  dailyNewCardLimit: number; // -1 = unbegrenzt, 0 = keine neuen Karten, >0 = Limit
+  dailyNewStats: Record<Language, { date: string; count: number }>; // neue Karten heute eingeführt
   trainingLog: Record<Language, string[]>; // per-language YYYY-MM-DD dates of completed due-card sessions
 }
 
@@ -35,8 +38,11 @@ interface LearningContextType extends LearningState {
   setLanguage: (lang: Language) => void;
   setQueryDirection: (dir: QueryDirection) => void;
   setDailyCardLimit: (limit: number) => void;
+  setDailyNewCardLimit: (limit: number) => void;
+  getNewCards: (lang: Language) => VocabularyItem[];
   setQuizAutoSpeak: (enabled: boolean) => void;
   setFlashcardAutoSpeak: (enabled: boolean) => void;
+  setTypingTolerant: (enabled: boolean) => void;
   getCardProgress: (vocabId: string, lang: Language) => CardProgress;
   markCard: (vocabId: string, lang: Language, correct: boolean) => void;
   addCustomVocabulary: (item: Omit<VocabularyItem, 'id' | 'isCustom'>, lang: Language) => void;
@@ -89,11 +95,11 @@ function todayDate(): Date {
 
 function isCardDue(progress: CardProgress): boolean {
   if (progress.box >= 6) return false;
+  if (progress.lastReviewed === null) return false; // neue Karte – über getNewCards einführen
   if (progress.nextDate != null) {
     return localDateStr(new Date()) >= progress.nextDate;
   }
   // Rückwärtskompatibilität für Karten ohne nextDate
-  if (!progress.lastReviewed) return true;
   const interval = BOX_INTERVALS[progress.box - 1];
   if (interval === 0) return true;
   const last = new Date(progress.lastReviewed);
@@ -112,6 +118,9 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     dailyStats: { english: { date: '', count: 0 }, spanish: { date: '', count: 0 } },
     quizAutoSpeak: false,
     flashcardAutoSpeak: false,
+    typingTolerant: false,
+    dailyNewCardLimit: 5,
+    dailyNewStats: { english: { date: '', count: 0 }, spanish: { date: '', count: 0 } },
     trainingLog: { english: [], spanish: [] },
   });
   const [loaded, setLoaded] = useState(false);
@@ -152,6 +161,10 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
           }
           if (!parsed.customVocabularyEN) parsed.customVocabularyEN = [];
           if (!parsed.customVocabularyES) parsed.customVocabularyES = [];
+          if (parsed.dailyNewCardLimit === undefined) parsed.dailyNewCardLimit = 5;
+          if (!parsed.dailyNewStats || !parsed.dailyNewStats.english) {
+            parsed.dailyNewStats = { english: { date: '', count: 0 }, spanish: { date: '', count: 0 } };
+          }
 
           setState(parsed);
         } catch {
@@ -184,8 +197,10 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
   const setLanguage = (lang: Language) => setState(s => ({ ...s, selectedLanguage: lang }));
   const setQueryDirection = (dir: QueryDirection) => setState(s => ({ ...s, queryDirection: dir }));
   const setDailyCardLimit = (limit: number) => setState(s => ({ ...s, dailyCardLimit: limit }));
+  const setDailyNewCardLimit = (limit: number) => setState(s => ({ ...s, dailyNewCardLimit: limit }));
   const setQuizAutoSpeak = (enabled: boolean) => setState(s => ({ ...s, quizAutoSpeak: enabled }));
   const setFlashcardAutoSpeak = (enabled: boolean) => setState(s => ({ ...s, flashcardAutoSpeak: enabled }));
+  const setTypingTolerant = (enabled: boolean) => setState(s => ({ ...s, typingTolerant: enabled }));
 
   const progressKey = (vocabId: string, lang: Language) => `${vocabId}_${lang}`;
 
@@ -220,9 +235,16 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       const prevDaily = langStats?.date === todayStr ? langStats : { date: todayStr, count: 0 };
       const newLangStats = { date: todayStr, count: prevDaily.count + 1 };
 
+      const isNewCard = current.lastReviewed === null;
+      const prevNewCount = s.dailyNewStats?.[lang]?.date === todayStr ? s.dailyNewStats[lang].count : 0;
+      const newDailyNewStats = isNewCard
+        ? { ...s.dailyNewStats, [lang]: { date: todayStr, count: prevNewCount + 1 } }
+        : s.dailyNewStats;
+
       return {
         ...s,
         dailyStats: { ...s.dailyStats, [lang]: newLangStats },
+        dailyNewStats: newDailyNewStats,
         progress: {
           ...s.progress,
           [key]: {
@@ -252,6 +274,19 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       customVocabularyEN: s.customVocabularyEN.filter(v => v.id !== id),
       customVocabularyES: s.customVocabularyES.filter(v => v.id !== id),
     }));
+  };
+
+  const getNewCards = (lang: Language): VocabularyItem[] => {
+    if (state.dailyNewCardLimit === 0) return [];
+    const todayStr = localDateStr(todayDate());
+    const introducedToday = state.dailyNewStats?.[lang]?.date === todayStr
+      ? state.dailyNewStats[lang].count : 0;
+    const remaining = state.dailyNewCardLimit === -1
+      ? Infinity
+      : Math.max(0, state.dailyNewCardLimit - introducedToday);
+    if (remaining === 0) return [];
+    const cards = getVocabForLang(lang).filter(v => getCardProgress(v.id, lang).lastReviewed === null);
+    return isFinite(remaining) ? cards.slice(0, remaining) : cards;
   };
 
   const getDueCards = (lang: Language): VocabularyItem[] => {
@@ -351,8 +386,11 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       setLanguage,
       setQueryDirection,
       setDailyCardLimit,
+      setDailyNewCardLimit,
+      getNewCards,
       setQuizAutoSpeak,
       setFlashcardAutoSpeak,
+      setTypingTolerant,
       getCardProgress,
       markCard,
       addCustomVocabulary,

@@ -3,6 +3,14 @@ import { Colors } from '../constants/theme';
 import { LANGUAGE_CONFIG, ALL_LANGUAGES } from '../constants/languages';
 import SWStatusPanel from '../components/SWStatusPanel';
 
+const NEW_CARD_LIMITS = [
+  { label: '0', value: 0 },
+  { label: '3', value: 3 },
+  { label: '5', value: 5 },
+  { label: '10', value: 10 },
+  { label: '∞', value: -1 },
+];
+
 const CARD_LIMITS = [
   { label: '10', value: 10 },
   { label: '20', value: 20 },
@@ -12,7 +20,7 @@ const CARD_LIMITS = [
 ];
 
 export default function Settings() {
-  const { selectedLanguage, setLanguage, queryDirection, setQueryDirection, dailyCardLimit, setDailyCardLimit, resetProgress, quizAutoSpeak, setQuizAutoSpeak, flashcardAutoSpeak, setFlashcardAutoSpeak } = useLearning();
+  const { selectedLanguage, setLanguage, queryDirection, setQueryDirection, dailyCardLimit, setDailyCardLimit, dailyNewCardLimit, setDailyNewCardLimit, resetProgress, quizAutoSpeak, setQuizAutoSpeak, flashcardAutoSpeak, setFlashcardAutoSpeak, typingTolerant, setTypingTolerant } = useLearning();
 
   const handleReset = () => {
     if (window.confirm('Wirklich den gesamten Lernfortschritt löschen? Alle Karten werden auf Fach 1 zurückgesetzt. Eigene Vokabeln bleiben erhalten.')) {
@@ -137,6 +145,34 @@ export default function Settings() {
           </div>
         </section>
 
+        {/* Eingabe-Modus */}
+        <section style={{ marginBottom: 28 }}>
+          <p style={sectionTitle}>Eingabe-Modus</p>
+          <div style={card}>
+            <button
+              onClick={() => setTypingTolerant(!typingTolerant)}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
+            >
+              <span style={{ fontSize: 22, width: 32, textAlign: 'center' }}>⌨️</span>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <div style={{ fontSize: 16, fontWeight: 600, color: Colors.text }}>Tipptolerant</div>
+                <div style={{ fontSize: 12, color: Colors.textMuted, marginTop: 2 }}>Kleine Tippfehler werden als richtig gewertet</div>
+              </div>
+              <div style={{
+                width: 44, height: 26, borderRadius: 13,
+                background: typingTolerant ? Colors.purple : Colors.border,
+                position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+              }}>
+                <div style={{
+                  position: 'absolute', top: 3, left: typingTolerant ? 21 : 3,
+                  width: 20, height: 20, borderRadius: 10, background: '#fff',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.2)', transition: 'left 0.2s',
+                }} />
+              </div>
+            </button>
+          </div>
+        </section>
+
         {/* Karten pro Tag */}
         <section style={{ marginBottom: 28 }}>
           <p style={sectionTitle}>Karten pro Tag</p>
@@ -152,6 +188,28 @@ export default function Settings() {
                   border: `2px solid ${dailyCardLimit === value ? Colors.purple : Colors.border}`,
                   borderRadius: 12, fontSize: 17, fontWeight: 700,
                   color: dailyCardLimit === value ? Colors.purple : Colors.textMuted,
+                  cursor: 'pointer', boxShadow: '0 2px 6px rgba(45,27,105,0.06)',
+                }}
+              >{label}</button>
+            ))}
+          </div>
+        </section>
+
+        {/* Neue Karten pro Tag */}
+        <section style={{ marginBottom: 28 }}>
+          <p style={sectionTitle}>Neue Karten pro Tag</p>
+          <p style={{ fontSize: 12, color: Colors.textMuted, marginBottom: 10, fontWeight: 500 }}>Wie viele unbekannte Karten pro Lernsitzung eingeführt werden</p>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {NEW_CARD_LIMITS.map(({ label, value }) => (
+              <button
+                key={label}
+                onClick={() => setDailyNewCardLimit(value)}
+                style={{
+                  flex: 1, padding: '13px 0',
+                  background: dailyNewCardLimit === value ? '#FFF8E1' : Colors.card,
+                  border: `2px solid ${dailyNewCardLimit === value ? '#F59E0B' : Colors.border}`,
+                  borderRadius: 12, fontSize: 17, fontWeight: 700,
+                  color: dailyNewCardLimit === value ? '#B45309' : Colors.textMuted,
                   cursor: 'pointer', boxShadow: '0 2px 6px rgba(45,27,105,0.06)',
                 }}
               >{label}</button>

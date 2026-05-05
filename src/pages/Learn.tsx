@@ -5,7 +5,7 @@ import { Colors } from '../constants/theme';
 import { VocabularyItem } from '../data/vocabulary';
 import { LANGUAGE_CONFIG } from '../constants/languages';
 
-type SessionMode = 'due' | 'all' | 'quiz';
+type SessionMode = 'due' | 'all' | 'quiz' | 'type';
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -14,6 +14,32 @@ function shuffle<T>(arr: T[]): T[] {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const dp: number[] = Array.from({ length: n + 1 }, (_, i) => i);
+  for (let i = 1; i <= m; i++) {
+    let prev = dp[0];
+    dp[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const temp = dp[j];
+      dp[j] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, dp[j], dp[j - 1]);
+      prev = temp;
+    }
+  }
+  return dp[n];
+}
+
+function evaluateTypedAnswer(input: string, correct: string, tolerant: boolean): 'correct' | 'almost' | 'wrong' {
+  const a = input.trim().toLowerCase();
+  const b = correct.trim().toLowerCase();
+  if (a === b) return 'correct';
+  if (tolerant) {
+    const maxDist = b.length <= 5 ? 1 : 2;
+    if (levenshtein(a, b) <= maxDist) return 'almost';
+  }
+  return 'wrong';
 }
 
 function generateQuizOptions(correct: string, allVocab: VocabularyItem[], field: keyof VocabularyItem): string[] {
@@ -36,7 +62,7 @@ function speak(text: string, lang: string) {
 }
 
 export default function Learn() {
-  const { selectedLanguage, queryDirection, getDueCards, allVocabulary, getCardProgress, markCard, dailyCardLimit, quizAutoSpeak, flashcardAutoSpeak, recordTrainingDay } = useLearning();
+  const { selectedLanguage, queryDirection, getDueCards, getNewCards, allVocabulary, getCardProgress, markCard, dailyCardLimit, quizAutoSpeak, flashcardAutoSpeak, typingTolerant, recordTrainingDay } = useLearning();
 
   const [sessionMode, setSessionMode] = useState<SessionMode>('due');
   const [sessionCards, setSessionCards] = useState<VocabularyItem[] | null>(null);
@@ -51,6 +77,9 @@ export default function Learn() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [quizAnswerCorrect, setQuizAnswerCorrect] = useState<boolean | null>(null);
   const [quizFlipKey, setQuizFlipKey] = useState(0);
+  const [typedAnswer, setTypedAnswer] = useState('');
+  const [typeResult, setTypeResult] = useState<'correct' | 'almost' | 'wrong' | null>(null);
+  const [sessionNewCards, setSessionNewCards] = useState(0);
 
   const dueCards = useMemo(() => getDueCards(selectedLanguage), [selectedLanguage]);
 
@@ -88,9 +117,13 @@ export default function Learn() {
 
   const startSession = useCallback((mode: SessionMode) => {
     let cards: VocabularyItem[];
-    if (mode === 'due') {
-      cards = getDueCards(selectedLanguage); // bereits sortiert: Phase ASC, Datum ASC
-      if (cards.length === 0) return; // In Lobby bleiben – "Toll gemacht!" wird dort angezeigt
+    let newCount = 0;
+    if (mode === 'due' || mode === 'type') {
+      const revCards = getDueCards(selectedLanguage);
+      const newCards = getNewCards(selectedLanguage);
+      newCount = newCards.length;
+      cards = [...revCards, ...newCards];
+      if (cards.length === 0) return;
     } else if (mode === 'quiz') {
       const base = dueCards.length > 0 ? dueCards : allVocabulary;
       const shuffled = shuffle(base);
@@ -100,6 +133,7 @@ export default function Learn() {
     }
     setSessionMode(mode);
     setSessionCards(cards);
+    setSessionNewCards(newCount);
     setCurrentIndex(0);
     setIsFlipped(false);
     setFlipReset(r => r + 1);
@@ -108,7 +142,9 @@ export default function Learn() {
     setSelectedAnswer(null);
     setQuizAnswerCorrect(null);
     setQuizFlipKey(0);
-  }, [selectedLanguage, allVocabulary, getDueCards, dueCards, dailyCardLimit]);
+    setTypedAnswer('');
+    setTypeResult(null);
+  }, [selectedLanguage, allVocabulary, getDueCards, getNewCards, dueCards, dailyCardLimit]);
 
   const speakWord = () => {
     if (!currentCard) return;
@@ -123,6 +159,15 @@ export default function Learn() {
   useEffect(() => {
     if (!sessionCards || sessionDone) return;
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (sessionMode === 'type') {
+        if (e.code === 'Enter') {
+          e.preventDefault();
+          if (typeResult !== null) {
+            advanceCard(typeResult !== 'wrong');
+          }
+        }
+        return;
+      }
       if (sessionMode === 'quiz') {
         if (selectedAnswer !== null && (e.code === 'Enter' || e.code === 'Space')) {
           e.preventDefault();
@@ -149,7 +194,7 @@ export default function Learn() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sessionMode, sessionCards, sessionDone, isFlipped, quizOptions, selectedAnswer, quizAnswerCorrect]);
+  }, [sessionMode, sessionCards, sessionDone, isFlipped, quizOptions, selectedAnswer, quizAnswerCorrect, typeResult]);
 
   const advanceCard = (correct: boolean) => {
     if (!currentCard || !sessionCards) return;
@@ -164,6 +209,8 @@ export default function Learn() {
       setCurrentIndex(nextIndex);
       setIsFlipped(false);
       setFlipReset(r => r + 1);
+      setTypedAnswer('');
+      setTypeResult(null);
     }
   };
 
@@ -179,6 +226,12 @@ export default function Learn() {
       const lang = answerField === 'translation' ? foreignLang : 'de-DE';
       speak(textToSpeak, lang);
     }
+  };
+
+  const handleTypeSubmit = () => {
+    if (!currentCard || typeResult !== null || typedAnswer.trim() === '') return;
+    const correct = currentCard[answerField] as string;
+    setTypeResult(evaluateTypedAnswer(typedAnswer, correct, typingTolerant));
   };
 
   const boxNumber = currentCard ? getCardProgress(currentCard.id, selectedLanguage).box : 1;
@@ -198,6 +251,7 @@ export default function Learn() {
             { mode: 'due' as SessionMode, colors: ['#FF6B6B', '#FF8E53'], emoji: '🎯', title: 'Fällige Karten', sub: `${dueCards.length} Karten heute fällig` },
             { mode: 'all' as SessionMode, colors: ['#A78BFA', '#7C3AED'], emoji: '🔁', title: 'Alle Vokabeln', sub: `Alle ${allVocabulary.length} Karten üben` },
             { mode: 'quiz' as SessionMode, colors: ['#4ECDC4', '#2ECC71'], emoji: '🧩', title: 'Quiz', sub: `Multiple Choice mit ${dailyCardLimit > 0 ? Math.min(dailyCardLimit, (dueCards.length || allVocabulary.length)) : (dueCards.length || allVocabulary.length)} Karten` },
+            { mode: 'type' as SessionMode, colors: ['#F59E0B', '#D97706'], emoji: '✍️', title: 'Eingabe-Modus', sub: 'Antworte durch Tippen' },
           ] as const).map(({ mode, colors, emoji, title, sub }) => (
             <button
               key={mode}
@@ -243,7 +297,7 @@ export default function Learn() {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
           <div style={{ fontSize: 72, marginBottom: 16 }}>{rate >= 80 ? '🏆' : rate >= 50 ? '👍' : '💪'}</div>
           <h2 style={{ fontSize: 28, fontWeight: 900, color: Colors.text, marginBottom: 28 }}>Sitzung beendet!</h2>
-          <div style={{ display: 'flex', gap: 12, marginBottom: 32, width: '100%' }}>
+          <div style={{ display: 'flex', gap: 12, marginBottom: sessionNewCards > 0 ? 16 : 32, width: '100%' }}>
             {[
               { label: 'Richtig', val: sessionStats.correct, color: Colors.success },
               { label: 'Falsch', val: sessionStats.incorrect, color: Colors.danger },
@@ -255,11 +309,119 @@ export default function Learn() {
               </div>
             ))}
           </div>
+          {sessionNewCards > 0 && (
+            <div style={{ background: '#FFF8E1', border: '2px solid #F59E0B', borderRadius: 12, padding: '10px 16px', marginBottom: 32, width: '100%', textAlign: 'center' }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: '#B45309' }}>
+                ✨ {sessionNewCards} neue {sessionNewCards === 1 ? 'Karte' : 'Karten'} eingeführt
+              </span>
+            </div>
+          )}
           <button onClick={() => setSessionCards(null)} style={{ width: '100%', border: 'none', cursor: 'pointer', padding: 0, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(45,27,105,0.18)' }}>
             <div style={{ background: 'linear-gradient(90deg, #A78BFA, #7C3AED)', padding: 18, textAlign: 'center', fontSize: 18, fontWeight: 800, color: '#fff' }}>
               Neue Sitzung
             </div>
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Eingabe-Modus ────────────────────────────────────────
+  if (sessionMode === 'type') {
+    const correctAnswer2 = currentCard ? (currentCard[answerField] as string) : '';
+    const resultColors = {
+      correct: { bg: '#E0F9EC', border: Colors.success, text: Colors.success, label: '✓ Richtig!' },
+      almost:  { bg: '#FFF8E1', border: '#F59E0B',      text: '#B45309',      label: '~ Fast richtig' },
+      wrong:   { bg: '#FFE5E5', border: Colors.danger,   text: Colors.danger,  label: '✗ Falsch' },
+    };
+    const rc = typeResult ? resultColors[typeResult] : null;
+
+    return (
+      <div style={{ background: Colors.background, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        <div style={topBar}>
+          <button onClick={() => setSessionCards(null)} style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, fontWeight: 700, cursor: 'pointer', border: 'none', background: 'none', width: 36, height: 36 }}>✕</button>
+          <span style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{currentIndex + 1} / {sessionCards.length}</span>
+          <button onClick={speakWord} style={{ width: 36, height: 36, borderRadius: 18, background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', fontSize: 18 }}>🔈</button>
+        </div>
+        <div style={{ height: 4, background: 'rgba(45,27,105,0.15)' }}>
+          <div style={{ height: 4, background: Colors.accent, width: `${progress * 100}%`, transition: 'width 0.3s' }} />
+        </div>
+        <div style={{ flex: 1, padding: '24px 20px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Frage */}
+          <div style={{ background: Colors.card, borderRadius: 16, padding: '24px 20px', textAlign: 'center', boxShadow: '0 2px 8px rgba(45,27,105,0.08)' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+              {effectiveDirection === 'de-to-foreign' ? 'Deutsch' : LANGUAGE_CONFIG[selectedLanguage].label}
+            </div>
+            <div style={{ fontSize: 26, fontWeight: 900, color: Colors.text }}>{frontText}</div>
+            {currentCard?.emoji && <div style={{ fontSize: 32, marginTop: 8 }}>{currentCard.emoji}</div>}
+          </div>
+
+          {/* Eingabefeld */}
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+              {effectiveDirection === 'de-to-foreign' ? LANGUAGE_CONFIG[selectedLanguage].label : 'Deutsch'}
+            </div>
+            <input
+              autoFocus
+              value={typedAnswer}
+              onChange={e => { if (typeResult === null) setTypedAnswer(e.target.value); }}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); typeResult === null ? handleTypeSubmit() : advanceCard(typeResult !== 'wrong'); } }}
+              placeholder="Antwort eingeben…"
+              style={{
+                width: '100%', boxSizing: 'border-box',
+                padding: '14px 16px', fontSize: 18, fontWeight: 700,
+                border: `2px solid ${rc ? rc.border : Colors.border}`,
+                borderRadius: 12, outline: 'none',
+                background: rc ? rc.bg : Colors.card,
+                color: rc ? rc.text : Colors.text,
+                transition: 'border-color 0.2s, background 0.2s',
+              }}
+            />
+          </div>
+
+          {/* Ergebnis */}
+          {rc && (
+            <div style={{ background: rc.bg, border: `2px solid ${rc.border}`, borderRadius: 12, padding: '12px 16px' }}>
+              <div style={{ fontSize: 16, fontWeight: 800, color: rc.text }}>{rc.label}</div>
+              {typeResult !== 'correct' && (
+                <div style={{ fontSize: 14, color: Colors.text, marginTop: 4 }}>
+                  Richtig: <strong>{correctAnswer2}</strong>
+                </div>
+              )}
+              {typeResult === 'almost' && (
+                <div style={{ fontSize: 12, color: Colors.textMuted, marginTop: 2 }}>Tipptolerant aktiv – wird als richtig gewertet</div>
+              )}
+            </div>
+          )}
+
+          {/* Buttons */}
+          {typeResult === null ? (
+            <button
+              onClick={handleTypeSubmit}
+              disabled={typedAnswer.trim() === ''}
+              style={{
+                padding: '15px 0', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800,
+                background: typedAnswer.trim() !== '' ? 'linear-gradient(90deg, #A78BFA, #7C3AED)' : Colors.border,
+                color: typedAnswer.trim() !== '' ? '#fff' : Colors.textMuted,
+                cursor: typedAnswer.trim() !== '' ? 'pointer' : 'default',
+                boxShadow: typedAnswer.trim() !== '' ? '0 4px 16px rgba(45,27,105,0.25)' : 'none',
+                transition: 'all 0.2s',
+              }}
+            >
+              Prüfen
+            </button>
+          ) : (
+            <button
+              onClick={() => advanceCard(typeResult !== 'wrong')}
+              style={{
+                padding: '15px 0', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800,
+                background: 'linear-gradient(90deg, #A78BFA, #7C3AED)', color: '#fff',
+                cursor: 'pointer', boxShadow: '0 4px 16px rgba(45,27,105,0.25)',
+              }}
+            >
+              Weiter <span style={{ fontSize: 12, fontWeight: 500, opacity: 0.85 }}>Enter</span>
+            </button>
+          )}
         </div>
       </div>
     );
