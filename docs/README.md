@@ -8,6 +8,7 @@ Dieses Verzeichnis enthält die gesamte Projektdokumentation.
 
 | Datei | Beschreibung |
 |-------|--------------|
+| [RELEASE_NOTES.md](./RELEASE_NOTES.md) | Release Notes aller Versionen |
 | [PLAN_V1.2.md](./PLAN_V1.2.md) | Entwicklungsplan V1.0.1 → V1.2 mit Änderungsprotokoll |
 | [neue-sprache-hinzufuegen.md](./neue-sprache-hinzufuegen.md) | Schritt-für-Schritt-Anleitung zum Ergänzen einer neuen Lernsprache |
 
