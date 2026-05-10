@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VokabelTrainer – Benutzerdokumentation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #F5F3EE;
+      --surface:   #FFFFFF;
+      --accent:    #2D6A4F;
+      --accent2:   #52B788;
+      --text:      #1A1A1A;
+      --muted:     #6B7280;
+      --border:    #E2DDD6;
+      --tag-bg:    #D8F3DC;
+      --tag-text:  #1B4332;
+      --warn-bg:   #FFF8E1;
+      --warn-border:#F59E0B;
+      --code-bg:   #1A1A1A;
+      --code-text: #A3E4BC;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── LAYOUT ── */
+    .page-grid {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    nav {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--accent);
+      color: #fff;
+      padding: 2rem 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-logo {
+      padding: 0 1.5rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      margin-bottom: 1.5rem;
+    }
+    .nav-logo .app-name {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.4rem;
+      line-height: 1.2;
+      color: #fff;
+    }
+    .nav-logo .app-sub {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.55);
+      margin-top: 0.2rem;
+    }
+
+    nav ul { list-style: none; padding: 0 0.75rem; flex: 1; }
+    nav ul li { margin-bottom: 0.15rem; }
+    nav ul li a {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: background 0.15s, color 0.15s;
+    }
+    nav ul li a:hover,
+    nav ul li a.active {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+    }
+    .nav-icon { font-size: 1rem; width: 1.2rem; text-align: center; }
+
+    .nav-section-label {
+      padding: 0.9rem 1.5rem 0.3rem;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.4);
+      font-weight: 600;
+    }
+
+    .nav-version {
+      padding: 1rem 1.5rem 0;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.35);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: auto;
+    }
+
+    /* ── MAIN ── */
+    main {
+      padding: 3rem 4rem 5rem;
+      max-width: 860px;
+    }
+
+    .page-header {
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-header h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: 2.6rem;
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+    }
+
+    .page-header .meta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      margin-bottom: 3.5rem;
+      animation: fadeIn 0.4s ease both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    section:nth-child(2) { animation-delay: 0.05s; }
+    section:nth-child(3) { animation-delay: 0.10s; }
+    section:nth-child(4) { animation-delay: 0.15s; }
+    section:nth-child(5) { animation-delay: 0.20s; }
+    section:nth-child(6) { animation-delay: 0.25s; }
+    section:nth-child(7) { animation-delay: 0.30s; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-num {
+      background: var(--accent);
+      color: #fff;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 500;
+      width: 1.8rem;
+      height: 1.8rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    h2 {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.55rem;
+      font-weight: 400;
+      color: var(--text);
+    }
+
+    h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 1.5rem 0 0.6rem;
+    }
+
+    p { margin-bottom: 0.9rem; color: #374151; }
+
+    ul, ol {
+      margin: 0.5rem 0 0.9rem 1.4rem;
+      color: #374151;
+      font-size: 0.9rem;
+      line-height: 1.9;
+    }
+
+    li { margin-bottom: 0.1rem; }
+
+    /* ── STEPS ── */
+    .steps {
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .step {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 2rem 1fr;
+      gap: 0.75rem;
+      align-items: start;
+    }
+
+    .step::before {
+      content: counter(step);
+      background: var(--accent2);
+      color: #fff;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0.1rem;
+      flex-shrink: 0;
+    }
+
+    .step-body { display: flex; flex-direction: column; gap: 0.4rem; }
+    .step-title { font-weight: 600; font-size: 0.9rem; }
+    .step-desc { color: #374151; font-size: 0.85rem; line-height: 1.6; }
+
+    /* ── CODE ── */
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      line-height: 1.6;
+    }
+
+    code {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      background: #E8F5E9;
+      color: #1B5E20;
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+    }
+
+    pre code { background: none; color: inherit; padding: 0; }
+
+    /* ── KBD ── */
+    kbd {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      background: #F3F4F6;
+      border: 1px solid #D1D5DB;
+      border-bottom: 2px solid #9CA3AF;
+      border-radius: 4px;
+      padding: 0.1em 0.45em;
+      color: #374151;
+      white-space: nowrap;
+    }
+
+    /* ── TABLES ── */
+    .table-wrap { overflow-x: auto; margin: 1rem 0; border-radius: 8px; border: 1px solid var(--border); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    th {
+      background: var(--accent);
+      color: #fff;
+      text-align: left;
+      padding: 0.65rem 1rem;
+      font-weight: 600;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+    }
+
+    td {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: #374151;
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #FAFAF8; }
+
+    /* ── CARDS ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    .card-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .card-label { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.2rem; }
+    .card-desc { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── MODE CARDS ── */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      gap: 0.85rem;
+      margin: 1rem 0;
+    }
+    .mode-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      transition: box-shadow 0.2s;
+    }
+    .mode-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .mode-card-icon { font-size: 1.6rem; margin-bottom: 0.4rem; }
+    .mode-card-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.25rem; }
+    .mode-card-desc { font-size: 0.78rem; color: #374151; line-height: 1.5; margin-bottom: 0.5rem; }
+    .mode-card-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 20px;
+    }
+    .mode-card-tag.sr { background: var(--tag-bg); color: var(--tag-text); }
+    .mode-card-tag.all { background: #EDE8FF; color: #4C1D95; }
+
+    /* ── CALLOUTS ── */
+    .callout {
+      border-left: 3px solid var(--accent2);
+      background: #F0FBF4;
+      padding: 0.85rem 1.1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+      color: #1B4332;
+    }
+
+    .callout.warn {
+      border-color: var(--warn-border);
+      background: var(--warn-bg);
+      color: #7C4700;
+    }
+
+    .callout.tip {
+      border-color: #3B82F6;
+      background: #EFF6FF;
+      color: #1E40AF;
+    }
+
+    .callout strong { display: block; margin-bottom: 0.25rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ── SR BOX DIAGRAM ── */
+    .sr-boxes {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      margin: 1.25rem 0;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+    .sr-box {
+      min-width: 90px;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 0.8rem 0.5rem;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .sr-box.b1 { border-color: #EF4444; background: #FEF2F2; }
+    .sr-box.b2 { border-color: #F97316; background: #FFF7ED; }
+    .sr-box.b3 { border-color: #EAB308; background: #FEFCE8; }
+    .sr-box.b4 { border-color: #22C55E; background: #F0FDF4; }
+    .sr-box.b5 { border-color: #3B82F6; background: #EFF6FF; }
+    .sr-box.b6 { border-color: #8B5CF6; background: #F5F3FF; }
+    .sr-box-num { font-size: 1.3rem; font-weight: 700; font-family: 'DM Mono', monospace; }
+    .sr-box.b1 .sr-box-num { color: #DC2626; }
+    .sr-box.b2 .sr-box-num { color: #EA580C; }
+    .sr-box.b3 .sr-box-num { color: #CA8A04; }
+    .sr-box.b4 .sr-box-num { color: #16A34A; }
+    .sr-box.b5 .sr-box-num { color: #2563EB; }
+    .sr-box.b6 .sr-box-num { color: #7C3AED; }
+    .sr-box-label { font-size: 0.65rem; color: var(--muted); margin-top: 0.15rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+    .sr-box-name { font-size: 0.78rem; font-weight: 600; margin-top: 0.3rem; }
+    .sr-box.b1 .sr-box-name { color: #DC2626; }
+    .sr-box.b2 .sr-box-name { color: #EA580C; }
+    .sr-box.b3 .sr-box-name { color: #CA8A04; }
+    .sr-box.b4 .sr-box-name { color: #16A34A; }
+    .sr-box.b5 .sr-box-name { color: #2563EB; }
+    .sr-box.b6 .sr-box-name { color: #7C3AED; }
+    .sr-box-interval { font-size: 0.72rem; font-family: 'DM Mono', monospace; margin-top: 0.45rem; font-weight: 700; padding: 0.15rem 0.4rem; border-radius: 4px; display: inline-block; }
+    .sr-box.b1 .sr-box-interval { color: #DC2626; background: #FEE2E2; }
+    .sr-box.b2 .sr-box-interval { color: #EA580C; background: #FFEDD5; }
+    .sr-box.b3 .sr-box-interval { color: #CA8A04; background: #FEF9C3; }
+    .sr-box.b4 .sr-box-interval { color: #16A34A; background: #DCFCE7; }
+    .sr-box.b5 .sr-box-interval { color: #2563EB; background: #DBEAFE; }
+    .sr-box.b6 .sr-box-interval { color: #7C3AED; background: #EDE9FE; }
+    .sr-arrow { color: #9CA3AF; font-size: 1.1rem; font-weight: 700; padding: 0 0.35rem; flex-shrink: 0; }
+
+    /* ── SR OUTCOME BOXES ── */
+    .sr-outcomes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .sr-outcome {
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      font-size: 0.85rem;
+    }
+    .sr-outcome.ok { background: #F0FDF4; border: 2px solid #22C55E; }
+    .sr-outcome.err { background: #FEF2F2; border: 2px solid #EF4444; }
+    .sr-outcome-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.3rem; }
+    .sr-outcome.ok .sr-outcome-title { color: #15803D; }
+    .sr-outcome.err .sr-outcome-title { color: #DC2626; }
+    .sr-outcome-desc { color: #374151; line-height: 1.5; }
+
+    /* ── SR TABLE COLORS ── */
+    .sr-table td:first-child { font-family: 'DM Mono', monospace; font-size: 0.78rem; }
+    .sr-table .fach-1 { color: #DC2626; font-weight: 700; }
+    .sr-table .fach-2 { color: #EA580C; font-weight: 700; }
+    .sr-table .fach-3 { color: #CA8A04; font-weight: 700; }
+    .sr-table .fach-4 { color: #16A34A; font-weight: 700; }
+    .sr-table .fach-5 { color: #2563EB; font-weight: 700; }
+    .sr-table .fach-6 { color: #7C3AED; font-weight: 700; }
+
+    /* ── KEYBOARD TABLE ── */
+    .key-table td { vertical-align: middle; }
+    .key-table .keys { white-space: nowrap; }
+
+    /* ── SETTINGS GROUPS ── */
+    .settings-group {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    .settings-group-header {
+      background: #F0FBF4;
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .settings-row {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-row:nth-child(even) { background: #FAFAF8; }
+    .settings-row > div { padding: 0.6rem 1rem; font-size: 0.85rem; }
+    .settings-label { font-weight: 600; color: var(--text); }
+    .settings-desc { color: #374151; }
+
+    /* ── FAQ ── */
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+      background: var(--surface);
+    }
+
+    .faq-q {
+      padding: 0.85rem 1rem;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      user-select: none;
+    }
+
+    .faq-q:hover { background: #F9F9F7; }
+
+    .faq-arrow {
+      flex-shrink: 0;
+      color: var(--accent);
+      transition: transform 0.2s;
+      font-style: normal;
+    }
+
+    .faq-a {
+      display: none;
+      padding: 0 1rem 0.85rem;
+      font-size: 0.85rem;
+      color: #374151;
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem;
+      line-height: 1.6;
+    }
+
+    .faq-item.open .faq-a { display: block; }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .page-grid { grid-template-columns: 1fr; }
+      nav { position: static; height: auto; }
+      main { padding: 1.5rem; }
+      .sr-outcomes { grid-template-columns: 1fr; }
+      .settings-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-grid">
+
+  <!-- ── SIDEBAR ── -->
+  <nav>
+    <div class="nav-logo">
+      <div class="app-name">📚 VokabelTrainer</div>
+      <div class="app-sub">Benutzerdokumentation</div>
+    </div>
+
+    <div class="nav-section-label">Inhalt</div>
+    <ul>
+      <li><a href="#ueberblick" class="active"><span class="nav-icon">●</span> Überblick</a></li>
+      <li><a href="#einrichtung"><span class="nav-icon">⚡</span> Ersteinrichtung</a></li>
+      <li><a href="#home"><span class="nav-icon">🏠</span> Startseite</a></li>
+      <li><a href="#lernen"><span class="nav-icon">🧠</span> Lernen</a></li>
+      <li><a href="#vokabeln"><span class="nav-icon">📚</span> Vokabeln</a></li>
+      <li><a href="#spaced"><span class="nav-icon">🔁</span> Spaced Repetition</a></li>
+      <li><a href="#statistik"><span class="nav-icon">📊</span> Statistik</a></li>
+      <li><a href="#einstellungen"><span class="nav-icon">⚙️</span> Einstellungen</a></li>
+      <li><a href="#datenschutz"><span class="nav-icon">🔒</span> Datenschutz</a></li>
+      <li><a href="#faq"><span class="nav-icon">❓</span> FAQ</a></li>
+    </ul>
+
+    <div class="nav-version">Version 1.2 · Mai 2026</div>
+  </nav>
+
+  <!-- ── MAIN ── -->
+  <main>
+
+    <div class="page-header">
+      <h1>Benutzerdokumentation</h1>
+      <div class="meta">
+        <span class="badge">v1.2</span>
+        <span>Offline-PWA · iPhone</span>
+        <span>Stand: Mai 2026</span>
+      </div>
+    </div>
+
+    <!-- ── 0 ÜBERBLICK ── -->
+    <section id="ueberblick">
+      <div class="section-header">
+        <div class="section-num">0</div>
+        <h2>Überblick</h2>
+      </div>
+      <p>VokabelTrainer ist eine offline-fähige App zum Lernen englischer und spanischer Vokabeln mit Karteikarten und intelligentem Wiederholungsalgorithmus. Die App läuft vollständig auf dem iPhone – ohne Internetverbindung und ohne App Store.</p>
+      <p>Sie gliedert sich in fünf Bereiche, erreichbar über die Navigationsleiste am unteren Bildschirmrand:</p>
+
+      <div class="card-grid">
+        <div class="card"><div class="card-icon">🏠</div><div class="card-label">Home</div><div class="card-desc">Sprachauswahl, Tagesübersicht, Lernen starten</div></div>
+        <div class="card"><div class="card-icon">🧠</div><div class="card-label">Lernen</div><div class="card-desc">4 Lernmodi: Karteikarten, Alle, Quiz, Eingabe</div></div>
+        <div class="card"><div class="card-icon">📚</div><div class="card-label">Vokabeln</div><div class="card-desc">Suchen, filtern und eigene Wörter hinzufügen</div></div>
+        <div class="card"><div class="card-icon">📊</div><div class="card-label">Statistik</div><div class="card-desc">Lernfortschritt und Trainings-Regelmäßigkeit</div></div>
+        <div class="card"><div class="card-icon">⚙️</div><div class="card-label">Einstellungen</div><div class="card-desc">Sprache, Modi, Limits und Audio konfigurieren</div></div>
+        <div class="card"><div class="card-icon">✈️</div><div class="card-label">Offline</div><div class="card-desc">Alle Daten lokal gespeichert – kein Internet nötig</div></div>
+      </div>
+    </section>
+
+    <!-- ── 1 ERSTEINRICHTUNG ── -->
+    <section id="einrichtung">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <h2>Ersteinrichtung</h2>
+      </div>
+      <p>Diese Schritte sind nur einmal notwendig. Danach startet die App direkt vom iPhone-Homescreen – ohne Mac und ohne WLAN.</p>
+
+      <div class="callout">
+        <strong>Voraussetzung</strong>
+        Mac und iPhone befinden sich beim ersten Start im selben WLAN-Netzwerk.
+      </div>
+
+      <h3>Schritt 1 – App auf dem Mac bereitstellen</h3>
+      <p>Terminal auf dem Mac öffnen, ins Projektverzeichnis wechseln und eingeben:</p>
+      <pre><code>npm run build
+npx serve -s dist</code></pre>
+      <p>Das Terminal zeigt die Netzwerkadresse, z.&nbsp;B.:</p>
+      <pre><code>Network: http://192.168.1.42:3000</code></pre>
+
+      <h3>Schritt 2 – App auf dem iPhone öffnen und installieren</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Safari öffnen</div>
+            <div class="step-desc">Auf dem iPhone Safari starten (nicht Chrome oder andere Browser – nur Safari unterstützt die Homescreen-Installation).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Adresse eingeben</div>
+            <div class="step-desc">Die Netzwerkadresse aus dem Terminal in die Adressleiste eingeben, z.&nbsp;B. <code>http://192.168.1.42:3000</code>. Die App erscheint und lädt sich einmalig in den Offline-Cache.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Teilen-Button antippen</div>
+            <div class="step-desc">Das Symbol <strong>□↑</strong> in der unteren Safari-Leiste antippen.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">„Zum Home-Bildschirm" wählen</div>
+            <div class="step-desc">Im Menü nach unten scrollen und diese Option antippen.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Bestätigen</div>
+            <div class="step-desc">Namen ggf. anpassen → <strong>„Hinzufügen"</strong> antippen. Die App erscheint als Icon auf dem Homescreen und läuft fortan ohne WLAN.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <strong>Ab jetzt offline nutzbar</strong>
+        Nachdem die App einmal vollständig geladen wurde, läuft sie dauerhaft offline – auch ohne Mac im Netzwerk. Der Mac wird nur erneut gebraucht, wenn eine neue Version installiert werden soll.
+      </div>
+    </section>
+
+    <!-- ── 2 STARTSEITE ── -->
+    <section id="home">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <h2>Startseite (🏠 Home)</h2>
+      </div>
+      <p>Die Startseite zeigt auf einen Blick den Lernstand des Tages und dient als schneller Einstieg ins Lernen.</p>
+
+      <h3>Sprachauswahl</h3>
+      <p>Oben auf der Startseite kann zwischen den zwei verfügbaren Sprachen gewechselt werden: 🇬🇧 Englisch und 🇪🇸 Spanisch. Die Wahl gilt global – alle Bereiche der App (Lernen, Vokabeln, Statistik) zeigen danach Inhalte für diese Sprache.</p>
+
+      <h3>Abfragerichtung</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Option</th><th>Vorderseite der Karte</th><th>Gesucht</th></tr></thead>
+          <tbody>
+            <tr><td>DE → EN / DE → ES</td><td>Deutsches Wort</td><td>Fremdsprachige Übersetzung</td></tr>
+            <tr><td>EN → DE / ES → DE</td><td>Fremdsprachiges Wort</td><td>Deutsche Bedeutung</td></tr>
+            <tr><td>🎲 Zufall</td><td>Wechselt zufällig bei jeder Karte</td><td>Mal die eine, mal die andere Richtung</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Tagesbanner</h3>
+      <p>Das farbige Banner zeigt, wie viele Karten heute fällig sind. Ein Antippen startet sofort die Lernsitzung im Modus „Fällige Karten". Direkt darunter erscheint ggf. die Anzahl neuer Karten, die heute noch eingeführt werden können.</p>
+
+      <h3>Fach-Übersicht</h3>
+      <p>Sechs farbige Kacheln zeigen, wie viele Karten sich aktuell in welchem der sechs Fächer befinden. Die Farben entsprechen dem Ampelsystem: Rot (Fach 1–2) bedeutet viele Wiederholungen nötig, Lila (Fach 6) steht für vollständig gelernte Karten.</p>
+    </section>
+
+    <!-- ── 3 LERNEN ── -->
+    <section id="lernen">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <h2>Lernen (🧠)</h2>
+      </div>
+      <p>Der Lernen-Tab bietet vier verschiedene Lernmodi. Vor dem Start erscheint ein Auswahlbildschirm mit vier Buttons.</p>
+
+      <h3>Die vier Lernmodi im Überblick</h3>
+      <div class="mode-grid">
+        <div class="mode-card">
+          <div class="mode-card-icon">🎯</div>
+          <div class="mode-card-title">Fällige Karten</div>
+          <div class="mode-card-desc">Nur Karten, die laut Wiederholungsplan heute an der Reihe sind – plus neue Karten bis zum Tageslimit. Der Haupt-Lernmodus.</div>
+          <span class="mode-card-tag sr">Fächer aktiv</span>
+        </div>
+        <div class="mode-card">
+          <div class="mode-card-icon">🔁</div>
+          <div class="mode-card-title">Alle Vokabeln</div>
+          <div class="mode-card-desc">Alle Karten der gewählten Sprache in zufälliger Reihenfolge als Karteikarten. Gut für freies Üben ohne Tageslimit.</div>
+          <span class="mode-card-tag sr">Fächer aktiv</span>
+        </div>
+        <div class="mode-card">
+          <div class="mode-card-icon">🧩</div>
+          <div class="mode-card-title">Quiz</div>
+          <div class="mode-card-desc">Multiple-Choice mit vier Antwortmöglichkeiten. Zeigt fällige und neue Karten.</div>
+          <span class="mode-card-tag sr">Fächer aktiv</span>
+        </div>
+        <div class="mode-card">
+          <div class="mode-card-icon">✍️</div>
+          <div class="mode-card-title">Eingabe</div>
+          <div class="mode-card-desc">Antwort frei eintippen. Optionale Tipptoleranz. Zeigt fällige und neue Karten.</div>
+          <span class="mode-card-tag sr">Fächer aktiv</span>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Alle Modi beeinflussen den Lernfortschritt</strong>
+        In jedem Modus wird jede Bewertung (richtig / falsch) im Spaced-Repetition-System gespeichert. Die Karte rückt das Fach vor oder fällt zurück – egal welchen Modus du wählst.
+      </div>
+
+      <h3>Karteikarten-Modus (Fällige Karten / Alle Vokabeln)</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Vorderseite: Frage lesen</div>
+            <div class="step-desc">Das Wort gemäß gewählter Abfragerichtung wird angezeigt. Beugungsformen und Kategorie sind sichtbar.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Antwort überlegen und Karte aufdecken</div>
+            <div class="step-desc">Karte antippen oder <kbd>Enter</kbd> drücken – die Rückseite klappt auf. Falls konfiguriert, wird die Antwort automatisch vorgelesen.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Selbst ehrlich bewerten</div>
+            <div class="step-desc">
+              <strong>✓ Richtig</strong> antippen (oder <kbd>Shift</kbd> + <kbd>→</kbd>) – Karte rückt ein Fach vor.<br>
+              <strong>✗ Falsch</strong> antippen (oder <kbd>Shift</kbd> + <kbd>←</kbd>) – Karte fällt auf Fach 1 zurück.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Quiz-Modus</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Frage und vier Antwortoptionen erscheinen</div>
+            <div class="step-desc">Das Wort auf der Vorderseite und vier Auswahlmöglichkeiten werden angezeigt. Eine ist korrekt, drei sind Ablenkungsantworten aus demselben Vokabelpool.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Antwort wählen</div>
+            <div class="step-desc">Antippen oder Taste <kbd>1</kbd>–<kbd>4</kbd> drücken. Die richtige Antwort wird grün markiert, falsch gewählte Antworten rot.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Weiter zur nächsten Karte</div>
+            <div class="step-desc"><strong>Weiter</strong> antippen oder <kbd>Enter</kbd> / <kbd>Leertaste</kbd> drücken.</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Eingabe-Modus</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Frage wird angezeigt</div>
+            <div class="step-desc">Das zu übersetzende Wort erscheint, darunter ein leeres Texteingabefeld.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Antwort eintippen</div>
+            <div class="step-desc">Übersetzung frei in das Textfeld eingeben. Groß-/Kleinschreibung spielt keine Rolle.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Prüfen</div>
+            <div class="step-desc"><strong>Prüfen</strong> antippen oder <kbd>Enter</kbd> drücken. Das Ergebnis wird sofort angezeigt:<br><br>
+              <strong>✓ Richtig</strong> – Antwort war korrekt.<br>
+              <strong>~ Fast richtig</strong> – Kleiner Tippfehler, aber im Toleranzbereich (wenn Tipptolerant aktiv; bis zu 2 Zeichen Unterschied).<br>
+              <strong>✗ Falsch</strong> – Anzeige der richtigen Antwort zum Vergleich.
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Weiter</div>
+            <div class="step-desc"><strong>Weiter</strong> antippen oder <kbd>Enter</kbd> drücken, um zur nächsten Karte zu gelangen.</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Tastatur-Kurzreferenz</h3>
+      <div class="table-wrap">
+        <table class="key-table">
+          <thead><tr><th>Taste</th><th>Funktion</th><th>Verfügbar in</th></tr></thead>
+          <tbody>
+            <tr><td class="keys"><kbd>Enter</kbd></td><td>Karte aufdecken / Antwort prüfen / Weiter</td><td>Allen Modi</td></tr>
+            <tr><td class="keys"><kbd>Shift</kbd> + <kbd>→</kbd></td><td>Richtig bewerten</td><td>Karteikarten</td></tr>
+            <tr><td class="keys"><kbd>Shift</kbd> + <kbd>←</kbd></td><td>Falsch bewerten</td><td>Karteikarten</td></tr>
+            <tr><td class="keys"><kbd>1</kbd> – <kbd>4</kbd></td><td>Quiz-Antwort auswählen</td><td>Quiz</td></tr>
+            <tr><td class="keys"><kbd>Leertaste</kbd></td><td>Weiter zur nächsten Karte</td><td>Quiz</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Audio</h3>
+      <p>In allen Lernmodi ist oben rechts der 🔈-Button verfügbar, der das aktuell angezeigte Wort vorliest. Alternativ kann das automatische Vorlesen nach dem Aufdecken der Antwort in den Einstellungen aktiviert werden (getrennt für Karteikarten und Quiz).</p>
+
+      <h3>Sitzungsende</h3>
+      <p>Nach der letzten Karte erscheint eine Auswertung mit der Anzahl richtig / falsch beantworteter Karten, der Erfolgsquote und der Anzahl neu eingeführter Karten. „Neue Sitzung" kehrt zum Auswahlbildschirm zurück.</p>
+    </section>
+
+    <!-- ── 4 VOKABELN ── -->
+    <section id="vokabeln">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <h2>Vokabeln (📚)</h2>
+      </div>
+      <p>Der Vokabeln-Tab zeigt alle Vokabeln der App und erlaubt das Hinzufügen eigener Einträge.</p>
+
+      <h3>Anzeige und Filter</h3>
+      <p>Oben kann zwischen 🇬🇧 Englisch und 🇪🇸 Spanisch gewechselt werden. Das Suchfeld filtert gleichzeitig nach deutschem Wort und Übersetzung. Zwei scrollbare Filterzeilen erlauben die Einschränkung nach:</p>
+      <ul>
+        <li><strong>Kategorie:</strong> Tiere, Essen &amp; Trinken, Körper, Kleidung, Natur &amp; Wetter, Zuhause, Transport, Sport &amp; Freizeit, Berufe, Technologie, Orte, Verben, Diverses</li>
+        <li><strong>Fach:</strong> Alle Fächer oder gezielt Fach 1–6</li>
+      </ul>
+      <p>Jeder Listeneintrag zeigt: Emoji, deutsches Wort, Übersetzung, Beugungsformen (falls vorhanden), Kategorie-Badge und das aktuelle Fach als farbigen Kreis.</p>
+
+      <h3>Eigene Vokabel hinzufügen</h3>
+      <p>„+ Neu" antippen, Formular ausfüllen und speichern:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Feld</th><th>Beschreibung</th><th>Pflicht</th></tr></thead>
+          <tbody>
+            <tr><td>Sprache</td><td>🇬🇧 Englisch oder 🇪🇸 Spanisch</td><td>Ja</td></tr>
+            <tr><td>Emoji</td><td>Symbol zur Veranschaulichung (Standard: 📝)</td><td>Nein</td></tr>
+            <tr><td>Deutsch</td><td>Das deutsche Wort</td><td>Ja</td></tr>
+            <tr><td>Englisch / Spanisch</td><td>Die fremdsprachige Übersetzung</td><td>Ja</td></tr>
+            <tr><td>Beugungsformen</td><td>Plural, Konjugation o. Ä., z.&nbsp;B. <code>[dogs]</code> oder <code>[lief, gelaufen]</code></td><td>Nein</td></tr>
+            <tr><td>Kategorie</td><td>Thematische Zuordnung für die Filter-Ansicht</td><td>Nein</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Eigene Vokabel löschen</h3>
+      <p>Eigene Vokabeln sind mit einem 🗑️-Symbol gekennzeichnet. Antippen → Löschung bestätigen. Der zugehörige Lernfortschritt wird ebenfalls entfernt.</p>
+
+      <div class="callout warn">
+        <strong>Fest eingebaute Vokabeln</strong>
+        Eingebaute Vokabeln können weder bearbeitet noch gelöscht werden. Nur selbst hinzugefügte Einträge zeigen das 🗑️-Symbol.
+      </div>
+    </section>
+
+    <!-- ── 5 SPACED REPETITION ── -->
+    <section id="spaced">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <h2>Spaced Repetition</h2>
+      </div>
+      <p>Die App verwendet ein <strong>6-Fach-Lernkartei-System</strong>. Die Grundidee: Eine Vokabel wird genau dann wiederholt, wenn sie im Begriff ist, vergessen zu werden – nicht früher und nicht später. Je sicherer du eine Karte kennst, desto länger der Abstand bis zur nächsten Wiederholung.</p>
+
+      <h3>Das 6-Fach-System</h3>
+      <p>Jede Vokabel sitzt in einem von sechs Fächern. Das Fach bestimmt, wann die Karte das nächste Mal erscheint:</p>
+
+      <div class="sr-boxes">
+        <div class="sr-box b1">
+          <div class="sr-box-num">1</div>
+          <div class="sr-box-label">Fach</div>
+          <div class="sr-box-name">Neu</div>
+          <div class="sr-box-interval">morgen</div>
+        </div>
+        <span class="sr-arrow">→</span>
+        <div class="sr-box b2">
+          <div class="sr-box-num">2</div>
+          <div class="sr-box-label">Fach</div>
+          <div class="sr-box-name">Bekannt</div>
+          <div class="sr-box-interval">+1 Tag</div>
+        </div>
+        <span class="sr-arrow">→</span>
+        <div class="sr-box b3">
+          <div class="sr-box-num">3</div>
+          <div class="sr-box-label">Fach</div>
+          <div class="sr-box-name">Gut</div>
+          <div class="sr-box-interval">+3 Tage</div>
+        </div>
+        <span class="sr-arrow">→</span>
+        <div class="sr-box b4">
+          <div class="sr-box-num">4</div>
+          <div class="sr-box-label">Fach</div>
+          <div class="sr-box-name">Sicher</div>
+          <div class="sr-box-interval">+7 Tage</div>
+        </div>
+        <span class="sr-arrow">→</span>
+        <div class="sr-box b5">
+          <div class="sr-box-num">5</div>
+          <div class="sr-box-label">Fach</div>
+          <div class="sr-box-name">Fast perfekt</div>
+          <div class="sr-box-interval">+14 Tage</div>
+        </div>
+        <span class="sr-arrow">→</span>
+        <div class="sr-box b6">
+          <div class="sr-box-num">6</div>
+          <div class="sr-box-label">Fach</div>
+          <div class="sr-box-name">Gelernt ✓</div>
+          <div class="sr-box-interval">nie wieder</div>
+        </div>
+      </div>
+
+      <h3>Was passiert bei der Bewertung?</h3>
+      <div class="sr-outcomes">
+        <div class="sr-outcome ok">
+          <div class="sr-outcome-title">✓ Richtig beantwortet</div>
+          <div class="sr-outcome-desc">Die Karte rückt ein Fach vor. Das nächste Fälligkeitsdatum verschiebt sich um das Intervall des neuen Fachs nach hinten. In Fach 6 angekommen erscheint die Karte nicht mehr.</div>
+        </div>
+        <div class="sr-outcome err">
+          <div class="sr-outcome-title">✗ Falsch beantwortet</div>
+          <div class="sr-outcome-desc">Die Karte fällt – egal aus welchem Fach – auf Fach 1 zurück. Sie erscheint <strong>morgen</strong> wieder (nicht sofort), damit die Sitzung nicht durch dieselbe Karte blockiert wird.</div>
+        </div>
+      </div>
+
+      <h3>Neue Karten</h3>
+      <p>Karten, die noch nie gezeigt wurden, sind <strong>keine</strong> fälligen Karten – sie werden separat über ein eigenes Tageslimit eingeführt (einstellbar in den Einstellungen). Standardmäßig kommen täglich 5 neue Karten dazu. So wird der tägliche Lernaufwand kontrollierbar gehalten.</p>
+
+      <h3>Beispiel: Wie eine Karte durchs System wandert</h3>
+      <div class="table-wrap">
+        <table class="sr-table">
+          <thead><tr><th>Wann</th><th>Bewertung</th><th>Fach vorher</th><th>Fach nachher</th><th>Nächste Wiederholung</th></tr></thead>
+          <tbody>
+            <tr><td>Tag 1</td><td>Neue Karte eingeführt, richtig</td><td class="fach-1">Fach 1</td><td class="fach-2">Fach 2</td><td>Tag 2</td></tr>
+            <tr><td>Tag 2</td><td>Richtig</td><td class="fach-2">Fach 2</td><td class="fach-3">Fach 3</td><td>Tag 5</td></tr>
+            <tr><td>Tag 5</td><td>Falsch</td><td class="fach-3">Fach 3</td><td class="fach-1">Fach 1</td><td>Tag 6 (morgen)</td></tr>
+            <tr><td>Tag 6</td><td>Richtig</td><td class="fach-1">Fach 1</td><td class="fach-2">Fach 2</td><td>Tag 7</td></tr>
+            <tr><td>Tag 7</td><td>Richtig</td><td class="fach-2">Fach 2</td><td class="fach-3">Fach 3</td><td>Tag 10</td></tr>
+            <tr><td>Tag 10</td><td>Richtig</td><td class="fach-3">Fach 3</td><td class="fach-4">Fach 4</td><td>Tag 17</td></tr>
+            <tr><td>Tag 17</td><td>Richtig</td><td class="fach-4">Fach 4</td><td class="fach-5">Fach 5</td><td>Tag 31</td></tr>
+            <tr><td>Tag 31</td><td>Richtig</td><td class="fach-5">Fach 5</td><td class="fach-6">Fach 6 ✓</td><td>Nie wieder</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Tipps für maximalen Lernerfolg</h3>
+      <ul>
+        <li><strong>Täglich üben</strong> – auch 10 Minuten reichen. Regelmäßigkeit ist wichtiger als Länge der Sitzung.</li>
+        <li><strong>Zuerst „Fällige Karten" wählen</strong> – das ist der effektivste Modus. Nur hier werden die Karten zum optimalen Zeitpunkt wiederholt.</li>
+        <li><strong>Ehrlich bewerten</strong> – im Karteikarten-Modus bewertest du dich selbst. Ein „Richtig" obwohl du unsicher warst verlangsamt den Lernerfolg.</li>
+        <li><strong>Neue Karten-Limit beachten</strong> – nicht zu viele neue Karten auf einmal. 5 pro Tag ist ein bewährter Startwert.</li>
+        <li><strong>Einen Tag verpasst?</strong> Kein Problem – fällige Karten bleiben fällig und warten beim nächsten Start auf dich.</li>
+      </ul>
+    </section>
+
+    <!-- ── 6 STATISTIK ── -->
+    <section id="statistik">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <h2>Statistik (📊)</h2>
+      </div>
+      <p>Der Statistik-Tab gibt einen vollständigen Überblick über den Lernfortschritt beider Sprachen.</p>
+
+      <h3>Übersicht je Sprache</h3>
+      <p>Zwei nebeneinanderstehende Kacheln zeigen für Englisch und Spanisch auf einen Blick:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Anzeige</th><th>Bedeutung</th></tr></thead>
+          <tbody>
+            <tr><td>Fällig heute</td><td>Wie viele Karten jetzt sofort gelernt werden könnten</td></tr>
+            <tr><td>Gelernt</td><td>Karten in Fach 6 – vollständig beherrscht</td></tr>
+            <tr><td>Gesamt</td><td>Alle Vokabeln dieser Sprache (eingebaut + eigene)</td></tr>
+            <tr><td>Erfolgsquote</td><td>Anteil korrekt beantworteter Karten über alle bisherigen Bewertungen in %</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Detailansicht (nach Sprachauswahl)</h3>
+      <ul>
+        <li><strong>Lernkartei – Fächer:</strong> Balkendiagramm mit der Verteilung der Karten auf Fach 1–6. Ein hoher Balken bei Fach 6 bedeutet: viel gelernt.</li>
+        <li><strong>Trainings-Regelmäßigkeit:</strong> Kalenderansicht der letzten Tage (grüne Punkte = trainiert) und Prozentwerte für 7, 30 und 90 Tage. Wird nur nach abgeschlossenen Fällig-Karten-Sitzungen aktualisiert.</li>
+        <li><strong>Fortschritt nach Kategorie:</strong> Für jede Kategorie zeigt ein Fortschrittsbalken den Anteil fertiger (Fach 6) und in Bearbeitung befindlicher Karten.</li>
+      </ul>
+
+      <h3>Fortschritt zurücksetzen</h3>
+      <p>Der Button am Ende der Statistik-Seite setzt alle Karten auf den Ausgangszustand zurück (wie beim ersten Start). <strong>Eigene Vokabeln bleiben dabei erhalten.</strong></p>
+
+      <div class="callout warn">
+        <strong>Dieser Vorgang kann nicht rückgängig gemacht werden</strong>
+        Der gesamte Lernfortschritt (alle Fach-Zuordnungen und Bewertungszähler) wird dauerhaft gelöscht.
+      </div>
+    </section>
+
+    <!-- ── 7 EINSTELLUNGEN ── -->
+    <section id="einstellungen">
+      <div class="section-header">
+        <div class="section-num">7</div>
+        <h2>Einstellungen (⚙️)</h2>
+      </div>
+      <p>Die Einstellungen sind über den ⚙️-Tab in der Navigationsleiste erreichbar. Alle Änderungen werden sofort gespeichert.</p>
+
+      <div class="settings-group">
+        <div class="settings-group-header">🌍 Lerninhalt</div>
+        <div class="settings-row">
+          <div class="settings-label">Lernsprache</div>
+          <div class="settings-desc">Aktive Sprache: 🇬🇧 Englisch oder 🇪🇸 Spanisch. Entspricht der Auswahl auf der Startseite.</div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-label">Abfragerichtung</div>
+          <div class="settings-desc">DE → Fremdsprache, Fremdsprache → DE, oder Zufällig gemischt. Entspricht der Auswahl auf der Startseite.</div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-header">📅 Tageslimits</div>
+        <div class="settings-row">
+          <div class="settings-label">Karten pro Tag</div>
+          <div class="settings-desc">Begrenzt fällige Karten pro Tag: 10 / 20 / 30 / 50 / ∞. Empfehlung für Einsteiger: 20. Wer viel Zeit hat, kann auf ∞ stellen.</div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-label">Neue Karten pro Tag</div>
+          <div class="settings-desc">Wie viele unbekannte Karten täglich neu eingeführt werden: 0 / 3 / 5 / 10 / ∞. Empfehlung: 5. Bei 0 lernt man keine neuen Karten, nur Wiederholungen.</div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-header">🔈 Audio</div>
+        <div class="settings-row">
+          <div class="settings-label">Quiz – Lösung vorlesen</div>
+          <div class="settings-desc">Spricht die richtige Antwort automatisch vor, sobald die Auflösung erscheint.</div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-label">Karteikarten – Lösung vorlesen</div>
+          <div class="settings-desc">Spricht die Rückseite automatisch vor, sobald die Karte aufgedeckt wird.</div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-header">✍️ Eingabe</div>
+        <div class="settings-row">
+          <div class="settings-label">Tipptolerant</div>
+          <div class="settings-desc">Im Eingabe-Modus werden kleine Tippfehler (bis zu 2 Zeichen Unterschied) als „fast richtig" gewertet und als korrekt gezählt. Empfehlenswert für lange oder schwierige Wörter.</div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <strong>Empfohlene Startkonfiguration</strong>
+        Karten pro Tag: 20 · Neue Karten: 5 · Tipptolerant: aktiv · Audio: nach Vorliebe. Diese Einstellungen sind ausgewogen für tägliches Lernen in 10–15 Minuten.
+      </div>
+    </section>
+
+    <!-- ── 8 DATENSCHUTZ ── -->
+    <section id="datenschutz">
+      <div class="section-header">
+        <div class="section-num">8</div>
+        <h2>Datenschutz &amp; Speicherung</h2>
+      </div>
+      <p>Alle Daten – Vokabeln, Lernfortschritt und Einstellungen – werden <strong>ausschließlich lokal auf dem Gerät</strong> gespeichert. Es werden keine Daten an externe Server übertragen, kein Konto benötigt und keine Nutzungsstatistiken erhoben.</p>
+
+      <p>Die Daten liegen im Browser-Speicher des iPhones (IndexedDB), der deutlich stabiler ist als der normale Browser-Cache. Dennoch gilt:</p>
+
+      <div class="callout warn">
+        <strong>Datenverlust vermeiden</strong>
+        Wird in Safari unter <em>Einstellungen → Safari → Verlauf und Websitedaten löschen</em> der Cache manuell bereinigt, können App-Daten verloren gehen. Die App immer über das Homescreen-Icon starten (nicht direkt im Safari-Browser öffnen), um dieses Risiko zu minimieren.
+      </div>
+
+      <div class="callout tip">
+        <strong>Sichere Nutzung</strong>
+        Starte die App immer über das Homescreen-Icon, nicht über einen Lesezeichen-Link in Safari. So läuft sie im Vollbild-Modus mit eigenem Speicherbereich, der nicht vom normalen Surf-Cache betroffen ist.
+      </div>
+    </section>
+
+    <!-- ── 9 FAQ ── -->
+    <section id="faq">
+      <div class="section-header">
+        <div class="section-num">9</div>
+        <h2>Häufige Fragen</h2>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Die App zeigt nach längerem Nichtbenutzen einen Fehler oder lädt nicht.
+          <i class="faq-arrow">▾</i>
+        </div>
+        <div class="faq-a">
+          Safari beendet den App-Hintergrundprozess nach einigen Wochen ohne Nutzung. Lösung: Mac einschalten, im Projektverzeichnis <code>npm run build &amp;&amp; npx serve -s dist</code> starten und die App einmal über WLAN neu laden. Danach läuft sie wieder dauerhaft offline. Alle Daten und der Lernfortschritt bleiben dabei erhalten.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Ich habe die Netzwerkadresse des Macs vergessen.
+          <i class="faq-arrow">▾</i>
+        </div>
+        <div class="faq-a">
+          Im Terminal auf dem Mac eingeben: <code>ipconfig getifaddr en0</code> – das gibt die aktuelle WLAN-IP-Adresse aus. Die vollständige URL lautet dann <code>http://&lt;IP-Adresse&gt;:3000</code>.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Was passiert, wenn ich eine Vokabel falsch beantworte?
+          <i class="faq-arrow">▾</i>
+        </div>
+        <div class="faq-a">
+          Die Karte fällt immer auf Fach 1 zurück – egal aus welchem Fach sie kommt. Sie erscheint aber <strong>nicht sofort erneut</strong> in derselben Sitzung, sondern erst am nächsten Tag. So wird die Sitzung nicht durch dieselbe Karte blockiert, und du hast eine Nacht Zeit, die Vokabel zu verinnerlichen.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Was ist der Unterschied zwischen „Fällige Karten" und „Alle Vokabeln"?
+          <i class="faq-arrow">▾</i>
+        </div>
+        <div class="faq-a">
+          „Fällige Karten" zeigt nur Karten, die laut Wiederholungsplan heute dran sind – plus neue Karten bis zum Tageslimit. Das ist der effiziente Alltagsmodus.<br><br>
+          „Alle Vokabeln" zeigt alle Karten der Sprache ohne Rücksicht auf den Plan – gut zum freien Üben oder Auffrischen. Beide Modi beeinflussen den Fach-Fortschritt gleichermaßen.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Warum sehe ich heute weniger fällige Karten als erwartet?
+          <i class="faq-arrow">▾</i>
+        </div>
+        <div class="faq-a">
+          Zwei Tageslimits begrenzen die Anzeige: das <strong>Karten-pro-Tag-Limit</strong> (wie viele fällige Karten insgesamt) und das <strong>Neue-Karten-Limit</strong> (wie viele neue Karten erstmalig eingeführt werden). Wenn du das Limit bereits ausgeschöpft hast – z.&nbsp;B. durch eine frühere Sitzung – erscheinen bis morgen keine weiteren Karten. Du kannst die Limits in den Einstellungen erhöhen oder auf ∞ stellen.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Kann ich die App auf mehreren Geräten nutzen?
+          <i class="faq-arrow">▾</i>
+        </div>
+        <div class="faq-a">
+          Ja. Dieselbe URL auf jedem Gerät in Safari öffnen und zum Homescreen hinzufügen. Die Lernstände werden jedoch <strong>nicht</strong> zwischen Geräten synchronisiert – jedes Gerät hat eine eigene lokale Datenbasis.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Wie viele Vokabeln sind eingebaut?
+          <i class="faq-arrow">▾</i>
+        </div>
+        <div class="faq-a">
+          Die App enthält fest eingebaute Vokabeln für Englisch und Spanisch, aufgeteilt in 13 Kategorien (Tiere, Essen &amp; Trinken, Körper, Kleidung, Natur &amp; Wetter, Zuhause, Transport, Sport &amp; Freizeit, Berufe, Technologie, Orte, Verben, Diverses). Eigene Einträge können beliebig ergänzt werden.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Kann ich Vokabeln sichern oder exportieren?
+          <i class="faq-arrow">▾</i>
+        </div>
+        <div class="faq-a">
+          Eine Exportfunktion ist derzeit nicht eingebaut. Die Daten liegen im lokalen Browserspeicher (IndexedDB) des iPhones. Eigene Vokabeln sollten daher auch woanders notiert werden, falls das Gerät zurückgesetzt werden muss.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Wie lange dauert es, bis alle eingebauten Vokabeln gelernt sind?
+          <i class="faq-arrow">▾</i>
+        </div>
+        <div class="faq-a">
+          Das hängt von den Tageslimits und der Regelmäßigkeit ab. Mit 5 neuen Karten pro Tag dauert es mehrere Monate, bis alle Karten das erste Mal gesehen wurden. Bis alle Karten in Fach 6 sitzen (vollständig gelernt) vergehen – bei täglichem Üben – erfahrungsgemäß 6 bis 12 Monate. Das Spaced-Repetition-System ist auf nachhaltiges Langzeitgedächtnis ausgelegt, nicht auf schnelles Auswendiglernen.
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.closest('.faq-item').classList.toggle('open');
+    });
+  });
+
+  // Active nav highlight on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const link = document.querySelector(`nav a[href="#${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

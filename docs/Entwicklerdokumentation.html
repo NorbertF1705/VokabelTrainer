@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VokabelTrainer – Entwicklerdokumentation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #F5F3EE;
+      --surface:   #FFFFFF;
+      --accent:    #1B4332;
+      --accent2:   #2D6A4F;
+      --accent3:   #52B788;
+      --text:      #1A1A1A;
+      --muted:     #6B7280;
+      --border:    #E2DDD6;
+      --tag-bg:    #D8F3DC;
+      --tag-text:  #1B4332;
+      --warn-bg:   #FFF8E1;
+      --warn-border:#F59E0B;
+      --info-bg:   #EDE8FF;
+      --info-border:#7C3AED;
+      --info-text: #4C1D95;
+      --code-bg:   #1A1A1A;
+      --code-text: #A3E4BC;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── LAYOUT ── */
+    .page-grid {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    nav {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--accent);
+      color: #fff;
+      padding: 2rem 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-logo {
+      padding: 0 1.5rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      margin-bottom: 1.5rem;
+    }
+    .nav-logo .app-name {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.3rem;
+      line-height: 1.2;
+      color: #fff;
+    }
+    .nav-logo .app-sub {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.55);
+      margin-top: 0.2rem;
+    }
+
+    nav ul { list-style: none; padding: 0 0.75rem; flex: 1; }
+    nav ul li { margin-bottom: 0.15rem; }
+    nav ul li a {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: background 0.15s, color 0.15s;
+    }
+    nav ul li a:hover,
+    nav ul li a.active {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+    }
+    .nav-icon { font-size: 1rem; width: 1.2rem; text-align: center; }
+
+    .nav-section-label {
+      padding: 0.9rem 1.5rem 0.3rem;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.4);
+      font-weight: 600;
+    }
+
+    .nav-version {
+      padding: 1rem 1.5rem 0;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.35);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: auto;
+    }
+
+    /* ── MAIN ── */
+    main {
+      padding: 3rem 4rem 5rem;
+      max-width: 900px;
+    }
+
+    .page-header {
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-header h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: 2.6rem;
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+    }
+
+    .page-header .meta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .badge.purple {
+      background: var(--info-bg);
+      color: var(--info-text);
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      margin-bottom: 3.5rem;
+      animation: fadeIn 0.4s ease both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-num {
+      background: var(--accent2);
+      color: #fff;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 500;
+      width: 1.8rem;
+      height: 1.8rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    h2 {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.55rem;
+      font-weight: 400;
+      color: var(--text);
+    }
+
+    h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent2);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 1.5rem 0 0.6rem;
+    }
+
+    h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 1.2rem 0 0.4rem;
+    }
+
+    p { margin-bottom: 0.9rem; color: #374151; }
+
+    ul, ol {
+      margin: 0.5rem 0 0.9rem 1.4rem;
+      color: #374151;
+      font-size: 0.9rem;
+      line-height: 1.9;
+    }
+
+    li { margin-bottom: 0.1rem; }
+
+    /* ── CODE ── */
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      line-height: 1.6;
+    }
+
+    code {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      background: #E8F5E9;
+      color: #1B5E20;
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+    }
+
+    pre code { background: none; color: inherit; padding: 0; }
+
+    /* ── TABLES ── */
+    .table-wrap { overflow-x: auto; margin: 1rem 0; border-radius: 8px; border: 1px solid var(--border); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    th {
+      background: var(--accent2);
+      color: #fff;
+      text-align: left;
+      padding: 0.65rem 1rem;
+      font-weight: 600;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+    }
+
+    td {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: #374151;
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #FAFAF8; }
+
+    td code { font-size: 0.78rem; }
+
+    /* ── CALLOUTS ── */
+    .callout {
+      border-left: 3px solid var(--accent3);
+      background: #F0FBF4;
+      padding: 0.85rem 1.1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+      color: #1B4332;
+    }
+
+    .callout.warn {
+      border-color: var(--warn-border);
+      background: var(--warn-bg);
+      color: #7C4700;
+    }
+
+    .callout.info {
+      border-color: var(--info-border);
+      background: var(--info-bg);
+      color: var(--info-text);
+    }
+
+    .callout strong { display: block; margin-bottom: 0.25rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 1rem 0;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+    }
+    .flow-box {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .flow-box.accent { border-color: var(--accent2); background: #F0FBF4; color: var(--accent2); }
+    .flow-box.purple { border-color: var(--info-border); background: var(--info-bg); color: var(--info-text); }
+    .flow-arrow { color: var(--muted); font-size: 1.1rem; font-weight: 700; }
+
+    /* ── FILE TREE v2 ── */
+    .filetree-new {
+      background: #161B22;
+      border-radius: 8px;
+      padding: 0.8rem 0;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      margin: 0.75rem 0;
+      overflow-x: auto;
+    }
+    .filetree-new > div {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 3px 1.2rem;
+      min-height: 1.75rem;
+      transition: background 0.1s;
+    }
+    .filetree-new > div:hover { background: rgba(255,255,255,0.05); }
+    .ftn-l1 { padding-left: 2.4rem !important; }
+    .ftn-l2 { padding-left: 3.8rem !important; }
+    .ftn-l3 { padding-left: 5.2rem !important; }
+    .ftn-d  { color: #79C0FF; font-weight: 500; white-space: nowrap; }
+    .ftn-f  { color: #A3E4BC; white-space: nowrap; }
+    .ftn-c  { color: #8B949E; font-size: 0.72rem; margin-left: auto; padding-left: 1.2rem; white-space: nowrap; flex-shrink: 0; }
+    .ftn-ico { flex-shrink: 0; font-size: 0.88rem; }
+    .ftn-divider {
+      border: none;
+      border-top: 1px solid #21262D;
+      margin: 0.3rem 1.2rem;
+    }
+
+    /* ── SR BOX DIAGRAM ── */
+    .sr-boxes {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      margin: 1.25rem 0;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+    .sr-box {
+      min-width: 90px;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 0.8rem 0.5rem;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .sr-box.b1 { border-color: #EF4444; background: #FEF2F2; }
+    .sr-box.b2 { border-color: #F97316; background: #FFF7ED; }
+    .sr-box.b3 { border-color: #EAB308; background: #FEFCE8; }
+    .sr-box.b4 { border-color: #22C55E; background: #F0FDF4; }
+    .sr-box.b5 { border-color: #3B82F6; background: #EFF6FF; }
+    .sr-box.b6 { border-color: #8B5CF6; background: #F5F3FF; }
+    .sr-box-num { font-size: 1.3rem; font-weight: 700; font-family: 'DM Mono', monospace; }
+    .sr-box.b1 .sr-box-num { color: #DC2626; }
+    .sr-box.b2 .sr-box-num { color: #EA580C; }
+    .sr-box.b3 .sr-box-num { color: #CA8A04; }
+    .sr-box.b4 .sr-box-num { color: #16A34A; }
+    .sr-box.b5 .sr-box-num { color: #2563EB; }
+    .sr-box.b6 .sr-box-num { color: #7C3AED; }
+    .sr-box-label { font-size: 0.62rem; color: var(--muted); margin-top: 0.15rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .sr-box-interval { font-size: 0.72rem; font-family: 'DM Mono', monospace; margin-top: 0.45rem; font-weight: 700; padding: 0.15rem 0.4rem; border-radius: 4px; display: inline-block; }
+    .sr-box.b1 .sr-box-interval { color: #DC2626; background: #FEE2E2; }
+    .sr-box.b2 .sr-box-interval { color: #EA580C; background: #FFEDD5; }
+    .sr-box.b3 .sr-box-interval { color: #CA8A04; background: #FEF9C3; }
+    .sr-box.b4 .sr-box-interval { color: #16A34A; background: #DCFCE7; }
+    .sr-box.b5 .sr-box-interval { color: #2563EB; background: #DBEAFE; }
+    .sr-box.b6 .sr-box-interval { color: #7C3AED; background: #EDE9FE; }
+    .sr-arrow { color: #9CA3AF; font-size: 1.1rem; font-weight: 700; padding: 0 0.35rem; flex-shrink: 0; }
+
+    .sr-wrong-note {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.6rem;
+      font-size: 0.8rem;
+      color: #DC2626;
+      font-style: italic;
+    }
+
+    /* ── ALGO STEPS ── */
+    .algo-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 1rem 0;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .algo-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .algo-step:last-child { border-bottom: none; }
+    .algo-step:nth-child(even) { background: #FAFAF8; }
+    .algo-step-num {
+      flex-shrink: 0;
+      width: 1.6rem;
+      height: 1.6rem;
+      background: var(--accent2);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: 'DM Mono', monospace;
+      margin-top: 0.1rem;
+    }
+    .algo-step-body { flex: 1; font-size: 0.85rem; color: #374151; line-height: 1.6; }
+    .algo-step-body strong { color: var(--text); }
+    .algo-step.branch { background: #FFF8E1 !important; border-left: 3px solid #F59E0B; }
+    .algo-step.branch .algo-step-num { background: #D97706; }
+    .algo-step.result-ok { background: #F0FBF4 !important; border-left: 3px solid var(--accent2); }
+    .algo-step.result-err { background: #FEF2F2 !important; border-left: 3px solid #EF4444; }
+
+    /* ── SEQUENCE (startup flow) ── */
+    .seq {
+      display: flex;
+      flex-direction: column;
+      margin: 1rem 0;
+    }
+    .seq-step {
+      display: flex;
+      gap: 0;
+      align-items: stretch;
+    }
+    .seq-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 2.2rem;
+    }
+    .seq-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent2);
+      flex-shrink: 0;
+      margin-top: 0.35rem;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px var(--accent2);
+    }
+    .seq-line {
+      width: 2px;
+      flex: 1;
+      background: var(--border);
+      min-height: 12px;
+      margin: 3px 0;
+    }
+    .seq-step:last-child .seq-line { display: none; }
+    .seq-content {
+      flex: 1;
+      padding: 0 0 1rem 0.75rem;
+    }
+    .seq-title { font-weight: 700; font-size: 0.9rem; color: var(--text); margin-bottom: 0.25rem; }
+    .seq-title code { font-size: 0.8rem; }
+    .seq-desc { font-size: 0.83rem; color: #374151; line-height: 1.6; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .page-grid { grid-template-columns: 1fr; }
+      nav { position: static; height: auto; }
+      main { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-grid">
+
+  <!-- ── SIDEBAR ── -->
+  <nav>
+    <div class="nav-logo">
+      <div class="app-name">🛠️ VokabelTrainer</div>
+      <div class="app-sub">Entwicklerdokumentation</div>
+    </div>
+
+    <div class="nav-section-label">Grundlagen</div>
+    <ul>
+      <li><a href="#stack" class="active"><span class="nav-icon">⚡</span> Tech-Stack</a></li>
+      <li><a href="#struktur"><span class="nav-icon">📁</span> Verzeichnisstruktur</a></li>
+      <li><a href="#einstieg"><span class="nav-icon">🚀</span> Einstiegspunkt</a></li>
+      <li><a href="#routing"><span class="nav-icon">🗺️</span> Routing</a></li>
+    </ul>
+
+    <div class="nav-section-label">Kern</div>
+    <ul>
+      <li><a href="#state"><span class="nav-icon">🧠</span> State Management</a></li>
+      <li><a href="#daten"><span class="nav-icon">📦</span> Datenschicht</a></li>
+      <li><a href="#storage"><span class="nav-icon">💾</span> Persistenz</a></li>
+      <li><a href="#spaced"><span class="nav-icon">🔁</span> Spaced Repetition</a></li>
+    </ul>
+
+    <div class="nav-section-label">Komponenten & Seiten</div>
+    <ul>
+      <li><a href="#komponenten"><span class="nav-icon">🧩</span> Komponenten</a></li>
+      <li><a href="#seiten"><span class="nav-icon">📄</span> Seiten (Pages)</a></li>
+    </ul>
+
+    <div class="nav-section-label">Infrastruktur</div>
+    <ul>
+      <li><a href="#pwa"><span class="nav-icon">📱</span> PWA & Service Worker</a></li>
+      <li><a href="#build"><span class="nav-icon">🔧</span> Build & Entwicklung</a></li>
+      <li><a href="#erweitern"><span class="nav-icon">➕</span> App erweitern</a></li>
+    </ul>
+
+    <div class="nav-version">Version 1.2.0 · Mai 2026</div>
+  </nav>
+
+  <!-- ── MAIN ── -->
+  <main>
+
+    <div class="page-header">
+      <h1>Entwicklerdokumentation</h1>
+      <div class="meta">
+        <span class="badge">v1.2.0</span>
+        <span class="badge purple">React 19</span>
+        <span class="badge purple">TypeScript</span>
+        <span class="badge purple">Vite + PWA</span>
+        <span>Stand: Mai 2026</span>
+      </div>
+    </div>
+
+    <!-- ── 1 TECH-STACK ── -->
+    <section id="stack">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <h2>Tech-Stack</h2>
+      </div>
+      <p>Die App ist eine Progressive Web App ohne Backend. Alle Daten werden lokal im Browser gespeichert.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Technologie</th><th>Version</th><th>Zweck</th></tr></thead>
+          <tbody>
+            <tr><td>React</td><td>19</td><td>UI-Framework</td></tr>
+            <tr><td>TypeScript</td><td>~5.9</td><td>Typsicherheit</td></tr>
+            <tr><td>React Router</td><td>v6</td><td>Client-seitiges Routing</td></tr>
+            <tr><td>Vite</td><td>6</td><td>Build-Tool &amp; Dev-Server</td></tr>
+            <tr><td>vite-plugin-pwa / Workbox</td><td>0.21</td><td>Service Worker, Offline-Cache, Web-Manifest</td></tr>
+            <tr><td>IndexedDB + localStorage</td><td>Browser-nativ</td><td>Persistenter Datenspeicher</td></tr>
+            <tr><td>Web Speech API</td><td>Browser-nativ</td><td>Text-to-Speech (Vokabeln vorlesen)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <strong>Keine externen Laufzeit-Abhängigkeiten</strong>
+        Die App verwendet weder ein CSS-Framework noch eine UI-Bibliothek. Alle Styles sind als Inline-Styles direkt in den Komponenten definiert. Es gibt kein Test-Framework und keine Linting-Konfiguration.
+      </div>
+    </section>
+
+    <!-- ── 2 VERZEICHNISSTRUKTUR ── -->
+    <section id="struktur">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <h2>Verzeichnisstruktur</h2>
+      </div>
+      <p>Alle relevanten Quelldateien liegen unter <code>src/</code>. Die Struktur folgt einer klaren Trennung nach Verantwortlichkeit: Seiten (pages), wiederverwendbare Komponenten (components), Geschäftslogik (context), Daten (data) und Hilfsfunktionen (utils).</p>
+
+      <div class="filetree-new">
+        <!-- Root -->
+        <div><span class="ftn-ico">📁</span><span class="ftn-d">vokabeltrainer-pwa/</span></div>
+
+        <hr class="ftn-divider">
+
+        <div class="ftn-l1"><span class="ftn-ico">📁</span><span class="ftn-d">docs/</span><span class="ftn-c">Benutzerdoku + Entwicklerdoku (HTML)</span></div>
+
+        <div class="ftn-l1"><span class="ftn-ico">📁</span><span class="ftn-d">public/</span></div>
+        <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">icons/</span><span class="ftn-c">icon-192.png, icon-512.png (PWA-Icons)</span></div>
+
+        <hr class="ftn-divider">
+
+        <div class="ftn-l1"><span class="ftn-ico">📁</span><span class="ftn-d">src/</span><span class="ftn-c">Gesamter Quellcode</span></div>
+
+        <div class="ftn-l2"><span class="ftn-ico">📄</span><span class="ftn-f">main.tsx</span><span class="ftn-c">Einstiegspunkt · mountet App · init Service Worker</span></div>
+        <div class="ftn-l2"><span class="ftn-ico">📄</span><span class="ftn-f">App.tsx</span><span class="ftn-c">Router-Konfiguration + Provider-Hierarchie</span></div>
+        <div class="ftn-l2"><span class="ftn-ico">📄</span><span class="ftn-f">index.css</span><span class="ftn-c">Globale Styles + FlashCard-3D-Flip-Animation</span></div>
+        <div class="ftn-l2"><span class="ftn-ico">📄</span><span class="ftn-f">version.ts</span><span class="ftn-c">APP_VERSION Konstante (einzige Stelle)</span></div>
+        <div class="ftn-l2"><span class="ftn-ico">📄</span><span class="ftn-f">vite-env.d.ts</span><span class="ftn-c">Vite-Typdeklarationen</span></div>
+
+        <hr class="ftn-divider">
+
+        <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">components/</span><span class="ftn-c">Wiederverwendbare UI-Bausteine</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Layout.tsx</span><span class="ftn-c">App-Rahmen mit Bottom-Navigation + &lt;Outlet&gt;</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">FlashCard.tsx</span><span class="ftn-c">Flip-Karteikarte (Vorder-/Rückseite, CSS-3D)</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">SWStatusPanel.tsx</span><span class="ftn-c">Service-Worker-Debug-Panel (in Einstellungen)</span></div>
+
+        <hr class="ftn-divider">
+
+        <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">constants/</span><span class="ftn-c">Anwendungskonstanten</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">languages.ts</span><span class="ftn-c">LANGUAGE_CONFIG: Label, Flag, speechCode, placeholder</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">theme.ts</span><span class="ftn-c">Farben, BOX_INTERVALS, Box-Labels</span></div>
+
+        <hr class="ftn-divider">
+
+        <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">context/</span><span class="ftn-c">Globaler State + Geschäftslogik</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">LearningContext.tsx</span><span class="ftn-c">Einziger Context: State, SR-Logik, alle Methoden</span></div>
+
+        <hr class="ftn-divider">
+
+        <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">data/</span><span class="ftn-c">Vokabeldaten</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">vocabulary_types.ts</span><span class="ftn-c">VocabularyItem &amp; Category Typ-Definitionen</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">vocabulary.ts</span><span class="ftn-c">Re-Exports + ALL_CATEGORIES Array</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">vocabulary_en.ts</span><span class="ftn-c">VOCABULARY_EN – eingebaute englische Vokabeln</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">vocabulary_es.ts</span><span class="ftn-c">VOCABULARY_ES – eingebaute spanische Vokabeln</span></div>
+
+        <hr class="ftn-divider">
+
+        <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">pages/</span><span class="ftn-c">Eine Datei pro Route</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Home.tsx</span><span class="ftn-c">/ – Startseite: Sprachauswahl, Tagesübersicht</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Learn.tsx</span><span class="ftn-c">/learn – Lernsitzung (komplexeste Seite)</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Vocabulary.tsx</span><span class="ftn-c">/vocabulary – Vokabelliste mit Suche &amp; Filtern</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Statistics.tsx</span><span class="ftn-c">/statistics – Lernstatistiken</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Settings.tsx</span><span class="ftn-c">/settings – Alle Benutzereinstellungen</span></div>
+
+        <hr class="ftn-divider">
+
+        <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">utils/</span><span class="ftn-c">Hilfsfunktionen</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">storage.ts</span><span class="ftn-c">IndexedDB + localStorage Wrapper (3 Funktionen)</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">serviceWorker.ts</span><span class="ftn-c">SW-Registrierung, Update-Checks, iOS-Quirks</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">swOverlay.ts</span><span class="ftn-c">Debug-Overlay für SW-Diagnose</span></div>
+
+        <hr class="ftn-divider">
+
+        <div class="ftn-l1"><span class="ftn-ico">📄</span><span class="ftn-f">vite.config.ts</span><span class="ftn-c">Vite + Workbox-Konfiguration</span></div>
+        <div class="ftn-l1"><span class="ftn-ico">📄</span><span class="ftn-f">tsconfig.json</span><span class="ftn-c">TypeScript-Konfiguration (strict)</span></div>
+        <div class="ftn-l1"><span class="ftn-ico">📄</span><span class="ftn-f">package.json</span><span class="ftn-c">Abhängigkeiten und npm-Skripte</span></div>
+      </div>
+
+      <div class="callout">
+        <strong>Faustregel zur Orientierung</strong>
+        Neue Funktionalität gehört in <code>LearningContext.tsx</code> (Logik) oder eine neue/bestehende Datei in <code>pages/</code> (UI). Wiederverwendbare UI-Bausteine kommen nach <code>components/</code>. Datenkonstanten nach <code>constants/</code> oder <code>data/</code>.
+      </div>
+    </section>
+
+    <!-- ── 3 EINSTIEGSPUNKT ── -->
+    <section id="einstieg">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <h2>Einstiegspunkt &amp; App-Aufbau</h2>
+      </div>
+
+      <h3>Startsequenz beim App-Laden</h3>
+      <p>Wenn der Browser <code>index.html</code> lädt, läuft folgende Kette ab:</p>
+
+      <div class="seq">
+        <div class="seq-step">
+          <div class="seq-left"><div class="seq-dot"></div><div class="seq-line"></div></div>
+          <div class="seq-content">
+            <div class="seq-title"><code>main.tsx</code> wird ausgeführt</div>
+            <div class="seq-desc">Vite injiziert den Bundle-Einstiegspunkt. <code>initServiceWorker()</code> wird synchron aufgerufen, bevor React mountet – damit der Service Worker so früh wie möglich registriert ist.</div>
+          </div>
+        </div>
+        <div class="seq-step">
+          <div class="seq-left"><div class="seq-dot"></div><div class="seq-line"></div></div>
+          <div class="seq-content">
+            <div class="seq-title"><code>LearningProvider</code> mountet</div>
+            <div class="seq-desc">Der Context-Provider setzt den initialen State (leere Felder, Standardwerte). Solange der gespeicherte Zustand noch nicht geladen ist, gilt <code>loaded = false</code> und der Provider rendert <code>null</code> – keine UI erscheint, kein Flackern.</div>
+          </div>
+        </div>
+        <div class="seq-step">
+          <div class="seq-left"><div class="seq-dot"></div><div class="seq-line"></div></div>
+          <div class="seq-content">
+            <div class="seq-title">Async: IndexedDB-Migration &amp; Laden</div>
+            <div class="seq-desc">Ein <code>useEffect</code> im Provider führt <code>migrateFromLocalStorage()</code> aus (einmalige Datenmigration), liest dann den Rohwert aus IndexedDB via <code>storageGet()</code> und parst das JSON. Falls alte Felder fehlen oder das Format veraltet ist, werden Migrations-Schritte nachgezogen (z.B. flaches <code>dailyStats</code> → per-Language, altes <code>customVocabulary</code> → Split EN/ES).</div>
+          </div>
+        </div>
+        <div class="seq-step">
+          <div class="seq-left"><div class="seq-dot"></div><div class="seq-line"></div></div>
+          <div class="seq-content">
+            <div class="seq-title">State-Hydration: <code>setState(parsed)</code></div>
+            <div class="seq-desc">Der vollständige gespeicherte Zustand ersetzt den Initial-State. Danach wird <code>setLoaded(true)</code> gesetzt.</div>
+          </div>
+        </div>
+        <div class="seq-step">
+          <div class="seq-left"><div class="seq-dot"></div><div class="seq-line"></div></div>
+          <div class="seq-content">
+            <div class="seq-title">UI rendert erstmals sichtbar</div>
+            <div class="seq-desc">Sobald <code>loaded = true</code>, gibt der Provider seine Children frei. React Router matcht die aktuelle URL und rendert die passende Seite. Ab jetzt beobachtet ein zweiter <code>useEffect</code> State-Änderungen und schreibt sie mit 300 ms Debounce zurück in IndexedDB.</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>App.tsx – Provider-Hierarchie und Routing</h3>
+      <p><code>App.tsx</code> legt die vollständige Komponentenhierarchie fest. Alle Seiten sind durch <code>LearningProvider</code> umschlossen, der den globalen State und die Geschäftslogik bereitstellt:</p>
+
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-box accent">LearningProvider</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">BrowserRouter</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">Layout (Bottom-Nav)</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box purple">Seite (Route)</div>
+        </div>
+      </div>
+
+      <p>Alle fünf Seiten werden unter dem gemeinsamen <code>Layout</code> gerendert. Unbekannte Routen werden per <code>Navigate</code> auf <code>/</code> umgeleitet.</p>
+
+      <h3>index.css</h3>
+      <p>Enthält ausschließlich die CSS-Flip-Animation der Karteikarte (<code>.fc-scene</code>, <code>.fc-inner</code>, <code>.fc-face</code>, <code>.fc-back</code>) sowie Reset-Regeln für <code>html/body</code> und die iOS-Safe-Area-Variable. Alle anderen Styles sind als Inline-Styles in den jeweiligen Komponenten definiert.</p>
+    </section>
+
+    <!-- ── 4 ROUTING ── -->
+    <section id="routing">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <h2>Routing</h2>
+      </div>
+      <p>React Router v6 mit <code>BrowserRouter</code>. Alle Routen sind flach unter einem einzigen <code>Layout</code>-Element verschachtelt.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Pfad</th><th>Komponente</th><th>Beschreibung</th></tr></thead>
+          <tbody>
+            <tr><td><code>/</code></td><td><code>Home.tsx</code></td><td>Startseite – Sprachauswahl, Tagesübersicht, Einstieg ins Lernen</td></tr>
+            <tr><td><code>/learn</code></td><td><code>Learn.tsx</code></td><td>Lernsitzung – Modus-Auswahl und Kartendurchlauf</td></tr>
+            <tr><td><code>/vocabulary</code></td><td><code>Vocabulary.tsx</code></td><td>Vokabelliste mit Filtern, Suche und Hinzufügen</td></tr>
+            <tr><td><code>/statistics</code></td><td><code>Statistics.tsx</code></td><td>Lernstatistiken und Trainings-Regelmäßigkeit</td></tr>
+            <tr><td><code>/settings</code></td><td><code>Settings.tsx</code></td><td>Alle Benutzereinstellungen</td></tr>
+            <tr><td><code>*</code></td><td><code>Navigate to="/"</code></td><td>Alle unbekannten Pfade → Redirect zur Startseite</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Die <code>Layout</code>-Komponente rendert die Bottom-Navigation mit fünf <code>NavLink</code>-Elementen und zeigt den aktiven Tab durch eine gelbe Farbe hervor. Der eigentliche Seiteninhalt wird via <code>&lt;Outlet /&gt;</code> eingesetzt.</p>
+    </section>
+
+    <!-- ── 5 STATE MANAGEMENT ── -->
+    <section id="state">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <h2>State Management</h2>
+      </div>
+      <p>Der gesamte Anwendungsstatus lebt in einem einzigen React Context: <code>LearningContext.tsx</code>. Es gibt keinen externen State-Manager (kein Redux, kein Zustand). Der Context exportiert sowohl den State als auch alle Methoden, die Seiten und Komponenten per <code>useLearning()</code> Hook abrufen.</p>
+
+      <h3>Zustand (LearningState)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Feld</th><th>Typ</th><th>Beschreibung</th></tr></thead>
+          <tbody>
+            <tr><td><code>selectedLanguage</code></td><td><code>'english' | 'spanish'</code></td><td>Aktuell aktive Sprache</td></tr>
+            <tr><td><code>queryDirection</code></td><td><code>'de-to-foreign' | 'foreign-to-de' | 'random'</code></td><td>Richtung der Kartenabfrage</td></tr>
+            <tr><td><code>progress</code></td><td><code>Record&lt;string, CardProgress&gt;</code></td><td>Lernfortschritt je Karte und Sprache. Schlüssel: <code>{vocabId}_{lang}</code></td></tr>
+            <tr><td><code>customVocabularyEN</code></td><td><code>VocabularyItem[]</code></td><td>Eigene englische Vokabeln</td></tr>
+            <tr><td><code>customVocabularyES</code></td><td><code>VocabularyItem[]</code></td><td>Eigene spanische Vokabeln</td></tr>
+            <tr><td><code>dailyCardLimit</code></td><td><code>number</code></td><td>Max. fällige Karten pro Tag (0 = unbegrenzt)</td></tr>
+            <tr><td><code>dailyNewCardLimit</code></td><td><code>number</code></td><td>Max. neue Karten pro Tag (-1 = unbegrenzt, 0 = keine)</td></tr>
+            <tr><td><code>dailyStats</code></td><td><code>Record&lt;Language, {date, count}&gt;</code></td><td>Anzahl der heute bereits bewerteten Karten je Sprache</td></tr>
+            <tr><td><code>dailyNewStats</code></td><td><code>Record&lt;Language, {date, count}&gt;</code></td><td>Anzahl heute eingeführter neuer Karten je Sprache</td></tr>
+            <tr><td><code>quizAutoSpeak</code></td><td><code>boolean</code></td><td>Lösung im Quiz automatisch vorlesen</td></tr>
+            <tr><td><code>flashcardAutoSpeak</code></td><td><code>boolean</code></td><td>Rückseite beim Aufdecken automatisch vorlesen</td></tr>
+            <tr><td><code>typingTolerant</code></td><td><code>boolean</code></td><td>Kleine Tippfehler im Eingabe-Modus als richtig werten</td></tr>
+            <tr><td><code>trainingLog</code></td><td><code>Record&lt;Language, string[]&gt;</code></td><td>ISO-Datumsstrings der Tage, an denen eine Fällig-Karten-Sitzung abgeschlossen wurde</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Methoden des Context</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Methode</th><th>Beschreibung</th></tr></thead>
+          <tbody>
+            <tr><td><code>getVocabularyForLang(lang)</code></td><td>Gibt eingebaute + eigene Vokabeln für eine Sprache zurück</td></tr>
+            <tr><td><code>getCardProgress(id, lang)</code></td><td>Gibt den <code>CardProgress</code> einer Karte zurück (Default: Box 1, nie reviewed)</td></tr>
+            <tr><td><code>markCard(id, lang, correct)</code></td><td>Aktualisiert Box, <code>nextDate</code>, Zähler; bucht dailyStats</td></tr>
+            <tr><td><code>getDueCards(lang)</code></td><td>Liefert heute fällige Karten, sortiert nach Box (ASC) und Datum, respektiert <code>dailyCardLimit</code></td></tr>
+            <tr><td><code>getNewCards(lang)</code></td><td>Liefert noch nie gesehene Karten bis zum <code>dailyNewCardLimit</code></td></tr>
+            <tr><td><code>addCustomVocabulary(item, lang)</code></td><td>Fügt eigene Vokabel hinzu; ID wird als <code>custom_{timestamp}</code> generiert</td></tr>
+            <tr><td><code>deleteCustomVocabulary(id)</code></td><td>Entfernt eigene Vokabel aus beiden Sprachlisten (ID ist eindeutig)</td></tr>
+            <tr><td><code>getBoxCounts(lang)</code></td><td>Array mit Anzahl Karten je Fach [Fach1, …, Fach6]</td></tr>
+            <tr><td><code>getTotalStats(lang)</code></td><td>Gesamtstatistik: total, learned, dueToday, successRate</td></tr>
+            <tr><td><code>recordTrainingDay(lang)</code></td><td>Trägt das heutige Datum ins trainingLog ein (idempotent)</td></tr>
+            <tr><td><code>getTrainingConsistency(lang, days)</code></td><td>Prozentsatz aktiver Trainingstage im Zeitfenster</td></tr>
+            <tr><td><code>resetProgress()</code></td><td>Setzt alle <code>progress</code>-Einträge zurück (eigene Vokabeln bleiben)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>State-Update-Zyklus</h3>
+      <p>Jede Benutzeraktion durchläuft immer denselben Weg – von der Komponente bis zur Festplatte:</p>
+
+      <div class="algo-steps">
+        <div class="algo-step">
+          <div class="algo-step-num">1</div>
+          <div class="algo-step-body"><strong>Komponente ruft Context-Methode auf</strong><br>z.B. <code>markCard('apple', 'english', true)</code> in <code>Learn.tsx</code></div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">2</div>
+          <div class="algo-step-body"><strong>Methode ruft <code>setState(s =&gt; …)</code> auf</strong><br>Alle Methoden im Context verwenden den Functional-Update-Style um Race Conditions bei schnellen Klicks zu verhindern. Der State wird nie direkt mutiert – immer ein neues Objekt mit Spread-Syntax.</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">3</div>
+          <div class="algo-step-body"><strong>React re-rendert betroffene Komponenten</strong><br>Alle Seiten/Komponenten, die <code>useLearning()</code> verwenden, erhalten den aktualisierten Context und rendern neu.</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">4</div>
+          <div class="algo-step-body"><strong>Save-Effect startet 300 ms Debounce</strong><br>Ein <code>useEffect([state, loaded])</code> reagiert auf jede State-Änderung. Er startet (oder verschiebt) einen Timeout. Erst wenn 300 ms lang keine weitere Änderung kommt, wird geschrieben.</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">5</div>
+          <div class="algo-step-body"><strong><code>storageSet(key, JSON.stringify(state))</code></strong><br>Der vollständige State wird als ein einziger JSON-String in IndexedDB geschrieben. Bei Fehler greift der Fallback auf localStorage.</div>
+        </div>
+      </div>
+
+      <h3>Persistenz des State</h3>
+      <p>Der gesamte State wird als ein einziges JSON-Objekt unter dem Schlüssel <code>vokabeltrainer_state</code> gespeichert. Beim Start liest ein <code>useEffect</code> den gespeicherten Zustand und hydriert den State; bis dieser Ladevorgang abgeschlossen ist, rendert der Provider <code>null</code> (kein Flackern).</p>
+
+      <h3>Datenmigration</h3>
+      <p>Beim ersten Start migriert der Context ältere Datenstände automatisch:</p>
+      <ul>
+        <li>localStorage → IndexedDB (<code>migrateFromLocalStorage</code>)</li>
+        <li>Altes <code>customVocabulary</code>-Format (einzelne Liste) → <code>customVocabularyEN</code> + <code>customVocabularyES</code></li>
+        <li>Altes <code>trainingLog</code>-Format (flaches Array) → <code>Record&lt;Language, string[]&gt;</code></li>
+        <li>Altes <code>dailyStats</code>-Format (sprachunabhängig) → per-Language</li>
+      </ul>
+    </section>
+
+    <!-- ── 6 DATENSCHICHT ── -->
+    <section id="daten">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <h2>Datenschicht</h2>
+      </div>
+
+      <h3>VocabularyItem (vocabulary_types.ts)</h3>
+      <p>Das zentrale Datenmodell für eine Vokabel:</p>
+      <pre><code>interface VocabularyItem {
+  id:           string;    // Eindeutige ID; eingebaut: sprechend, custom: "custom_{timestamp}"
+  german:       string;    // Das deutsche Wort
+  translation:  string;    // Übersetzung in der Zielsprache
+  emoji:        string;    // Emoji zur visuellen Veranschaulichung
+  category:     Category;  // Thematische Kategorie (z.B. "Tiere")
+  inflections?: string;    // Beugungsformen, optional (z.B. "[dogs]" oder "[lief, gelaufen]")
+  isCustom?:    boolean;   // true = eigene Vokabel, false/undefined = eingebaut
+}</code></pre>
+
+      <h3>CardProgress (LearningContext.tsx)</h3>
+      <p>Fortschrittsstand einer einzelnen Karte für eine bestimmte Sprache:</p>
+      <pre><code>interface CardProgress {
+  box:           number;          // Fach 1–6
+  lastReviewed:  string | null;   // ISO-Zeitstempel der letzten Bewertung; null = noch nie gesehen
+  nextDate:      string | null;   // YYYY-MM-DD des nächsten fälligen Tages; null = Fach 6 (fertig)
+  correctCount:  number;          // Gesamtzahl richtiger Antworten
+  incorrectCount: number;         // Gesamtzahl falscher Antworten
+}</code></pre>
+
+      <p>Der Fortschritts-Schlüssel im <code>progress</code>-Objekt lautet immer <code>{vocabId}_{lang}</code>, z.B. <code>apple_english</code>. Dadurch ist der Fortschritt für jede Sprache separat gespeichert – eine englische Vokabel und eine spanische mit gleicher ID stören sich nicht.</p>
+
+      <h3>Vokabeldaten (vocabulary_en.ts / vocabulary_es.ts)</h3>
+      <p>Die eingebauten Vokabeln sind statische TypeScript-Arrays (<code>VOCABULARY_EN</code>, <code>VOCABULARY_ES</code>), die beim Build direkt in das Bundle kompiliert werden. Um neue eingebaute Vokabeln hinzuzufügen, wird der entsprechende Array in der jeweiligen Datei erweitert.</p>
+
+      <h3>Kategorien</h3>
+      <p><code>ALL_CATEGORIES</code> in <code>vocabulary.ts</code> ist das einzige definierte Array der 13 Kategorien. Dieses Array wird sowohl für Filter-UI als auch für das Formular beim Hinzufügen eigener Vokabeln verwendet. Neue Kategorien werden hier ergänzt und müssen auch in den <code>Category</code>-Typ in <code>vocabulary_types.ts</code> aufgenommen werden.</p>
+    </section>
+
+    <!-- ── 7 STORAGE ── -->
+    <section id="storage">
+      <div class="section-header">
+        <div class="section-num">7</div>
+        <h2>Persistenz (storage.ts)</h2>
+      </div>
+      <p><code>storage.ts</code> kapselt den gesamten Zugriff auf den persistenten Speicher hinter drei einfachen async-Funktionen:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Funktion</th><th>Beschreibung</th></tr></thead>
+          <tbody>
+            <tr><td><code>storageGet(key)</code></td><td>Liest einen String aus IndexedDB. Fallback auf localStorage bei Fehler.</td></tr>
+            <tr><td><code>storageSet(key, value)</code></td><td>Schreibt einen String nach IndexedDB. Fallback auf localStorage.</td></tr>
+            <tr><td><code>migrateFromLocalStorage(key)</code></td><td>Einmalige Migration: liest Key aus localStorage, schreibt nach IndexedDB, entfernt aus localStorage.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Lese-Ablauf: storageGet()</h3>
+      <div class="algo-steps">
+        <div class="algo-step">
+          <div class="algo-step-num">1</div>
+          <div class="algo-step-body"><strong>IndexedDB öffnen</strong> – Datenbank <code>VokabelTrainerDB</code>, Object Store <code>keyval</code>, Version 1. Wird beim ersten Aufruf automatisch angelegt.</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">2</div>
+          <div class="algo-step-body"><strong>IDBRequest: <code>store.get(key)</code></strong> – Asynchroner Lesevorgang. Bei Erfolg wird der gespeicherte String zurückgegeben (oder <code>null</code> falls Key unbekannt).</div>
+        </div>
+        <div class="algo-step branch">
+          <div class="algo-step-num">!</div>
+          <div class="algo-step-body"><strong>Bei Fehler:</strong> IndexedDB nicht verfügbar (privater Modus, alter Browser) → Fallback: <code>localStorage.getItem(key)</code> wird direkt zurückgegeben.</div>
+        </div>
+      </div>
+
+      <h3>Schreib-Ablauf: storageSet()</h3>
+      <div class="algo-steps">
+        <div class="algo-step">
+          <div class="algo-step-num">1</div>
+          <div class="algo-step-body"><strong>IndexedDB öffnen</strong> – gleicher Datenbankname, Transaktion im <code>'readwrite'</code>-Modus.</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">2</div>
+          <div class="algo-step-body"><strong><code>store.put(value, key)</code></strong> – Schreibt den Wert. Existiert der Key bereits, wird er überschrieben (upsert-Semantik).</div>
+        </div>
+        <div class="algo-step branch">
+          <div class="algo-step-num">!</div>
+          <div class="algo-step-body"><strong>Bei Fehler:</strong> Fallback: <code>localStorage.setItem(key, value)</code>. localStorage hat ein 5 MB Limit – bei sehr großen Vokabellisten kann dies zum Problem werden.</div>
+        </div>
+      </div>
+
+      <p><strong>Warum IndexedDB statt localStorage?</strong> Safari auf iOS löscht den localStorage aggressiv bei Speicherdruck oder wenn die App längere Zeit nicht genutzt wurde. IndexedDB ist stabiler und für PWAs die empfohlene Speicherstrategie. Der localStorage-Fallback bleibt als Sicherheitsnetz für Browser ohne IndexedDB-Unterstützung.</p>
+
+      <div class="callout warn">
+        <strong>Datenstruktur beachten</strong>
+        Der gesamte State wird als ein einziger JSON-String gespeichert. Bei strukturellen Änderungen am State-Interface (z.B. neue Felder) muss die Migrations-Logik in <code>LearningContext.tsx</code> angepasst werden, damit ältere gespeicherte Zustände korrekt gelesen werden können.
+      </div>
+    </section>
+
+    <!-- ── 8 SPACED REPETITION ── -->
+    <section id="spaced">
+      <div class="section-header">
+        <div class="section-num">8</div>
+        <h2>Spaced-Repetition-Logik</h2>
+      </div>
+      <p>Die Spaced-Repetition-Logik ist vollständig in <code>LearningContext.tsx</code> implementiert. Sie basiert auf einem <strong>6-Fach-Lernkartei-System</strong>: Karten wandern bei richtiger Antwort in ein höheres Fach (längeres Wiederholungsintervall), bei falscher Antwort immer zurück in Fach 1.</p>
+
+      <h3>Das 6-Fach-System und seine Intervalle</h3>
+      <p>Die Intervalle sind in <code>constants/theme.ts</code> als einziger zentraler Wert definiert:</p>
+      <pre><code>export const BOX_INTERVALS = [0, 1, 3, 7, 14, Infinity];
+//  Index:                     0  1  2   3   4       5
+//  Fach:                      1  2  3   4   5       6</code></pre>
+
+      <p>Der Wert an Position <code>newBox - 1</code> gibt an, wie viele Tage nach dem heutigen Datum die Karte als nächstes fällig ist. Fach 6 mit <code>Infinity</code> bedeutet: nie wieder fällig – die Karte ist vollständig gelernt.</p>
+
+      <div class="sr-boxes">
+        <div class="sr-box b1">
+          <div class="sr-box-num">1</div>
+          <div class="sr-box-label">Fach</div>
+          <div class="sr-box-interval">morgen*</div>
+        </div>
+        <span class="sr-arrow">→</span>
+        <div class="sr-box b2">
+          <div class="sr-box-num">2</div>
+          <div class="sr-box-label">Fach</div>
+          <div class="sr-box-interval">+1 Tag</div>
+        </div>
+        <span class="sr-arrow">→</span>
+        <div class="sr-box b3">
+          <div class="sr-box-num">3</div>
+          <div class="sr-box-label">Fach</div>
+          <div class="sr-box-interval">+3 Tage</div>
+        </div>
+        <span class="sr-arrow">→</span>
+        <div class="sr-box b4">
+          <div class="sr-box-num">4</div>
+          <div class="sr-box-label">Fach</div>
+          <div class="sr-box-interval">+7 Tage</div>
+        </div>
+        <span class="sr-arrow">→</span>
+        <div class="sr-box b5">
+          <div class="sr-box-num">5</div>
+          <div class="sr-box-label">Fach</div>
+          <div class="sr-box-interval">+14 Tage</div>
+        </div>
+        <span class="sr-arrow">→</span>
+        <div class="sr-box b6">
+          <div class="sr-box-num">6</div>
+          <div class="sr-box-label">Fach</div>
+          <div class="sr-box-interval">✓ gelernt</div>
+        </div>
+      </div>
+      <p style="font-size:0.78rem; color: var(--muted); margin-top: 0; margin-bottom: 1.2rem;">* Fach 1 hat rechnerisch Intervall 0. In der Praxis wird bei falscher Antwort immer <em>morgen</em> gesetzt, um eine Sofortwiederholung am selben Tag zu verhindern.</p>
+
+      <div class="callout warn">
+        <strong>Falsche Antwort = immer zurück auf Fach 1</strong>
+        Egal aus welchem Fach eine Karte kommt: bei falscher Antwort landet sie in Fach 1 mit <code>nextDate = morgen</code>. Die Karte erscheint also frühestens am nächsten Tag wieder – nie sofort erneut in derselben Sitzung.
+      </div>
+
+      <h3>Prozessablauf: markCard(vocabId, lang, correct)</h3>
+      <p>Die Kernfunktion wird nach jeder Kartenbewertung aufgerufen. Sie läuft komplett innerhalb eines <code>setState(s =&gt; …)</code>-Callbacks ab:</p>
+
+      <div class="algo-steps">
+        <div class="algo-step">
+          <div class="algo-step-num">1</div>
+          <div class="algo-step-body">
+            <strong>Aktuellen Fortschritt laden</strong><br>
+            <code>current = s.progress["{vocabId}_{lang}"] ?? defaultProgress()</code><br>
+            Neu-Karten haben keinen Eintrag; <code>defaultProgress()</code> liefert <code>{box:1, lastReviewed:null, nextDate:null, correctCount:0, incorrectCount:0}</code>.
+          </div>
+        </div>
+        <div class="algo-step branch">
+          <div class="algo-step-num">2</div>
+          <div class="algo-step-body">
+            <strong>Neues Fach berechnen</strong><br>
+            <strong>Richtig:</strong> <code>newBox = Math.min(current.box + 1, 6)</code> – ein Fach höher, maximal Fach 6.<br>
+            <strong>Falsch:</strong> <code>newBox = 1</code> – immer zurück in Fach 1.
+          </div>
+        </div>
+        <div class="algo-step branch">
+          <div class="algo-step-num">3</div>
+          <div class="algo-step-body">
+            <strong>nextDate berechnen</strong><br>
+            <strong>Falsch:</strong> <code>nextDate = morgen</code> (Fach 1, aber nicht sofort).<br>
+            <strong>Richtig &amp; newBox = 6:</strong> <code>nextDate = null</code> (gelernt, nie wieder fällig).<br>
+            <strong>Richtig &amp; newBox &lt; 6:</strong> <code>nextDate = heute + BOX_INTERVALS[newBox - 1] Tage</code><br>
+            Beispiel: Karte in Fach 3 richtig → newBox=4 → <code>nextDate = heute + 7 Tage</code>.
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">4</div>
+          <div class="algo-step-body">
+            <strong>Tagesstatistik aktualisieren (dailyStats)</strong><br>
+            <code>dailyStats[lang]</code> speichert Datum und Zähler. Wenn das gespeicherte Datum gleich heute ist, wird <code>count + 1</code> gesetzt; sonst wird der Zähler auf 1 zurückgesetzt (neuer Tag). Diese Statistik begrenzt, wie viele fällige Karten heute noch eingeblendet werden.
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">5</div>
+          <div class="algo-step-body">
+            <strong>Neue-Karten-Statistik aktualisieren (dailyNewStats)</strong><br>
+            Wenn <code>current.lastReviewed === null</code> (erste Bewertung dieser Karte), wird auch <code>dailyNewStats[lang].count + 1</code> gesetzt. Dieser Zähler begrenzt, wie viele neue Karten heute noch eingeführt werden.
+          </div>
+        </div>
+        <div class="algo-step result-ok">
+          <div class="algo-step-num">6</div>
+          <div class="algo-step-body">
+            <strong>State zurückgeben</strong><br>
+            Neuer Progress-Eintrag: <code>{box: newBox, lastReviewed: jetzt (ISO), nextDate, correctCount ± 1, incorrectCount ± 1}</code>. Alles per Spread-Syntax als neues Objekt – der State wird nie mutiert.
+          </div>
+        </div>
+      </div>
+
+      <h3>Prozessablauf: isCardDue(progress)</h3>
+      <p>Hilfsfunktion (nicht direkt im Context-API, intern genutzt). Bestimmt, ob eine Karte heute fällig ist:</p>
+
+      <div class="algo-steps">
+        <div class="algo-step result-err">
+          <div class="algo-step-num">→</div>
+          <div class="algo-step-body"><strong>Fach 6 (<code>box &gt;= 6</code>):</strong> Sofort <code>false</code>. Gelernte Karten erscheinen nie wieder.</div>
+        </div>
+        <div class="algo-step result-err">
+          <div class="algo-step-num">→</div>
+          <div class="algo-step-body"><strong>Neue Karte (<code>lastReviewed === null</code>):</strong> Sofort <code>false</code>. Noch nie gesehene Karten laufen über <code>getNewCards()</code>, nicht über <code>getDueCards()</code>.</div>
+        </div>
+        <div class="algo-step result-ok">
+          <div class="algo-step-num">→</div>
+          <div class="algo-step-body"><strong>Normalpfad (<code>nextDate</code> vorhanden):</strong> <code>return localDateStr(today) &gt;= progress.nextDate</code>. Einfacher String-Vergleich im Format <code>YYYY-MM-DD</code> – da das Format lexikografisch sortierbar ist, reicht ein String-Vergleich.</div>
+        </div>
+        <div class="algo-step branch">
+          <div class="algo-step-num">!</div>
+          <div class="algo-step-body"><strong>Legacy-Karten (kein nextDate):</strong> Rückfall auf intervalbasierte Berechnung: <code>diffDays = (now - lastReviewed) / msPerDay</code>. Ist <code>diffDays &gt;= BOX_INTERVALS[box - 1]</code>, gilt die Karte als fällig.</div>
+        </div>
+      </div>
+
+      <h3>Prozessablauf: getDueCards(lang)</h3>
+      <p>Wird von <code>Home.tsx</code> (Tagesübersicht) und <code>Learn.tsx</code> (Sitzungsstart) aufgerufen:</p>
+
+      <div class="algo-steps">
+        <div class="algo-step">
+          <div class="algo-step-num">1</div>
+          <div class="algo-step-body"><strong>Tages-Restlimit berechnen</strong><br>
+            <code>alreadyDone = dailyStats[lang].date === heute ? count : 0</code><br>
+            <code>remaining = dailyCardLimit - alreadyDone</code><br>
+            Ist <code>dailyCardLimit = 0</code> → keine Beschränkung (Infinity).
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">2</div>
+          <div class="algo-step-body"><strong>Alle fälligen Karten filtern</strong><br>
+            Über alle Vokabeln der Sprache (eingebaut + custom) wird <code>isCardDue(progress)</code> geprüft.
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">3</div>
+          <div class="algo-step-body"><strong>Sortierung: Box aufsteigend, dann nextDate aufsteigend</strong><br>
+            Karten in Fach 1 (Wiederholungen falscher Antworten) erscheinen zuerst. Bei gleichem Fach kommt die älteste Fälligkeit zuerst.
+          </div>
+        </div>
+        <div class="algo-step result-ok">
+          <div class="algo-step-num">4</div>
+          <div class="algo-step-body"><strong>Limit anwenden: <code>cards.slice(0, remaining)</code></strong><br>
+            Die Rückgabe enthält maximal so viele Karten, wie das Tageslimit noch zulässt.
+          </div>
+        </div>
+      </div>
+
+      <h3>Prozessablauf: getNewCards(lang)</h3>
+      <div class="algo-steps">
+        <div class="algo-step">
+          <div class="algo-step-num">1</div>
+          <div class="algo-step-body"><strong>Limit 0?</strong> Sofort leeres Array zurückgeben (Benutzer möchte keine neuen Karten).</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">2</div>
+          <div class="algo-step-body"><strong>Bereits heute eingeführt (<code>dailyNewStats</code>)</strong><br>
+            <code>introducedToday = dailyNewStats[lang].date === heute ? count : 0</code><br>
+            <code>remaining = dailyNewCardLimit - introducedToday</code>. Bei Limit -1 → Infinity (unbegrenzt).
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">3</div>
+          <div class="algo-step-body"><strong>Neue Karten filtern</strong><br>
+            Alle Vokabeln der Sprache, bei denen <code>getCardProgress().lastReviewed === null</code>. Die Reihenfolge entspricht der Reihenfolge im Vokabelarray (eingebaut zuerst, dann custom).
+          </div>
+        </div>
+        <div class="algo-step result-ok">
+          <div class="algo-step-num">4</div>
+          <div class="algo-step-body"><strong><code>cards.slice(0, remaining)</code></strong> – maximal so viele neue Karten wie das Tageslimit zulässt.</div>
+        </div>
+      </div>
+
+      <h3>Konkretes Beispiel: Karte „apple" über mehrere Tage</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tag</th><th>Aktion</th><th>Fach vorher</th><th>Fach nachher</th><th>nextDate</th></tr></thead>
+          <tbody>
+            <tr><td>Tag 1</td><td>Erste Vorstellung (getNewCards)</td><td>– (neu)</td><td>–</td><td>–</td></tr>
+            <tr><td>Tag 1</td><td>markCard → richtig</td><td>1</td><td>2</td><td>Tag 2</td></tr>
+            <tr><td>Tag 2</td><td>markCard → richtig</td><td>2</td><td>3</td><td>Tag 5</td></tr>
+            <tr><td>Tag 5</td><td>markCard → falsch</td><td>3</td><td>1</td><td>Tag 6</td></tr>
+            <tr><td>Tag 6</td><td>markCard → richtig</td><td>1</td><td>2</td><td>Tag 7</td></tr>
+            <tr><td>Tag 7</td><td>markCard → richtig</td><td>2</td><td>3</td><td>Tag 10</td></tr>
+            <tr><td>Tag 10</td><td>markCard → richtig</td><td>3</td><td>4</td><td>Tag 17</td></tr>
+            <tr><td>Tag 17</td><td>markCard → richtig</td><td>4</td><td>5</td><td>Tag 31</td></tr>
+            <tr><td>Tag 31</td><td>markCard → richtig</td><td>5</td><td>6</td><td>null (fertig)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Tagesgrenzen und Interaktion zwischen den Limits</h3>
+      <p>Es gibt zwei unabhängige Tageszähler, die beide gleichzeitig wirken:</p>
+      <ul>
+        <li><strong>dailyCardLimit / dailyStats:</strong> Wie viele fällige Karten können heute noch gezeigt werden? Jede Bewertung (richtig oder falsch) zählt hier rein.</li>
+        <li><strong>dailyNewCardLimit / dailyNewStats:</strong> Wie viele neue Karten (erstmalig gesehen) können heute noch eingeführt werden? Zählt nur bei der allerersten Bewertung einer Karte.</li>
+      </ul>
+      <p>Beide Zähler werden täglich automatisch zurückgesetzt: beim ersten Zugriff nach Tageswechsel erkennt der Code, dass das gespeicherte Datum nicht mehr dem heutigen entspricht, und startet bei 0.</p>
+    </section>
+
+    <!-- ── 9 KOMPONENTEN ── -->
+    <section id="komponenten">
+      <div class="section-header">
+        <div class="section-num">9</div>
+        <h2>Komponenten</h2>
+      </div>
+
+      <h3>Layout.tsx</h3>
+      <p>Der Rahmen der App. Rendert eine scrollbare <code>&lt;main&gt;</code>-Region und eine fixe Bottom-Navigation mit fünf <code>NavLink</code>-Elementen. Der aktive Tab wird automatisch durch React Router's <code>NavLink</code> erkannt und farblich hervorgehoben. Der Seiteninhalt wird über <code>&lt;Outlet /&gt;</code> eingesetzt.</p>
+
+      <h3>FlashCard.tsx</h3>
+      <p>Zeigt eine Karteikarte mit CSS-3D-Flip-Animation. Vorder- und Rückseite sind übereinanderliegend im DOM (CSS <code>backface-visibility: hidden</code>). Die Flip-Animation selbst wird durch die CSS-Klassen in <code>index.css</code> gesteuert.</p>
+
+      <p><strong>Props:</strong></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Prop</th><th>Typ</th><th>Beschreibung</th></tr></thead>
+          <tbody>
+            <tr><td><code>frontText / backText</code></td><td><code>string</code></td><td>Texte der Vorder- und Rückseite</td></tr>
+            <tr><td><code>frontLang / backLang</code></td><td><code>string</code></td><td>Sprachbezeichnung als kleiner Label</td></tr>
+            <tr><td><code>emoji</code></td><td><code>string</code></td><td>Emoji oben auf der Karte</td></tr>
+            <tr><td><code>category</code></td><td><code>string</code></td><td>Kategoriebezeichnung links oben</td></tr>
+            <tr><td><code>boxNumber</code></td><td><code>number</code></td><td>Fach (1–6) für Farbgebung und Badge</td></tr>
+            <tr><td><code>inflections?</code></td><td><code>string</code></td><td>Beugungsformen auf der Rückseite (optional)</td></tr>
+            <tr><td><code>onFlip?</code></td><td><code>(flipped: boolean) =&gt; void</code></td><td>Callback wenn Karte umgedreht wird</td></tr>
+            <tr><td><code>forceReset?</code></td><td><code>number</code></td><td>Inkrementieren setzt die Karte auf die Vorderseite zurück (neue Karte)</td></tr>
+            <tr><td><code>flipKey?</code></td><td><code>number</code></td><td>Inkrementieren löst einen programmatischen Flip aus (Tastatur-Shortcut)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <strong>forceReset vs. flipKey</strong>
+        <code>forceReset</code> wird beim Übergang zur nächsten Karte hochgezählt und stellt sicher, dass die neue Karte immer auf der Vorderseite startet. <code>flipKey</code> wird verwendet, wenn die Karte per Tastatur (Enter) umgedreht werden soll, ohne dass der Parent direkt auf den internen Flip-State zugreift.
+      </div>
+
+      <h3>SWStatusPanel.tsx</h3>
+      <p>Ein Debug-Panel in den Einstellungen, das den Service-Worker-Status (Registrierungsstatus, Scope, Caches, Online/Offline) anzeigt. Über einen Button lässt sich manuell ein Update-Check auslösen. Ein zweiter Button ruft <code>showSWOverlay()</code> aus <code>swOverlay.ts</code> auf, das ein temporäres Terminal-ähnliches Overlay einblendet.</p>
+    </section>
+
+    <!-- ── 10 SEITEN ── -->
+    <section id="seiten">
+      <div class="section-header">
+        <div class="section-num">10</div>
+        <h2>Seiten (Pages)</h2>
+      </div>
+
+      <h4>Home.tsx</h4>
+      <p>Liest <code>getDueCards</code> und <code>getNewCards</code> aus dem Context und zeigt die Tagesübersicht. Die Sprachauswahl und Abfragerichtung werden direkt über <code>setLanguage</code> und <code>setQueryDirection</code> gesetzt. Das Tagesbanner und der „Lernen starten"-Button navigieren per <code>useNavigate</code> zu <code>/learn</code>.</p>
+
+      <h4>Learn.tsx – Sitzungs-Zustandsmaschine</h4>
+      <p>Die komplexeste Seite der App. Sie verwaltet einen lokalen Sitzungs-State und durchläuft dabei klar definierte Phasen:</p>
+
+      <div class="algo-steps">
+        <div class="algo-step">
+          <div class="algo-step-num">①</div>
+          <div class="algo-step-body">
+            <strong>Lobby</strong> – Kein aktiver Session-State.<br>
+            Zeigt die vier Modus-Buttons: <em>Fällige Karten</em>, <em>Alle Karten</em>, <em>Quiz</em>, <em>Tippen</em>. Jeder Button kennt seine Kartenquelle (getDueCards vs. getNewCards + getDueCards vs. alle).
+          </div>
+        </div>
+        <div class="algo-step branch">
+          <div class="algo-step-num">②</div>
+          <div class="algo-step-body">
+            <strong>startSession(mode)</strong> – Übergang Lobby → aktive Sitzung.<br>
+            Lädt die Kartenliste je nach Modus. Bei <em>Fällige Karten</em>: <code>getDueCards()</code> + <code>getNewCards()</code>, gemischt. Bei <em>Alle Karten</em>: alle Vokabeln der Sprache. Bei <em>Quiz</em> und <em>Tippen</em>: fällige + neue Karten. Setzt <code>sessionCards</code>, <code>currentIndex = 0</code>.
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">③</div>
+          <div class="algo-step-body">
+            <strong>Aktive Sitzung – Kartendurchlauf</strong><br>
+            Drei Render-Zweige je nach Modus: Karteikarten-Flip (FlashCard.tsx), Multiple-Choice-Quiz (4 Optionen, 1 richtige), Tippen (Freitexteingabe + optionale Tipptoleranz via Levenshtein).<br>
+            Tastatur-Shortcuts werden über einen globalen <code>keydown</code>-Listener implementiert (Enter = Karte umdrehen / bestätigen, Pfeiltasten = richtig/falsch). Der Listener wird beim Sitzungsende entfernt.
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">④</div>
+          <div class="algo-step-body">
+            <strong>Karte bewerten: <code>markCard()</code></strong><br>
+            Nach jeder Bewertung wird <code>markCard(id, lang, correct)</code> im Context aufgerufen. Der nächste <code>currentIndex++</code>-Schritt blendet die nächste Karte ein.
+          </div>
+        </div>
+        <div class="algo-step result-ok">
+          <div class="algo-step-num">⑤</div>
+          <div class="algo-step-body">
+            <strong>Sitzung beendet – Auswertungsansicht</strong><br>
+            Wenn <code>currentIndex &gt;= sessionCards.length</code>, wechselt die Darstellung zur Ergebnisansicht (richtige, falsche, Gesamtzahl). Bei Fällig-Karten-Sitzungen wird <code>recordTrainingDay(lang)</code> aufgerufen (idempotent – nur einmal pro Tag).
+          </div>
+        </div>
+      </div>
+
+      <p>Die Tipptoleranz im Eingabe-Modus nutzt einen Levenshtein-Algorithmus, der direkt in <code>Learn.tsx</code> implementiert ist. Eine Antwort wird als „toleriert richtig" gewertet, wenn die Editierdistanz ≤ 2 ist und die Eingabe mindestens 4 Zeichen lang ist.</p>
+
+      <h4>Vocabulary.tsx</h4>
+      <p>Listet alle Vokabeln der gewählten Sprache. Filterung per <code>useMemo</code> auf Basis von Suchtext, Kategorie und Fach – die gefilterte Liste wird nur neu berechnet, wenn sich die Filterwerte oder die Vokabelliste ändert. Das Hinzufügen-Modal ist in der Komponente inline implementiert. Nur Einträge mit <code>isCustom === true</code> zeigen das Löschen-Symbol.</p>
+
+      <h4>Statistics.tsx</h4>
+      <p>Reine Darstellungsseite ohne eigene Geschäftslogik. Berechnet die Kategorie-Statistiken lokal mit <code>getCardProgress</code>. Die Trainings-Regelmäßigkeit liest <code>getTrainingConsistency</code> für 7, 30 und 90 Tage aus. Der Reset-Button ruft <code>resetProgress()</code> auf.</p>
+
+      <h4>Settings.tsx</h4>
+      <p>Jede Einstellung ist direkt über einen Setter-Callback aus dem Context verdrahtet (keine lokaler State). Enthält das <code>SWStatusPanel</code> zur PWA-Diagnose.</p>
+    </section>
+
+    <!-- ── 11 PWA ── -->
+    <section id="pwa">
+      <div class="section-header">
+        <div class="section-num">11</div>
+        <h2>PWA &amp; Service Worker</h2>
+      </div>
+
+      <h3>Workbox-Strategie (vite.config.ts)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Asset-Typ</th><th>Strategie</th><th>Cache-Dauer</th></tr></thead>
+          <tbody>
+            <tr><td>JS, CSS, Fonts, Bilder (Precache)</td><td>CacheFirst</td><td>1 Jahr</td></tr>
+            <tr><td>index.html (SPA-Fallback)</td><td>Precache (kein Ablauf)</td><td>dauerhaft bis Update</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><code>clientsClaim: true</code> und <code>skipWaiting: true</code> stellen sicher, dass ein neuer Service Worker sofort alle offenen Tabs übernimmt. Das ist auf iOS besonders wichtig, wo Tabs den alten Worker sonst sehr lange behalten können.</p>
+
+      <h3>Service-Worker-Lebenszyklus und Update-Ablauf</h3>
+      <div class="algo-steps">
+        <div class="algo-step">
+          <div class="algo-step-num">1</div>
+          <div class="algo-step-body"><strong>Registrierung beim App-Start</strong><br><code>navigator.serviceWorker.register('/sw.js')</code>. Im Dev-Modus (Vite HMR) wird kein SW registriert.</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">2</div>
+          <div class="algo-step-body"><strong>Stündlicher Update-Check</strong><br><code>setInterval()</code> löst alle 60 Minuten <code>registration.update()</code> aus – aber nur wenn <code>navigator.onLine === true</code>, um Fehlermeldungen im Offline-Betrieb zu vermeiden.</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">3</div>
+          <div class="algo-step-body"><strong>Vordergrund-Event: <code>visibilitychange</code></strong><br>Wenn die App aus dem Hintergrund zurückkommt (Tab wieder sichtbar) und online ist, wird sofort ein Update-Check ausgelöst. Falls kein SW mehr registriert ist (iOS hat ihn beendet), wird einmalig ein Reload versucht.</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">4</div>
+          <div class="algo-step-body"><strong>iOS bfcache: <code>pageshow</code></strong><br>Safari kann Seiten im Back-/Forward-Cache einfrieren. Der <code>pageshow</code>-Listener mit <code>event.persisted</code>-Check erkennt diesen Fall und löst ebenfalls einen Update-Check aus.</div>
+        </div>
+        <div class="algo-step result-ok">
+          <div class="algo-step-num">5</div>
+          <div class="algo-step-body"><strong>Neuer SW verfügbar</strong><br>Da <code>skipWaiting: true</code> gesetzt ist, aktiviert sich ein neuer SW sofort. Mit <code>clientsClaim: true</code> übernimmt er alle offenen Fenster. Beim nächsten Seitenaufruf ist die neue Version aktiv.</div>
+        </div>
+      </div>
+
+      <h3>swOverlay.ts</h3>
+      <p>Hilfsfunktion für die Diagnose. Blendet ein temporäres, terminal-ähnliches Overlay ein (grüner Text auf schwarzem Hintergrund), das den aktuellen SW-Zustand, Online-Status und Cache-Belegung anzeigt. Verschwindet nach 8 Sekunden oder bei Antippen. Nur über das SWStatusPanel in den Einstellungen erreichbar.</p>
+    </section>
+
+    <!-- ── 12 BUILD ── -->
+    <section id="build">
+      <div class="section-header">
+        <div class="section-num">12</div>
+        <h2>Build &amp; Entwicklung</h2>
+      </div>
+
+      <h3>npm-Skripte</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Befehl</th><th>Beschreibung</th></tr></thead>
+          <tbody>
+            <tr><td><code>npm run dev</code></td><td>Startet den Vite-Dev-Server (HMR, kein echter Service Worker)</td></tr>
+            <tr><td><code>npm run build</code></td><td>TypeScript-Prüfung (<code>tsc -b</code>), dann Produktions-Build nach <code>dist/</code></td></tr>
+            <tr><td><code>npm run preview</code></td><td>Lokale Vorschau des Produktions-Builds mit echtem Service Worker</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warn">
+        <strong>Dev-Modus vs. Produktions-Build</strong>
+        Im Dev-Modus (<code>npm run dev</code>) ist der Service Worker nicht aktiv. PWA-Verhalten (Offline-Fähigkeit, Caching, Homescreen-Installation) ist nur im Produktions-Build (<code>npm run build</code> + <code>npm run preview</code>) vollständig vorhanden.
+      </div>
+
+      <h3>Build-Ablauf im Detail</h3>
+      <div class="algo-steps">
+        <div class="algo-step">
+          <div class="algo-step-num">1</div>
+          <div class="algo-step-body"><strong><code>tsc -b</code> – TypeScript-Prüfung</strong><br>Strikte Typenprüfung ohne Ausgabe von Dateien. Bei Typ-Fehlern bricht der Build hier ab.</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">2</div>
+          <div class="algo-step-body"><strong>Vite bundelt den Code</strong><br>Tree-Shaking, Code-Splitting (React Router lädt Seiten bei Bedarf), Minifizierung.</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">3</div>
+          <div class="algo-step-body"><strong>vite-plugin-pwa generiert</strong><br><code>dist/sw.js</code> (Workbox Service Worker) und <code>dist/manifest.webmanifest</code>. Die Precache-Manifest-Liste enthält alle generierten Assets mit Inhaltshashes.</div>
+        </div>
+        <div class="algo-step result-ok">
+          <div class="algo-step-num">4</div>
+          <div class="algo-step-body"><strong>Ausgabe in <code>dist/</code></strong><br>Fertige statische Dateien, die direkt auf jedem Webserver deployed werden können (kein Node.js zur Laufzeit nötig).</div>
+        </div>
+      </div>
+
+      <h3>App-Version aktualisieren</h3>
+      <p>Die Versionsnummer wird nur an einer Stelle gepflegt: <code>src/version.ts</code>. Sie wird auf der Startseite angezeigt und kann dort einfach hochgezählt werden.</p>
+      <pre><code>// src/version.ts
+export const APP_VERSION = '1.2.0';</code></pre>
+
+      <h3>TypeScript-Konfiguration</h3>
+      <p>Strikte TypeScript-Konfiguration. Alle React-Komponenten sind typisiert. Es gibt keine <code>any</code>-Verwendungen außer in den Migrations-Funktionen (dort explizit durch ESLint-Kommentar auskommentiert).</p>
+    </section>
+
+    <!-- ── 13 ERWEITERN ── -->
+    <section id="erweitern">
+      <div class="section-header">
+        <div class="section-num">13</div>
+        <h2>App erweitern</h2>
+      </div>
+
+      <h3>Neue Vokabeln zu einer bestehenden Sprache hinzufügen</h3>
+      <p>Die Datei <code>src/data/vocabulary_en.ts</code> (bzw. <code>vocabulary_es.ts</code>) erweitern:</p>
+      <pre><code>// Eintrag zum VOCABULARY_EN Array hinzufügen:
+{
+  id: 'eindeutige_id',      // Muss eindeutig sein – z.B. 'tree', 'to_swim_en'
+  german: 'der Baum',
+  translation: 'tree',
+  emoji: '🌳',
+  category: 'Natur & Wetter',
+  inflections: '[trees]',   // optional
+}</code></pre>
+
+      <h3>Neue Kategorie hinzufügen</h3>
+      <ol>
+        <li>Den neuen Kategorienamen als Union-Member in <code>src/data/vocabulary_types.ts</code> zum <code>Category</code>-Typ hinzufügen.</li>
+        <li>Den gleichen String in das <code>ALL_CATEGORIES</code>-Array in <code>src/data/vocabulary.ts</code> eintragen.</li>
+      </ol>
+
+      <h3>Neue Sprache hinzufügen</h3>
+      <p>Die App unterstützt beliebig viele Sprachen. Eine Schritt-für-Schritt-Anleitung dazu ist in <a href="neue-sprache-hinzufuegen.md" style="color: var(--accent2); font-weight: 600;">docs/neue-sprache-hinzufuegen.md</a> beschrieben.</p>
+      <p>Zusammengefasst sind folgende Schritte nötig:</p>
+      <ol>
+        <li><code>src/data/vocabulary_XX.ts</code> anlegen und mit <code>VOCABULARY_XX</code> befüllen.</li>
+        <li>Re-Export in <code>src/data/vocabulary.ts</code> ergänzen.</li>
+        <li>Neuen Spracheintrag in <code>src/constants/languages.ts</code> zu <code>LANGUAGE_CONFIG</code> hinzufügen (Label, Flag, Abbr, speechCode, placeholder).</li>
+        <li><code>Language</code>-Typ in <code>languages.ts</code> um den neuen Wert erweitern.</li>
+        <li>Im <code>LearningContext</code>: Initialen State um die neue Sprache ergänzen (<code>customVocabularyXX</code>, <code>dailyStats</code>, <code>dailyNewStats</code>, <code>trainingLog</code>).</li>
+      </ol>
+
+      <div class="callout info">
+        <strong>Kein zentrales Routing-Update nötig</strong>
+        Seiten wie Home, Statistics und Vocabulary lesen Sprachen dynamisch aus <code>ALL_LANGUAGES</code> (aus <code>constants/languages.ts</code>). Nach dem Hinzufügen einer Sprache erscheint sie automatisch in der Sprachauswahl und in den Filtern, ohne dass Seiten-Code angepasst werden muss.
+      </div>
+
+      <h3>Neuen Lernmodus hinzufügen</h3>
+      <p>Alle Lernmodi sind in <code>src/pages/Learn.tsx</code> in einem einzigen <code>SessionMode</code>-Union-Typ definiert. Ein neuer Modus erfordert:</p>
+      <ol>
+        <li><code>SessionMode</code>-Union um den neuen Wert erweitern.</li>
+        <li>Button im Lobby-Screen ergänzen (Array mit <code>mode</code>, <code>colors</code>, <code>emoji</code>, <code>title</code>, <code>sub</code>).</li>
+        <li><code>startSession</code>: Kartenauswahl-Logik für den neuen Modus implementieren.</li>
+        <li>Render-Zweig für den neuen Modus vor dem Karteikarten-Fallback hinzufügen.</li>
+      </ol>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Active nav highlight on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const link = document.querySelector(`nav a[href="#${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
