@@ -2,6 +2,20 @@
 
 ---
 
+## v1.2.2 — 2026-05-10
+
+### Bugfix: Lernstand bleibt nach App-Updates erhalten
+
+Beim Einspielen einer neuen App-Version konnte es vorkommen, dass der gesamte Lernstand zurückgesetzt wurde. Ursachen waren ein Race-Condition mit dem 300ms-Debounce beim Speichern sowie iOS-seitige IndexedDB-Eviction bei Service-Worker-Updates.
+
+**Maßnahmen:**
+- `navigator.storage.persist()` — iOS signalisieren, IndexedDB-Daten zu schützen
+- Duales Schreiben: jeder Save schreibt synchron ein localStorage-Backup
+- Backup-Fallback beim Lesen: bei leerem IndexedDB-Ergebnis wird das Backup herangezogen
+- `pagehide`/`visibilitychange`-Flush: State wird unmittelbar vor Seitenentladen gesichert
+
+---
+
 ## v1.2.1 — 2026-05-10
 
 ### Verbesserungen

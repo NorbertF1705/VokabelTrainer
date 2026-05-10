@@ -124,11 +124,39 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     trainingLog: { english: [], spanish: [] },
   });
   const [loaded, setLoaded] = useState(false);
-  // Track pending saves to avoid write-after-unmount issues
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Always holds the latest state for synchronous flush handlers
+  const stateRef = useRef<LearningState>(state);
+
+  // Keep stateRef in sync so pagehide handler always has the latest state
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
+  // Flush state synchronously to localStorage backup before page unloads.
+  // This catches the 300ms debounce window that would otherwise be lost
+  // when a Service Worker update triggers a forced page reload on iOS.
+  useEffect(() => {
+    if (!loaded) return;
+    const flush = () => {
+      try {
+        localStorage.setItem(STORAGE_KEY + '_backup', JSON.stringify(stateRef.current));
+      } catch { /* ignore quota errors */ }
+    };
+    window.addEventListener('pagehide', flush);
+    const onVisibility = () => { if (document.visibilityState === 'hidden') flush(); };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [loaded]);
 
   useEffect(() => {
     (async () => {
+      // Request persistent storage — tells iOS not to evict IndexedDB data
+      if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
+
       // Migrate any existing localStorage data to IndexedDB on first run
       await migrateFromLocalStorage(STORAGE_KEY);
 

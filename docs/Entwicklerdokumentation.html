@@ -556,7 +556,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.2.1 · Mai 2026</div>
+    <div class="nav-version">Version 1.2.2 · Mai 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -565,7 +565,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.2.1</span>
+        <span class="badge">v1.2.2</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1401,7 +1401,7 @@ function pickVoice(lang: string): SpeechSynthesisVoice | null {
       <h3>App-Version aktualisieren</h3>
       <p>Die Versionsnummer wird nur an einer Stelle gepflegt: <code>src/version.ts</code>. Sie wird auf der Startseite angezeigt und kann dort einfach hochgezählt werden.</p>
       <pre><code>// src/version.ts
-export const APP_VERSION = '1.2.1';</code></pre>
+export const APP_VERSION = '1.2.2';</code></pre>
 
       <h3>TypeScript-Konfiguration</h3>
       <p>Strikte TypeScript-Konfiguration. Alle React-Komponenten sind typisiert. Es gibt keine <code>any</code>-Verwendungen außer in den Migrations-Funktionen (dort explizit durch ESLint-Kommentar auskommentiert).</p>
@@ -1465,10 +1465,35 @@ export const APP_VERSION = '1.2.1';</code></pre>
         <h2>Release Notes</h2>
       </div>
 
-      <!-- v1.2.1 -->
+      <!-- v1.2.2 -->
       <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
-          <span class="badge">v1.2.1</span>
+          <span class="badge">v1.2.2</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-05-10</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Bugfix: Lernstand-Persistenz bei SW-Updates</h4>
+        <p style="margin-bottom:0.5rem;">Zwei kombinierte Ursachen führten dazu, dass der Lernstand nach App-Updates zurückgesetzt wurde:</p>
+        <ul>
+          <li><strong>300ms-Debounce-Race</strong>: Wenn <code>skipWaiting</code> + <code>clientsClaim</code> einen sofortigen Page-Reload auslösen, wurde der laufende Debounce-Timer nicht mehr gefeuert — die letzten Änderungen gingen verloren.</li>
+          <li><strong>iOS IndexedDB-Eviction</strong>: iOS/Safari kann IndexedDB-Daten von PWAs bei SW-Updates löschen. Der localStorage-Fallback in <code>storageGet</code> griff nur bei einem <em>Fehler</em>, nicht bei leerem Ergebnis nach Eviction.</li>
+        </ul>
+        <h4 style="margin:0.6rem 0 0.4rem;">Maßnahmen</h4>
+        <ul>
+          <li><strong><code>navigator.storage.persist()</code></strong> — beim App-Start angefordert; signalisiert iOS, die IndexedDB-Daten nicht zu evikten.</li>
+          <li><strong>Duales Schreiben</strong>: <code>storageSet</code> schreibt synchron ein localStorage-Backup (<code>_backup</code>-Suffix) vor dem asynchronen IndexedDB-Write.</li>
+          <li><strong>Backup-Fallback beim Lesen</strong>: <code>storageGet</code> prüft bei IDB-<code>null</code> das localStorage-Backup, bevor es Default-State akzeptiert.</li>
+          <li><strong><code>pagehide</code>/<code>visibilitychange:hidden</code>-Flush</strong>: Ein Handler im <code>LearningProvider</code> schreibt den aktuellen State sofort synchron ins localStorage-Backup, bevor die Seite stirbt — auch mitten in einer offenen Debounce-Wartezeit.</li>
+        </ul>
+        <pre><code>// pagehide-Flush in LearningContext.tsx
+window.addEventListener('pagehide', () =&gt; {
+  localStorage.setItem(STORAGE_KEY + '_backup', JSON.stringify(stateRef.current));
+});</code></pre>
+      </div>
+
+      <!-- v1.2.1 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.2.1</span>
           <span style="color:var(--muted); font-size:0.82rem;">2026-05-10</span>
         </div>
         <h4 style="margin-bottom:0.4rem;">Verbesserungen</h4>
