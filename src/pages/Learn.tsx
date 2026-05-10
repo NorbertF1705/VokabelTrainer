@@ -51,14 +51,31 @@ function generateQuizOptions(correct: string, allVocab: VocabularyItem[], field:
   return [...wrong, correct].sort(() => Math.random() - 0.5);
 }
 
+let _voices: SpeechSynthesisVoice[] = [];
+if ('speechSynthesis' in window) {
+  const loadVoices = () => { _voices = window.speechSynthesis.getVoices(); };
+  loadVoices();
+  window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+}
+
+function pickVoice(lang: string): SpeechSynthesisVoice | null {
+  const voices = _voices.length ? _voices : window.speechSynthesis.getVoices();
+  return (
+    voices.find(v => v.lang === lang) ??
+    voices.find(v => v.lang.startsWith(lang.split('-')[0])) ??
+    null
+  );
+}
+
 function speak(text: string, lang: string) {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang;
-    u.rate = 0.85;
-    window.speechSynthesis.speak(u);
-  }
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  u.rate = 0.85;
+  const voice = pickVoice(lang);
+  if (voice) u.voice = voice;
+  window.speechSynthesis.speak(u);
 }
 
 export default function Learn() {
