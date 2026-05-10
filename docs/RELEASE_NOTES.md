@@ -2,6 +2,17 @@
 
 ---
 
+## v1.2.1 — 2026-05-10
+
+### Verbesserungen
+- **Sprachausgabe**: Die App wählt nun explizit die passende Systemstimme für jede Sprache (Deutsch, Englisch, Spanisch). Ein Voice-Cache auf Modulebene umgeht einen bekannten Browser-Bug, bei dem `getVoices()` beim ersten Aufruf noch leer ist.
+
+### Dokumentation
+- Benutzerdokumentation als HTML veröffentlicht
+- Entwicklerdokumentation als HTML veröffentlicht (inkl. technischer Beschreibung der Sprachausgabe-Logik)
+
+---
+
 ## v1.2.0 — 2026-05-06
 
 ### Übersicht

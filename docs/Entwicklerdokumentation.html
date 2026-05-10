@@ -551,6 +551,11 @@
       <li><a href="#erweitern"><span class="nav-icon">➕</span> App erweitern</a></li>
     </ul>
 
+    <div class="nav-section-label">Versionen</div>
+    <ul>
+      <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
+    </ul>
+
     <div class="nav-version">Version 1.2.1 · Mai 2026</div>
   </nav>
 
@@ -1451,6 +1456,89 @@ export const APP_VERSION = '1.2.1';</code></pre>
         <li><code>startSession</code>: Kartenauswahl-Logik für den neuen Modus implementieren.</li>
         <li>Render-Zweig für den neuen Modus vor dem Karteikarten-Fallback hinzufügen.</li>
       </ol>
+    </section>
+
+    <!-- ── CHANGELOG ── -->
+    <section id="changelog">
+      <div class="section-header">
+        <div class="section-num">📋</div>
+        <h2>Release Notes</h2>
+      </div>
+
+      <!-- v1.2.1 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.2.1</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-05-10</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Verbesserungen</h4>
+        <ul>
+          <li><strong>Sprachausgabe</strong>: <code>speak()</code> wählt nun explizit die passende Systemstimme per <code>pickVoice(lang)</code>. Ein Voice-Cache auf Modulebene (<code>_voices</code>, aktualisiert über <code>voiceschanged</code>) umgeht den Chrome-Bug, bei dem <code>getVoices()</code> beim ersten synchronen Aufruf noch leer ist. Suche: zuerst exakte Locale (<code>en-US</code>), dann Sprachpräfix (<code>en</code>).</li>
+        </ul>
+        <h4 style="margin:0.6rem 0 0.4rem;">Dokumentation</h4>
+        <ul>
+          <li>Benutzerdokumentation als HTML veröffentlicht</li>
+          <li>Entwicklerdokumentation als HTML veröffentlicht</li>
+        </ul>
+      </div>
+
+      <!-- v1.2.0 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.2.0</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-05-06</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Neu</h4>
+        <ul>
+          <li><strong>Eingabe-Modus (✍️)</strong>: Vierter Lernmodus — Antwort eintippen statt aufdecken, mit Sofort-Feedback (richtig / fast richtig / falsch)</li>
+          <li><strong>Tipptolerant</strong>: Kleine Tippfehler werden als richtig gewertet (Levenshtein ≤ 1 bei kurzen, ≤ 2 bei längeren Wörtern)</li>
+          <li><strong>Gestuftes Einführen neuer Karten</strong>: Neue Vokabeln werden kontrolliert pro Tag eingeführt (0 / 3 / 5 / 10 / ∞, Standard: 5)</li>
+          <li><strong>Design-Restore</strong>: V1-Design des Home-Bildschirms exakt wiederhergestellt</li>
+        </ul>
+        <h4 style="margin:0.6rem 0 0.4rem;">Interne Verbesserungen</h4>
+        <ul>
+          <li>Vokabeldaten aufgeteilt in <code>vocabulary_en.ts</code> und <code>vocabulary_es.ts</code></li>
+          <li><code>LANGUAGE_CONFIG</code> / <code>ALL_LANGUAGES</code> für einfachere Spracherweiterung</li>
+          <li>Unabhängige Lernfortschrittsprofile pro Sprache in IndexedDB</li>
+          <li>Zufällig-Richtung (🎲) als dritte Abfrage-Option</li>
+          <li>Quiz: kein Auto-Advance mehr, Weiter per Klick oder Enter/Leertaste</li>
+          <li>Optionales automatisches Vorlesen der Lösung (getrennt für Karteikarten und Quiz)</li>
+          <li>Konsistenz-Tracking: Lerntage werden pro Sprache aufgezeichnet</li>
+        </ul>
+      </div>
+
+      <!-- v1.0.1 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.0.1</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-04-25</span>
+        </div>
+        <ul>
+          <li>Bugfix: Beugungsformen werden in der Zielsprache angezeigt (EN/ES statt DE)</li>
+          <li>Versionsanzeige (<code>v{APP_VERSION}</code>) im App-Header eingeführt</li>
+          <li>Beugungsformen für unregelmäßige Verben ergänzt</li>
+        </ul>
+      </div>
+
+      <!-- v1.0.0 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 1rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.0.0</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-04-18</span>
+        </div>
+        <p style="margin-bottom:0.4rem;">Erste stabile Version.</p>
+        <ul>
+          <li>Lernkartei-System mit 6 Fächern (Spaced Repetition)</li>
+          <li>Sprachen: Deutsch ↔ Englisch, Deutsch ↔ Spanisch</li>
+          <li>Modi: Karteikarten, Alle Vokabeln, Quiz (Multiple Choice)</li>
+          <li>Eigene Vokabeln hinzufügen und löschen</li>
+          <li>Statistiken: Fachverteilung, Konsistenz, Kategorien</li>
+          <li>PWA: installierbar, Offline-Betrieb, Service Worker</li>
+          <li>Web Speech API: Vokabeln vorlesen lassen</li>
+          <li>Tägliches Kartenlimit einstellbar</li>
+        </ul>
+      </div>
+
     </section>
 
   </main>
