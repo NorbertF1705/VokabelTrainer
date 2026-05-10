@@ -586,6 +586,7 @@
       <li><a href="#einstellungen"><span class="nav-icon">⚙️</span> Einstellungen</a></li>
       <li><a href="#datenschutz"><span class="nav-icon">🔒</span> Datenschutz</a></li>
       <li><a href="#faq"><span class="nav-icon">❓</span> FAQ</a></li>
+      <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
     <div class="nav-version">Version 1.2.1 · Mai 2026</div>
@@ -1205,6 +1206,74 @@ npx serve -s dist</code></pre>
         <div class="faq-a">
           Das hängt von den Tageslimits und der Regelmäßigkeit ab. Mit 5 neuen Karten pro Tag dauert es mehrere Monate, bis alle Karten das erste Mal gesehen wurden. Bis alle Karten in Fach 6 sitzen (vollständig gelernt) vergehen – bei täglichem Üben – erfahrungsgemäß 6 bis 12 Monate. Das Spaced-Repetition-System ist auf nachhaltiges Langzeitgedächtnis ausgelegt, nicht auf schnelles Auswendiglernen.
         </div>
+      </div>
+
+    </section>
+
+    <!-- ── CHANGELOG ── -->
+    <section id="changelog">
+      <div class="section-header">
+        <div class="section-num">📋</div>
+        <h2>Release Notes</h2>
+      </div>
+
+      <!-- v1.2.1 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge">v1.2.1</span>
+          <span style="color:var(--muted); font-size:0.82rem;">10. Mai 2026</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Verbesserungen</h4>
+        <ul>
+          <li><strong>Bessere Aussprache</strong>: Die App wählt nun automatisch die optimale Systemstimme für jede Sprache. Die Sprachausgabe klingt damit natürlicher und klarer.</li>
+        </ul>
+        <h4 style="margin:0.6rem 0 0.4rem;">Dokumentation</h4>
+        <ul>
+          <li>Benutzer- und Entwicklerdokumentation als HTML veröffentlicht</li>
+        </ul>
+      </div>
+
+      <!-- v1.2.0 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.2.0</span>
+          <span style="color:var(--muted); font-size:0.82rem;">6. Mai 2026</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Neu</h4>
+        <ul>
+          <li><strong>Eingabe-Modus (✍️)</strong>: Vierter Lernmodus – Antwort frei eintippen statt aufdecken, mit farbigem Sofort-Feedback</li>
+          <li><strong>Tipptolerant</strong>: Kleine Tippfehler werden als richtig gewertet (in den Einstellungen ein-/ausschaltbar)</li>
+          <li><strong>Neue Karten pro Tag</strong>: Einstellbares Limit für täglich neu eingeführte Vokabeln (Standard: 5)</li>
+          <li><strong>Design-Restore</strong>: Startseite zeigt wieder das vertraute V1-Design</li>
+        </ul>
+      </div>
+
+      <!-- v1.0.1 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.0.1</span>
+          <span style="color:var(--muted); font-size:0.82rem;">25. April 2026</span>
+        </div>
+        <ul>
+          <li>Bugfix: Beugungsformen werden jetzt in der richtigen Sprache (EN/ES) angezeigt</li>
+          <li>Versionsnummer wird auf der Startseite angezeigt</li>
+        </ul>
+      </div>
+
+      <!-- v1.0.0 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 1rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.0.0</span>
+          <span style="color:var(--muted); font-size:0.82rem;">18. April 2026</span>
+        </div>
+        <p style="margin-bottom:0.4rem;">Erste stabile Version.</p>
+        <ul>
+          <li>Lernkartei-System mit 6 Fächern (Spaced Repetition)</li>
+          <li>Englisch und Spanisch, jeweils Deutsch ↔ Fremdsprache</li>
+          <li>Modi: Karteikarten, Alle Vokabeln, Quiz</li>
+          <li>Eigene Vokabeln hinzufügen und löschen</li>
+          <li>Statistiken, Offline-Betrieb (PWA), Sprachausgabe</li>
+        </ul>
       </div>
 
     </section>
