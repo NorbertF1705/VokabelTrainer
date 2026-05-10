@@ -551,7 +551,7 @@
       <li><a href="#erweitern"><span class="nav-icon">➕</span> App erweitern</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.2.0 · Mai 2026</div>
+    <div class="nav-version">Version 1.2.1 · Mai 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -560,7 +560,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.2.0</span>
+        <span class="badge">v1.2.1</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1275,6 +1275,23 @@
 
       <p>Die Tipptoleranz im Eingabe-Modus nutzt einen Levenshtein-Algorithmus, der direkt in <code>Learn.tsx</code> implementiert ist. Eine Antwort wird als „toleriert richtig" gewertet, wenn die Editierdistanz ≤ 2 ist und die Eingabe mindestens 4 Zeichen lang ist.</p>
 
+      <h4>Sprachausgabe (Web Speech API)</h4>
+      <p>Die Funktion <code>speak(text, lang)</code> nutzt die Web Speech API (<code>SpeechSynthesisUtterance</code>). Ab v1.2.1 wird die Systemstimme explizit per <code>pickVoice(lang)</code> ausgewählt, statt dem Browser die Wahl zu überlassen:</p>
+      <pre><code>// Modulebene – einmalig beim Laden, danach per Event aktualisiert
+let _voices: SpeechSynthesisVoice[] = [];
+speechSynthesis.addEventListener('voiceschanged', () =&gt; {
+  _voices = speechSynthesis.getVoices();
+});
+
+// Sucht zuerst exakte Locale (en-US), dann Sprachpräfix (en)
+function pickVoice(lang: string): SpeechSynthesisVoice | null {
+  const voices = _voices.length ? _voices : speechSynthesis.getVoices();
+  return voices.find(v =&gt; v.lang === lang)
+    ?? voices.find(v =&gt; v.lang.startsWith(lang.split('-')[0]))
+    ?? null;
+}</code></pre>
+      <p>Der Voice-Cache auf Modulebene umgeht einen bekannten Browser-Bug (vor allem Chrome), bei dem <code>getVoices()</code> beim ersten synchronen Aufruf noch eine leere Liste zurückgibt. Das <code>voiceschanged</code>-Event signalisiert, wann die Stimmen tatsächlich verfügbar sind.</p>
+
       <h4>Vocabulary.tsx</h4>
       <p>Listet alle Vokabeln der gewählten Sprache. Filterung per <code>useMemo</code> auf Basis von Suchtext, Kategorie und Fach – die gefilterte Liste wird nur neu berechnet, wenn sich die Filterwerte oder die Vokabelliste ändert. Das Hinzufügen-Modal ist in der Komponente inline implementiert. Nur Einträge mit <code>isCustom === true</code> zeigen das Löschen-Symbol.</p>
 
@@ -1379,7 +1396,7 @@
       <h3>App-Version aktualisieren</h3>
       <p>Die Versionsnummer wird nur an einer Stelle gepflegt: <code>src/version.ts</code>. Sie wird auf der Startseite angezeigt und kann dort einfach hochgezählt werden.</p>
       <pre><code>// src/version.ts
-export const APP_VERSION = '1.2.0';</code></pre>
+export const APP_VERSION = '1.2.1';</code></pre>
 
       <h3>TypeScript-Konfiguration</h3>
       <p>Strikte TypeScript-Konfiguration. Alle React-Komponenten sind typisiert. Es gibt keine <code>any</code>-Verwendungen außer in den Migrations-Funktionen (dort explizit durch ESLint-Kommentar auskommentiert).</p>
