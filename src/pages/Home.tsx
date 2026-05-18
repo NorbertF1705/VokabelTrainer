@@ -1,26 +1,22 @@
 import { useNavigate } from 'react-router-dom';
-import { useLearning, Language, QueryDirection } from '../context/LearningContext';
+import { useLearning } from '../context/LearningContext';
+import type { QueryDirection } from '../context/LearningContext';
+import { useActiveFile } from '../hooks/useActiveFile';
 import { Colors, BOX_LABELS } from '../constants/theme';
-import { LANGUAGE_CONFIG, ALL_LANGUAGES } from '../constants/languages';
 import { APP_VERSION } from '../version';
 
 export default function Home() {
   const navigate = useNavigate();
-  const { selectedLanguage, queryDirection, setLanguage, setQueryDirection, getDueCards, getNewCards, getBoxCounts } = useLearning();
+  const { settings, updateSettings, getDueCards, getNewCards, getBoxCounts } = useLearning();
+  const activeFile = useActiveFile();
 
-  const dueCards = getDueCards(selectedLanguage);
-  const newCards = getNewCards(selectedLanguage);
-  const boxCounts = getBoxCounts(selectedLanguage);
+  const dueCards = getDueCards();
+  const newCards = getNewCards();
+  const boxCounts = getBoxCounts();
   const totalDue = dueCards.length;
   const totalNew = newCards.length;
 
-  const langConfig = ALL_LANGUAGES.map(lang => ({
-    lang,
-    label: LANGUAGE_CONFIG[lang].label,
-    flag: LANGUAGE_CONFIG[lang].flag,
-  }));
-
-  const abbr = LANGUAGE_CONFIG[selectedLanguage].abbr;
+  const abbr = activeFile ? activeFile.manifest.language.toUpperCase() : '??';
   const dirConfig: { dir: QueryDirection; label: string }[] = [
     { dir: 'de-to-foreign', label: `DE → ${abbr}` },
     { dir: 'foreign-to-de', label: `${abbr} → DE` },
@@ -47,29 +43,6 @@ export default function Home() {
       </div>
 
       <div style={{ padding: '0 20px 32px' }}>
-        {/* Language Selector */}
-        <section style={{ marginTop: 24 }}>
-          <p style={sectionTitle}>Sprache</p>
-          <div style={{ display: 'flex', gap: 10 }}>
-            {langConfig.map(({ lang, label, flag }) => (
-              <button
-                key={lang}
-                onClick={() => setLanguage(lang)}
-                style={{
-                  ...toggleBtn,
-                  ...(selectedLanguage === lang ? toggleBtnActive : {}),
-                }}
-              >
-                <span style={{ fontSize: 20 }}>{flag}</span>
-                <span style={{
-                  fontSize: 15, fontWeight: 700,
-                  color: selectedLanguage === lang ? Colors.purple : Colors.textMuted,
-                }}>{label}</span>
-              </button>
-            ))}
-          </div>
-        </section>
-
         {/* Direction Selector */}
         <section style={{ marginTop: 24 }}>
           <p style={sectionTitle}>Abfragerichtung</p>
@@ -77,15 +50,15 @@ export default function Home() {
             {dirConfig.map(({ dir, label }) => (
               <button
                 key={dir}
-                onClick={() => setQueryDirection(dir)}
+                onClick={() => updateSettings({ queryDirection: dir })}
                 style={{
                   ...toggleBtn,
-                  ...(queryDirection === dir ? toggleBtnActive : {}),
+                  ...(settings.queryDirection === dir ? toggleBtnActive : {}),
                 }}
               >
                 <span style={{
                   fontSize: 16, fontWeight: 800,
-                  color: queryDirection === dir ? Colors.purple : Colors.textMuted,
+                  color: settings.queryDirection === dir ? Colors.purple : Colors.textMuted,
                 }}>{label}</span>
               </button>
             ))}

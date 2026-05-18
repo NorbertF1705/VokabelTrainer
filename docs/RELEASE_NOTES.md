@@ -2,6 +2,33 @@
 
 ---
 
+## v1.3.0 — 2026-05-18
+
+### Architektur: Einzelne aktive Vokabeldatei
+
+Version 1.3 ersetzt das bisherige Zwei-Sprachen-Parallelmodell durch eine flexible Einzeldatei-Architektur. Statt Englisch und Spanisch immer gleichzeitig zu verwalten, ist jetzt jeweils genau eine Vokabeldatei aktiv. Die Datei kann jederzeit über einen Selektor im App-Header gewechselt werden.
+
+**Sichtbare Änderungen für den Benutzer:**
+
+- **Erststart:** Beim ersten Öffnen der App erscheint ein Willkommensbildschirm zur Auswahl des Lernpakets
+- **Datei-Selektor im Header:** Kleiner Button oben rechts zeigt die aktive Datei; Tipp öffnet ein Bottom-Sheet zum Wechseln
+- **Home:** Sprach-Toggle (EN / ES) entfernt; Abfragerichtung-Buttons bleiben
+- **Vokabeln:** Sprach-Tabs entfernt; die Liste zeigt immer die aktive Datei
+- **Statistik:** Zweisprachige Übersichts-Kacheln und Sprach-Tabs entfernt; Statistik gilt für die aktive Datei
+- **Einstellungen:** „Lernsprache"-Abschnitt entfernt
+- **Datei-Wechsel während Session:** Bestätigungsdialog schützt vor ungewolltem Sitzungsabbruch
+
+**Interne Änderungen:**
+
+- Neues Storage-Schema v3: Schlüssel `vt:schemaVersion`, `vt:activeFileId`, `vt:settings`, `vt:file:<id>`
+- Idempotente Migration v1.2 → v1.3: bestehender Lernstand wird automatisch übernommen, v1.2-Blob bleibt als Backup erhalten
+- Vokabeldaten werden per Dynamic Import (Code Splitting) lazy geladen
+- `file_config.ts` als zentrale Manifest-Datei für alle Vokabeldateien
+- Vocabulary-Dateien unter `src/data/vocabulary/` als schlanke Re-Export-Wrapper
+- `useActiveFile()` Hook für typsicheren Zugriff auf Manifest + State + Vokabular
+
+---
+
 ## v1.2.2 — 2026-05-10
 
 ### Bugfix: Lernstand bleibt nach App-Updates erhalten

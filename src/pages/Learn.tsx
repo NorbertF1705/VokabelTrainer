@@ -1,9 +1,10 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useLearning } from '../context/LearningContext';
+import { useActiveFile } from '../hooks/useActiveFile';
 import FlashCard from '../components/FlashCard';
 import { Colors } from '../constants/theme';
+import { LANGUAGE_LABELS } from '../config/file_config';
 import { VocabularyItem } from '../data/vocabulary';
-import { LANGUAGE_CONFIG } from '../constants/languages';
 
 type SessionMode = 'due' | 'all' | 'quiz' | 'type';
 
@@ -79,7 +80,12 @@ function speak(text: string, lang: string) {
 }
 
 export default function Learn() {
-  const { selectedLanguage, queryDirection, getDueCards, getNewCards, allVocabulary, getCardProgress, markCard, dailyCardLimit, quizAutoSpeak, flashcardAutoSpeak, typingTolerant, recordTrainingDay } = useLearning();
+  const { settings, getDueCards, getNewCards, getCardProgress, markCard, recordTrainingDay, setSessionActive } = useLearning();
+  const activeFile = useActiveFile();
+  const allVocabulary = activeFile?.allVocabulary ?? [];
+  const voiceCode = activeFile?.manifest.voice ?? 'en-US';
+  const langLabel = activeFile ? LANGUAGE_LABELS[activeFile.manifest.language] : '';
+  const { queryDirection, dailyCardLimit, quizAutoSpeak, flashcardAutoSpeak, typingTolerant } = settings;
 
   const [sessionMode, setSessionMode] = useState<SessionMode>('due');
   const [sessionCards, setSessionCards] = useState<VocabularyItem[] | null>(null);
@@ -98,7 +104,7 @@ export default function Learn() {
   const [typeResult, setTypeResult] = useState<'correct' | 'almost' | 'wrong' | null>(null);
   const [sessionNewCards, setSessionNewCards] = useState(0);
 
-  const dueCards = useMemo(() => getDueCards(selectedLanguage), [selectedLanguage]);
+  const dueCards = getDueCards();
 
   useEffect(() => {
     if (queryDirection === 'random') {
@@ -132,21 +138,28 @@ export default function Learn() {
     ? effectiveDirection === 'de-to-foreign' ? currentCard.translation : currentCard.german
     : '';
 
+  const exitSession = useCallback(() => {
+    setSessionCards(null);
+    setSessionActive(false);
+  }, [setSessionActive]);
+
   const startSession = useCallback((mode: SessionMode) => {
+    const allVocab = activeFile?.allVocabulary ?? [];
     let cards: VocabularyItem[];
     let newCount = 0;
     if (mode === 'due' || mode === 'type') {
-      const revCards = getDueCards(selectedLanguage);
-      const newCards = getNewCards(selectedLanguage);
-      newCount = newCards.length;
-      cards = [...revCards, ...newCards];
+      const revCards = getDueCards();
+      const newC = getNewCards();
+      newCount = newC.length;
+      cards = [...revCards, ...newC];
       if (cards.length === 0) return;
     } else if (mode === 'quiz') {
-      const base = dueCards.length > 0 ? dueCards : allVocabulary;
+      const due = getDueCards();
+      const base = due.length > 0 ? due : allVocab;
       const shuffled = shuffle(base);
       cards = dailyCardLimit > 0 ? shuffled.slice(0, dailyCardLimit) : shuffled;
     } else {
-      cards = shuffle([...allVocabulary]);
+      cards = shuffle([...allVocab]);
     }
     setSessionMode(mode);
     setSessionCards(cards);
@@ -161,15 +174,15 @@ export default function Learn() {
     setQuizFlipKey(0);
     setTypedAnswer('');
     setTypeResult(null);
-  }, [selectedLanguage, allVocabulary, getDueCards, getNewCards, dueCards, dailyCardLimit]);
+    setSessionActive(true);
+  }, [activeFile, getDueCards, getNewCards, dailyCardLimit, setSessionActive]);
 
   const speakWord = () => {
     if (!currentCard) return;
     const text = isFlipped ? backText : frontText;
-    const foreignLang = LANGUAGE_CONFIG[selectedLanguage].speechCode;
     const lang = isFlipped
-      ? (effectiveDirection === 'de-to-foreign' ? foreignLang : 'de-DE')
-      : (effectiveDirection === 'de-to-foreign' ? 'de-DE' : foreignLang);
+      ? (effectiveDirection === 'de-to-foreign' ? voiceCode : 'de-DE')
+      : (effectiveDirection === 'de-to-foreign' ? 'de-DE' : voiceCode);
     speak(text, lang);
   };
 
@@ -215,13 +228,14 @@ export default function Learn() {
 
   const advanceCard = (correct: boolean) => {
     if (!currentCard || !sessionCards) return;
-    markCard(currentCard.id, selectedLanguage, correct);
+    markCard(currentCard.id, correct);
     const newStats = { correct: sessionStats.correct + (correct ? 1 : 0), incorrect: sessionStats.incorrect + (correct ? 0 : 1) };
     setSessionStats(newStats);
     const nextIndex = currentIndex + 1;
     if (nextIndex >= sessionCards.length) {
-      recordTrainingDay(selectedLanguage);
+      recordTrainingDay();
       setSessionDone(true);
+      setSessionActive(false);
     } else {
       setCurrentIndex(nextIndex);
       setIsFlipped(false);
@@ -239,8 +253,7 @@ export default function Learn() {
     setQuizFlipKey(k => k + 1);
     if (quizAutoSpeak) {
       const textToSpeak = currentCard[answerField] as string;
-      const foreignLang = LANGUAGE_CONFIG[selectedLanguage].speechCode;
-      const lang = answerField === 'translation' ? foreignLang : 'de-DE';
+      const lang = answerField === 'translation' ? voiceCode : 'de-DE';
       speak(textToSpeak, lang);
     }
   };
@@ -251,7 +264,7 @@ export default function Learn() {
     setTypeResult(evaluateTypedAnswer(typedAnswer, correct, typingTolerant));
   };
 
-  const boxNumber = currentCard ? getCardProgress(currentCard.id, selectedLanguage).box : 1;
+  const boxNumber = currentCard ? (getCardProgress(currentCard.id)?.box ?? 1) : 1;
   const correctAnswer = currentCard ? (currentCard[answerField] as string) : '';
 
   // ── Lobby ──────────────────────────────────────────────────
@@ -333,7 +346,7 @@ export default function Learn() {
               </span>
             </div>
           )}
-          <button onClick={() => setSessionCards(null)} style={{ width: '100%', border: 'none', cursor: 'pointer', padding: 0, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(45,27,105,0.18)' }}>
+          <button onClick={exitSession} style={{ width: '100%', border: 'none', cursor: 'pointer', padding: 0, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(45,27,105,0.18)' }}>
             <div style={{ background: 'linear-gradient(90deg, #A78BFA, #7C3AED)', padding: 18, textAlign: 'center', fontSize: 18, fontWeight: 800, color: '#fff' }}>
               Neue Sitzung
             </div>
@@ -356,7 +369,7 @@ export default function Learn() {
     return (
       <div style={{ background: Colors.background, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <div style={topBar}>
-          <button onClick={() => setSessionCards(null)} style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, fontWeight: 700, cursor: 'pointer', border: 'none', background: 'none', width: 36, height: 36 }}>✕</button>
+          <button onClick={exitSession} style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, fontWeight: 700, cursor: 'pointer', border: 'none', background: 'none', width: 36, height: 36 }}>✕</button>
           <span style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{currentIndex + 1} / {sessionCards.length}</span>
           <button onClick={speakWord} style={{ width: 36, height: 36, borderRadius: 18, background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', fontSize: 18 }}>🔈</button>
         </div>
@@ -367,7 +380,7 @@ export default function Learn() {
           {/* Frage */}
           <div style={{ background: Colors.card, borderRadius: 16, padding: '24px 20px', textAlign: 'center', boxShadow: '0 2px 8px rgba(45,27,105,0.08)' }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
-              {effectiveDirection === 'de-to-foreign' ? 'Deutsch' : LANGUAGE_CONFIG[selectedLanguage].label}
+              {effectiveDirection === 'de-to-foreign' ? 'Deutsch' : langLabel}
             </div>
             <div style={{ fontSize: 26, fontWeight: 900, color: Colors.text }}>{frontText}</div>
             {currentCard?.emoji && <div style={{ fontSize: 32, marginTop: 8 }}>{currentCard.emoji}</div>}
@@ -376,7 +389,7 @@ export default function Learn() {
           {/* Eingabefeld */}
           <div>
             <div style={{ fontSize: 12, fontWeight: 700, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
-              {effectiveDirection === 'de-to-foreign' ? LANGUAGE_CONFIG[selectedLanguage].label : 'Deutsch'}
+              {effectiveDirection === 'de-to-foreign' ? langLabel : 'Deutsch'}
             </div>
             <input
               autoFocus
@@ -449,7 +462,7 @@ export default function Learn() {
     return (
       <div style={{ background: Colors.background, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={topBar}>
-          <button onClick={() => setSessionCards(null)} style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, fontWeight: 700, cursor: 'pointer', border: 'none', background: 'none', width: 36, height: 36 }}>✕</button>
+          <button onClick={exitSession} style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, fontWeight: 700, cursor: 'pointer', border: 'none', background: 'none', width: 36, height: 36 }}>✕</button>
           <span style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{currentIndex + 1} / {sessionCards.length}</span>
           <button onClick={speakWord} style={{ width: 36, height: 36, borderRadius: 18, background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', fontSize: 18 }}>🔈</button>
         </div>
@@ -461,8 +474,8 @@ export default function Learn() {
             <FlashCard
               frontText={frontText}
               backText={backText}
-              frontLang={effectiveDirection === 'de-to-foreign' ? 'Deutsch' : (LANGUAGE_CONFIG[selectedLanguage].label)}
-              backLang={effectiveDirection === 'de-to-foreign' ? (LANGUAGE_CONFIG[selectedLanguage].label) : 'Deutsch'}
+              frontLang={effectiveDirection === 'de-to-foreign' ? 'Deutsch' : langLabel}
+              backLang={effectiveDirection === 'de-to-foreign' ? langLabel : 'Deutsch'}
               emoji={currentCard!.emoji}
               category={currentCard!.category}
               boxNumber={boxNumber}
@@ -518,7 +531,7 @@ export default function Learn() {
   return (
     <div style={{ background: Colors.background, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       <div style={topBar}>
-        <button onClick={() => setSessionCards(null)} style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, fontWeight: 700, cursor: 'pointer', border: 'none', background: 'none', width: 36, height: 36 }}>✕</button>
+        <button onClick={exitSession} style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, fontWeight: 700, cursor: 'pointer', border: 'none', background: 'none', width: 36, height: 36 }}>✕</button>
         <span style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{currentIndex + 1} / {sessionCards.length}</span>
         <button onClick={speakWord} style={{ width: 36, height: 36, borderRadius: 18, background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', fontSize: 18 }}>🔈</button>
       </div>
@@ -530,8 +543,8 @@ export default function Learn() {
           <FlashCard
             frontText={frontText}
             backText={backText}
-            frontLang={effectiveDirection === 'de-to-foreign' ? 'Deutsch' : (LANGUAGE_CONFIG[selectedLanguage].label)}
-            backLang={effectiveDirection === 'de-to-foreign' ? (LANGUAGE_CONFIG[selectedLanguage].label) : 'Deutsch'}
+            frontLang={effectiveDirection === 'de-to-foreign' ? 'Deutsch' : langLabel}
+            backLang={effectiveDirection === 'de-to-foreign' ? langLabel : 'Deutsch'}
             emoji={currentCard!.emoji}
             category={currentCard!.category}
             boxNumber={boxNumber}
@@ -539,8 +552,7 @@ export default function Learn() {
             onFlip={(flipped) => {
               setIsFlipped(flipped);
               if (flipped && flashcardAutoSpeak && currentCard) {
-                const foreignLang = LANGUAGE_CONFIG[selectedLanguage].speechCode;
-                const lang = effectiveDirection === 'de-to-foreign' ? foreignLang : 'de-DE';
+                const lang = effectiveDirection === 'de-to-foreign' ? voiceCode : 'de-DE';
                 speak(backText, lang);
               }
             }}

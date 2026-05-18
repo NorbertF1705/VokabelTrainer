@@ -1,6 +1,5 @@
 import { useLearning } from '../context/LearningContext';
 import { Colors } from '../constants/theme';
-import { LANGUAGE_CONFIG, ALL_LANGUAGES } from '../constants/languages';
 import SWStatusPanel from '../components/SWStatusPanel';
 
 const NEW_CARD_LIMITS = [
@@ -20,7 +19,7 @@ const CARD_LIMITS = [
 ];
 
 export default function Settings() {
-  const { selectedLanguage, setLanguage, queryDirection, setQueryDirection, dailyCardLimit, setDailyCardLimit, dailyNewCardLimit, setDailyNewCardLimit, resetProgress, quizAutoSpeak, setQuizAutoSpeak, flashcardAutoSpeak, setFlashcardAutoSpeak, typingTolerant, setTypingTolerant } = useLearning();
+  const { settings, updateSettings, resetProgress } = useLearning();
 
   const handleReset = () => {
     if (window.confirm('Wirklich den gesamten Lernfortschritt löschen? Alle Karten werden auf Fach 1 zurückgesetzt. Eigene Vokabeln bleiben erhalten.')) {
@@ -35,32 +34,6 @@ export default function Settings() {
       </div>
 
       <div style={{ padding: '20px 20px 40px' }}>
-        {/* Sprache */}
-        <section style={{ marginBottom: 28 }}>
-          <p style={sectionTitle}>Lernsprache</p>
-          <div style={card}>
-            {ALL_LANGUAGES.map((lang, idx) => {
-              const { flag: emoji, label } = LANGUAGE_CONFIG[lang];
-              return (
-              <div key={lang}>
-                {idx > 0 && <div style={{ height: 1, background: Colors.border, margin: '0 16px' }} />}
-                <button
-                  onClick={() => setLanguage(lang)}
-                  style={{
-                    width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                    padding: '14px 16px', background: selectedLanguage === lang ? '#EDE8FF' : 'transparent',
-                    border: 'none', cursor: 'pointer',
-                  }}
-                >
-                  <span style={{ fontSize: 22, width: 32, textAlign: 'center' }}>{emoji}</span>
-                  <span style={{ flex: 1, fontSize: 16, fontWeight: 600, color: selectedLanguage === lang ? Colors.purple : Colors.text, textAlign: 'left' }}>{label}</span>
-                  {selectedLanguage === lang && <span style={{ fontSize: 16, color: Colors.purple, fontWeight: 900 }}>✓</span>}
-                </button>
-              </div>
-            );})}
-          </div>
-        </section>
-
         {/* Abfragerichtung */}
         <section style={{ marginBottom: 28 }}>
           <p style={sectionTitle}>Abfragerichtung</p>
@@ -73,16 +46,16 @@ export default function Settings() {
               <div key={dir}>
                 {idx > 0 && <div style={{ height: 1, background: Colors.border, margin: '0 16px' }} />}
                 <button
-                  onClick={() => setQueryDirection(dir)}
+                  onClick={() => updateSettings({ queryDirection: dir })}
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                    padding: '14px 16px', background: queryDirection === dir ? '#EDE8FF' : 'transparent',
+                    padding: '14px 16px', background: settings.queryDirection === dir ? '#EDE8FF' : 'transparent',
                     border: 'none', cursor: 'pointer',
                   }}
                 >
                   <span style={{ fontSize: 22, width: 32, textAlign: 'center' }}>{emoji}</span>
-                  <span style={{ flex: 1, fontSize: 16, fontWeight: 600, color: queryDirection === dir ? Colors.purple : Colors.text, textAlign: 'left' }}>{label}</span>
-                  {queryDirection === dir && <span style={{ fontSize: 16, color: Colors.purple, fontWeight: 900 }}>✓</span>}
+                  <span style={{ flex: 1, fontSize: 16, fontWeight: 600, color: settings.queryDirection === dir ? Colors.purple : Colors.text, textAlign: 'left' }}>{label}</span>
+                  {settings.queryDirection === dir && <span style={{ fontSize: 16, color: Colors.purple, fontWeight: 900 }}>✓</span>}
                 </button>
               </div>
             ))}
@@ -94,7 +67,7 @@ export default function Settings() {
           <p style={sectionTitle}>Quiz</p>
           <div style={card}>
             <button
-              onClick={() => setQuizAutoSpeak(!quizAutoSpeak)}
+              onClick={() => updateSettings({ quizAutoSpeak: !settings.quizAutoSpeak })}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
             >
               <span style={{ fontSize: 22, width: 32, textAlign: 'center' }}>🔈</span>
@@ -104,11 +77,11 @@ export default function Settings() {
               </div>
               <div style={{
                 width: 44, height: 26, borderRadius: 13,
-                background: quizAutoSpeak ? Colors.purple : Colors.border,
+                background: settings.quizAutoSpeak ? Colors.purple : Colors.border,
                 position: 'relative', transition: 'background 0.2s', flexShrink: 0,
               }}>
                 <div style={{
-                  position: 'absolute', top: 3, left: quizAutoSpeak ? 21 : 3,
+                  position: 'absolute', top: 3, left: settings.quizAutoSpeak ? 21 : 3,
                   width: 20, height: 20, borderRadius: 10, background: '#fff',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.2)', transition: 'left 0.2s',
                 }} />
@@ -122,7 +95,7 @@ export default function Settings() {
           <p style={sectionTitle}>Karteikarten</p>
           <div style={card}>
             <button
-              onClick={() => setFlashcardAutoSpeak(!flashcardAutoSpeak)}
+              onClick={() => updateSettings({ flashcardAutoSpeak: !settings.flashcardAutoSpeak })}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
             >
               <span style={{ fontSize: 22, width: 32, textAlign: 'center' }}>🔈</span>
@@ -132,11 +105,11 @@ export default function Settings() {
               </div>
               <div style={{
                 width: 44, height: 26, borderRadius: 13,
-                background: flashcardAutoSpeak ? Colors.purple : Colors.border,
+                background: settings.flashcardAutoSpeak ? Colors.purple : Colors.border,
                 position: 'relative', transition: 'background 0.2s', flexShrink: 0,
               }}>
                 <div style={{
-                  position: 'absolute', top: 3, left: flashcardAutoSpeak ? 21 : 3,
+                  position: 'absolute', top: 3, left: settings.flashcardAutoSpeak ? 21 : 3,
                   width: 20, height: 20, borderRadius: 10, background: '#fff',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.2)', transition: 'left 0.2s',
                 }} />
@@ -150,7 +123,7 @@ export default function Settings() {
           <p style={sectionTitle}>Eingabe-Modus</p>
           <div style={card}>
             <button
-              onClick={() => setTypingTolerant(!typingTolerant)}
+              onClick={() => updateSettings({ typingTolerant: !settings.typingTolerant })}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
             >
               <span style={{ fontSize: 22, width: 32, textAlign: 'center' }}>⌨️</span>
@@ -160,11 +133,11 @@ export default function Settings() {
               </div>
               <div style={{
                 width: 44, height: 26, borderRadius: 13,
-                background: typingTolerant ? Colors.purple : Colors.border,
+                background: settings.typingTolerant ? Colors.purple : Colors.border,
                 position: 'relative', transition: 'background 0.2s', flexShrink: 0,
               }}>
                 <div style={{
-                  position: 'absolute', top: 3, left: typingTolerant ? 21 : 3,
+                  position: 'absolute', top: 3, left: settings.typingTolerant ? 21 : 3,
                   width: 20, height: 20, borderRadius: 10, background: '#fff',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.2)', transition: 'left 0.2s',
                 }} />
@@ -181,13 +154,13 @@ export default function Settings() {
             {CARD_LIMITS.map(({ label, value }) => (
               <button
                 key={label}
-                onClick={() => setDailyCardLimit(value)}
+                onClick={() => updateSettings({ dailyCardLimit: value })}
                 style={{
                   flex: 1, padding: '13px 0',
-                  background: dailyCardLimit === value ? '#EDE8FF' : Colors.card,
-                  border: `2px solid ${dailyCardLimit === value ? Colors.purple : Colors.border}`,
+                  background: settings.dailyCardLimit === value ? '#EDE8FF' : Colors.card,
+                  border: `2px solid ${settings.dailyCardLimit === value ? Colors.purple : Colors.border}`,
                   borderRadius: 12, fontSize: 17, fontWeight: 700,
-                  color: dailyCardLimit === value ? Colors.purple : Colors.textMuted,
+                  color: settings.dailyCardLimit === value ? Colors.purple : Colors.textMuted,
                   cursor: 'pointer', boxShadow: '0 2px 6px rgba(45,27,105,0.06)',
                 }}
               >{label}</button>
@@ -203,13 +176,13 @@ export default function Settings() {
             {NEW_CARD_LIMITS.map(({ label, value }) => (
               <button
                 key={label}
-                onClick={() => setDailyNewCardLimit(value)}
+                onClick={() => updateSettings({ dailyNewCardLimit: value })}
                 style={{
                   flex: 1, padding: '13px 0',
-                  background: dailyNewCardLimit === value ? '#FFF8E1' : Colors.card,
-                  border: `2px solid ${dailyNewCardLimit === value ? '#F59E0B' : Colors.border}`,
+                  background: settings.dailyNewCardLimit === value ? '#FFF8E1' : Colors.card,
+                  border: `2px solid ${settings.dailyNewCardLimit === value ? '#F59E0B' : Colors.border}`,
                   borderRadius: 12, fontSize: 17, fontWeight: 700,
-                  color: dailyNewCardLimit === value ? '#B45309' : Colors.textMuted,
+                  color: settings.dailyNewCardLimit === value ? '#B45309' : Colors.textMuted,
                   cursor: 'pointer', boxShadow: '0 2px 6px rgba(45,27,105,0.06)',
                 }}
               >{label}</button>

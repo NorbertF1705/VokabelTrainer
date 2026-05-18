@@ -578,6 +578,8 @@
     <ul>
       <li><a href="#ueberblick" class="active"><span class="nav-icon">●</span> Überblick</a></li>
       <li><a href="#einrichtung"><span class="nav-icon">⚡</span> Ersteinrichtung</a></li>
+      <li><a href="#erststart"><span class="nav-icon">🎉</span> Erststart</a></li>
+      <li><a href="#paket"><span class="nav-icon">🗂️</span> Lernpaket wechseln</a></li>
       <li><a href="#home"><span class="nav-icon">🏠</span> Startseite</a></li>
       <li><a href="#lernen"><span class="nav-icon">🧠</span> Lernen</a></li>
       <li><a href="#vokabeln"><span class="nav-icon">📚</span> Vokabeln</a></li>
@@ -589,7 +591,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.2.2 · Mai 2026</div>
+    <div class="nav-version">Version 1.3.0 · Mai 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -598,7 +600,7 @@
     <div class="page-header">
       <h1>Benutzerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.2.2</span>
+        <span class="badge">v1.3.0</span>
         <span>Offline-PWA · iPhone</span>
         <span>Stand: Mai 2026</span>
       </div>
@@ -610,15 +612,16 @@
         <div class="section-num">0</div>
         <h2>Überblick</h2>
       </div>
-      <p>VokabelTrainer ist eine offline-fähige App zum Lernen englischer und spanischer Vokabeln mit Karteikarten und intelligentem Wiederholungsalgorithmus. Die App läuft vollständig auf dem iPhone – ohne Internetverbindung und ohne App Store.</p>
-      <p>Sie gliedert sich in fünf Bereiche, erreichbar über die Navigationsleiste am unteren Bildschirmrand:</p>
+      <p>VokabelTrainer ist eine offline-fähige App zum Lernen von Vokabeln mit Karteikarten und intelligentem Wiederholungsalgorithmus. Die App läuft vollständig auf dem iPhone – ohne Internetverbindung und ohne App Store.</p>
+      <p>Es ist immer genau ein <strong>Lernpaket</strong> aktiv. Aktuell verfügbare Pakete: 🇬🇧 Englisch – Grundwortschatz und 🇪🇸 Spanisch – Grundwortschatz. Das Paket lässt sich jederzeit über den Selektor oben rechts im Header wechseln.</p>
+      <p>Die App gliedert sich in fünf Bereiche, erreichbar über die Navigationsleiste am unteren Bildschirmrand:</p>
 
       <div class="card-grid">
-        <div class="card"><div class="card-icon">🏠</div><div class="card-label">Home</div><div class="card-desc">Sprachauswahl, Tagesübersicht, Lernen starten</div></div>
+        <div class="card"><div class="card-icon">🏠</div><div class="card-label">Home</div><div class="card-desc">Tagesübersicht, Lernen starten</div></div>
         <div class="card"><div class="card-icon">🧠</div><div class="card-label">Lernen</div><div class="card-desc">4 Lernmodi: Karteikarten, Alle, Quiz, Eingabe</div></div>
         <div class="card"><div class="card-icon">📚</div><div class="card-label">Vokabeln</div><div class="card-desc">Suchen, filtern und eigene Wörter hinzufügen</div></div>
         <div class="card"><div class="card-icon">📊</div><div class="card-label">Statistik</div><div class="card-desc">Lernfortschritt und Trainings-Regelmäßigkeit</div></div>
-        <div class="card"><div class="card-icon">⚙️</div><div class="card-label">Einstellungen</div><div class="card-desc">Sprache, Modi, Limits und Audio konfigurieren</div></div>
+        <div class="card"><div class="card-icon">⚙️</div><div class="card-label">Einstellungen</div><div class="card-desc">Modi, Limits und Audio konfigurieren</div></div>
         <div class="card"><div class="card-icon">✈️</div><div class="card-label">Offline</div><div class="card-desc">Alle Daten lokal gespeichert – kein Internet nötig</div></div>
       </div>
     </section>
@@ -683,24 +686,44 @@ npx serve -s dist</code></pre>
       </div>
     </section>
 
-    <!-- ── 2 STARTSEITE ── -->
-    <section id="home">
+    <!-- ── 2 ERSTSTART ── -->
+    <section id="erststart">
       <div class="section-header">
         <div class="section-num">2</div>
+        <h2>Erststart &amp; Lernpaket-Auswahl</h2>
+      </div>
+      <p>Beim allerersten Öffnen der App erscheint ein Willkommensbildschirm. Hier wird das Lernpaket gewählt, mit dem gestartet werden soll. Die verfügbaren Pakete sind nach Sprache gruppiert aufgeführt.</p>
+      <p>Die Auswahl lässt sich später jederzeit über den Selektor im App-Header ändern (siehe nächster Abschnitt).</p>
+    </section>
+
+    <!-- ── 3 LERNPAKET WECHSELN ── -->
+    <section id="paket">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <h2>Lernpaket wechseln</h2>
+      </div>
+      <p>Am oberen Rand der App befindet sich ein kleiner Button, der den Namen des aktiven Lernpakets anzeigt (z.&nbsp;B. „🇬🇧 Englisch · Grundwortschatz ▾"). Ein Tipp öffnet ein Auswahlblatt mit allen verfügbaren Paketen.</p>
+      <ul>
+        <li>Der Lernfortschritt jedes Pakets wird separat gespeichert und bleibt beim Wechseln erhalten.</li>
+        <li>Läuft gerade eine Lernsitzung, erscheint ein Bestätigungsdialog, bevor die Sitzung beendet wird.</li>
+      </ul>
+    </section>
+
+    <!-- ── 4 STARTSEITE ── -->
+    <section id="home">
+      <div class="section-header">
+        <div class="section-num">4</div>
         <h2>Startseite (🏠 Home)</h2>
       </div>
       <p>Die Startseite zeigt auf einen Blick den Lernstand des Tages und dient als schneller Einstieg ins Lernen.</p>
-
-      <h3>Sprachauswahl</h3>
-      <p>Oben auf der Startseite kann zwischen den zwei verfügbaren Sprachen gewechselt werden: 🇬🇧 Englisch und 🇪🇸 Spanisch. Die Wahl gilt global – alle Bereiche der App (Lernen, Vokabeln, Statistik) zeigen danach Inhalte für diese Sprache.</p>
 
       <h3>Abfragerichtung</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Option</th><th>Vorderseite der Karte</th><th>Gesucht</th></tr></thead>
           <tbody>
-            <tr><td>DE → EN / DE → ES</td><td>Deutsches Wort</td><td>Fremdsprachige Übersetzung</td></tr>
-            <tr><td>EN → DE / ES → DE</td><td>Fremdsprachiges Wort</td><td>Deutsche Bedeutung</td></tr>
+            <tr><td>DE → EN/ES</td><td>Deutsches Wort</td><td>Fremdsprachige Übersetzung</td></tr>
+            <tr><td>EN/ES → DE</td><td>Fremdsprachiges Wort</td><td>Deutsche Bedeutung</td></tr>
             <tr><td>🎲 Zufall</td><td>Wechselt zufällig bei jeder Karte</td><td>Mal die eine, mal die andere Richtung</td></tr>
           </tbody>
         </table>
@@ -713,10 +736,10 @@ npx serve -s dist</code></pre>
       <p>Sechs farbige Kacheln zeigen, wie viele Karten sich aktuell in welchem der sechs Fächer befinden. Die Farben entsprechen dem Ampelsystem: Rot (Fach 1–2) bedeutet viele Wiederholungen nötig, Lila (Fach 6) steht für vollständig gelernte Karten.</p>
     </section>
 
-    <!-- ── 3 LERNEN ── -->
+    <!-- ── 5 LERNEN ── -->
     <section id="lernen">
       <div class="section-header">
-        <div class="section-num">3</div>
+        <div class="section-num">5</div>
         <h2>Lernen (🧠)</h2>
       </div>
       <p>Der Lernen-Tab bietet vier verschiedene Lernmodi. Vor dem Start erscheint ein Auswahlbildschirm mit vier Buttons.</p>
@@ -732,7 +755,7 @@ npx serve -s dist</code></pre>
         <div class="mode-card">
           <div class="mode-card-icon">🔁</div>
           <div class="mode-card-title">Alle Vokabeln</div>
-          <div class="mode-card-desc">Alle Karten der gewählten Sprache in zufälliger Reihenfolge als Karteikarten. Gut für freies Üben ohne Tageslimit.</div>
+          <div class="mode-card-desc">Alle Karten des aktiven Lernpakets in zufälliger Reihenfolge als Karteikarten. Gut für freies Üben ohne Tageslimit.</div>
           <span class="mode-card-tag sr">Fächer aktiv</span>
         </div>
         <div class="mode-card">
@@ -855,16 +878,16 @@ npx serve -s dist</code></pre>
       <p>Nach der letzten Karte erscheint eine Auswertung mit der Anzahl richtig / falsch beantworteter Karten, der Erfolgsquote und der Anzahl neu eingeführter Karten. „Neue Sitzung" kehrt zum Auswahlbildschirm zurück.</p>
     </section>
 
-    <!-- ── 4 VOKABELN ── -->
+    <!-- ── 6 VOKABELN ── -->
     <section id="vokabeln">
       <div class="section-header">
-        <div class="section-num">4</div>
+        <div class="section-num">6</div>
         <h2>Vokabeln (📚)</h2>
       </div>
-      <p>Der Vokabeln-Tab zeigt alle Vokabeln der App und erlaubt das Hinzufügen eigener Einträge.</p>
+      <p>Der Vokabeln-Tab zeigt alle Vokabeln des aktiven Lernpakets und erlaubt das Hinzufügen eigener Einträge.</p>
 
       <h3>Anzeige und Filter</h3>
-      <p>Oben kann zwischen 🇬🇧 Englisch und 🇪🇸 Spanisch gewechselt werden. Das Suchfeld filtert gleichzeitig nach deutschem Wort und Übersetzung. Zwei scrollbare Filterzeilen erlauben die Einschränkung nach:</p>
+      <p>Das Suchfeld filtert gleichzeitig nach deutschem Wort und Übersetzung. Zwei scrollbare Filterzeilen erlauben die Einschränkung nach:</p>
       <ul>
         <li><strong>Kategorie:</strong> Tiere, Essen &amp; Trinken, Körper, Kleidung, Natur &amp; Wetter, Zuhause, Transport, Sport &amp; Freizeit, Berufe, Technologie, Orte, Verben, Diverses</li>
         <li><strong>Fach:</strong> Alle Fächer oder gezielt Fach 1–6</li>
@@ -877,10 +900,9 @@ npx serve -s dist</code></pre>
         <table>
           <thead><tr><th>Feld</th><th>Beschreibung</th><th>Pflicht</th></tr></thead>
           <tbody>
-            <tr><td>Sprache</td><td>🇬🇧 Englisch oder 🇪🇸 Spanisch</td><td>Ja</td></tr>
             <tr><td>Emoji</td><td>Symbol zur Veranschaulichung (Standard: 📝)</td><td>Nein</td></tr>
             <tr><td>Deutsch</td><td>Das deutsche Wort</td><td>Ja</td></tr>
-            <tr><td>Englisch / Spanisch</td><td>Die fremdsprachige Übersetzung</td><td>Ja</td></tr>
+            <tr><td>Fremdsprache</td><td>Übersetzung in der Sprache des aktiven Pakets</td><td>Ja</td></tr>
             <tr><td>Beugungsformen</td><td>Plural, Konjugation o. Ä., z.&nbsp;B. <code>[dogs]</code> oder <code>[lief, gelaufen]</code></td><td>Nein</td></tr>
             <tr><td>Kategorie</td><td>Thematische Zuordnung für die Filter-Ansicht</td><td>Nein</td></tr>
           </tbody>
@@ -896,10 +918,10 @@ npx serve -s dist</code></pre>
       </div>
     </section>
 
-    <!-- ── 5 SPACED REPETITION ── -->
+    <!-- ── 7 SPACED REPETITION ── -->
     <section id="spaced">
       <div class="section-header">
-        <div class="section-num">5</div>
+        <div class="section-num">7</div>
         <h2>Spaced Repetition</h2>
       </div>
       <p>Die App verwendet ein <strong>6-Fach-Lernkartei-System</strong>. Die Grundidee: Eine Vokabel wird genau dann wiederholt, wenn sie im Begriff ist, vergessen zu werden – nicht früher und nicht später. Je sicherer du eine Karte kennst, desto länger der Abstand bis zur nächsten Wiederholung.</p>
@@ -993,29 +1015,14 @@ npx serve -s dist</code></pre>
       </ul>
     </section>
 
-    <!-- ── 6 STATISTIK ── -->
+    <!-- ── 8 STATISTIK ── -->
     <section id="statistik">
       <div class="section-header">
-        <div class="section-num">6</div>
+        <div class="section-num">8</div>
         <h2>Statistik (📊)</h2>
       </div>
-      <p>Der Statistik-Tab gibt einen vollständigen Überblick über den Lernfortschritt beider Sprachen.</p>
+      <p>Der Statistik-Tab gibt einen Überblick über den Lernfortschritt des aktiven Lernpakets.</p>
 
-      <h3>Übersicht je Sprache</h3>
-      <p>Zwei nebeneinanderstehende Kacheln zeigen für Englisch und Spanisch auf einen Blick:</p>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Anzeige</th><th>Bedeutung</th></tr></thead>
-          <tbody>
-            <tr><td>Fällig heute</td><td>Wie viele Karten jetzt sofort gelernt werden könnten</td></tr>
-            <tr><td>Gelernt</td><td>Karten in Fach 6 – vollständig beherrscht</td></tr>
-            <tr><td>Gesamt</td><td>Alle Vokabeln dieser Sprache (eingebaut + eigene)</td></tr>
-            <tr><td>Erfolgsquote</td><td>Anteil korrekt beantworteter Karten über alle bisherigen Bewertungen in %</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3>Detailansicht (nach Sprachauswahl)</h3>
       <ul>
         <li><strong>Lernkartei – Fächer:</strong> Balkendiagramm mit der Verteilung der Karten auf Fach 1–6. Ein hoher Balken bei Fach 6 bedeutet: viel gelernt.</li>
         <li><strong>Trainings-Regelmäßigkeit:</strong> Kalenderansicht der letzten Tage (grüne Punkte = trainiert) und Prozentwerte für 7, 30 und 90 Tage. Wird nur nach abgeschlossenen Fällig-Karten-Sitzungen aktualisiert.</li>
@@ -1031,20 +1038,16 @@ npx serve -s dist</code></pre>
       </div>
     </section>
 
-    <!-- ── 7 EINSTELLUNGEN ── -->
+    <!-- ── 9 EINSTELLUNGEN ── -->
     <section id="einstellungen">
       <div class="section-header">
-        <div class="section-num">7</div>
+        <div class="section-num">9</div>
         <h2>Einstellungen (⚙️)</h2>
       </div>
       <p>Die Einstellungen sind über den ⚙️-Tab in der Navigationsleiste erreichbar. Alle Änderungen werden sofort gespeichert.</p>
 
       <div class="settings-group">
         <div class="settings-group-header">🌍 Lerninhalt</div>
-        <div class="settings-row">
-          <div class="settings-label">Lernsprache</div>
-          <div class="settings-desc">Aktive Sprache: 🇬🇧 Englisch oder 🇪🇸 Spanisch. Entspricht der Auswahl auf der Startseite.</div>
-        </div>
         <div class="settings-row">
           <div class="settings-label">Abfragerichtung</div>
           <div class="settings-desc">DE → Fremdsprache, Fremdsprache → DE, oder Zufällig gemischt. Entspricht der Auswahl auf der Startseite.</div>
@@ -1089,10 +1092,10 @@ npx serve -s dist</code></pre>
       </div>
     </section>
 
-    <!-- ── 8 DATENSCHUTZ ── -->
+    <!-- ── 10 DATENSCHUTZ ── -->
     <section id="datenschutz">
       <div class="section-header">
-        <div class="section-num">8</div>
+        <div class="section-num">10</div>
         <h2>Datenschutz &amp; Speicherung</h2>
       </div>
       <p>Alle Daten – Vokabeln, Lernfortschritt und Einstellungen – werden <strong>ausschließlich lokal auf dem Gerät</strong> gespeichert. Es werden keine Daten an externe Server übertragen, kein Konto benötigt und keine Nutzungsstatistiken erhoben.</p>
@@ -1110,10 +1113,10 @@ npx serve -s dist</code></pre>
       </div>
     </section>
 
-    <!-- ── 9 FAQ ── -->
+    <!-- ── 11 FAQ ── -->
     <section id="faq">
       <div class="section-header">
-        <div class="section-num">9</div>
+        <div class="section-num">11</div>
         <h2>Häufige Fragen</h2>
       </div>
 
@@ -1154,7 +1157,7 @@ npx serve -s dist</code></pre>
         </div>
         <div class="faq-a">
           „Fällige Karten" zeigt nur Karten, die laut Wiederholungsplan heute dran sind – plus neue Karten bis zum Tageslimit. Das ist der effiziente Alltagsmodus.<br><br>
-          „Alle Vokabeln" zeigt alle Karten der Sprache ohne Rücksicht auf den Plan – gut zum freien Üben oder Auffrischen. Beide Modi beeinflussen den Fach-Fortschritt gleichermaßen.
+          „Alle Vokabeln" zeigt alle Karten des aktiven Lernpakets ohne Rücksicht auf den Plan – gut zum freien Üben oder Auffrischen. Beide Modi beeinflussen den Fach-Fortschritt gleichermaßen.
         </div>
       </div>
 
@@ -1165,6 +1168,16 @@ npx serve -s dist</code></pre>
         </div>
         <div class="faq-a">
           Zwei Tageslimits begrenzen die Anzeige: das <strong>Karten-pro-Tag-Limit</strong> (wie viele fällige Karten insgesamt) und das <strong>Neue-Karten-Limit</strong> (wie viele neue Karten erstmalig eingeführt werden). Wenn du das Limit bereits ausgeschöpft hast – z.&nbsp;B. durch eine frühere Sitzung – erscheinen bis morgen keine weiteren Karten. Du kannst die Limits in den Einstellungen erhöhen oder auf ∞ stellen.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Bleibt mein Lernfortschritt beim Wechsel des Lernpakets erhalten?
+          <i class="faq-arrow">▾</i>
+        </div>
+        <div class="faq-a">
+          Ja. Jedes Lernpaket hat seinen eigenen Fortschritt, der unabhängig gespeichert wird. Beim Wechsel auf ein anderes Paket wird der Fortschritt des alten Pakets nicht verändert und ist beim Zurückwechseln wieder vollständig vorhanden.
         </div>
       </div>
 
@@ -1217,10 +1230,27 @@ npx serve -s dist</code></pre>
         <h2>Release Notes</h2>
       </div>
 
-      <!-- v1.2.2 -->
+      <!-- v1.3.0 -->
       <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
-          <span class="badge">v1.2.2</span>
+          <span class="badge">v1.3.0</span>
+          <span style="color:var(--muted); font-size:0.82rem;">18. Mai 2026</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Lernpaket-Architektur: ein aktives Paket</h4>
+        <p style="margin-bottom:0.5rem;">Version 1.3 ersetzt das bisherige Zwei-Sprachen-Parallelmodell durch eine flexible Einzeldatei-Architektur. Es ist immer genau ein Lernpaket aktiv; es kann jederzeit über einen neuen Selektor im App-Header gewechselt werden.</p>
+        <ul>
+          <li><strong>Erststart-Bildschirm</strong>: Beim ersten Öffnen wird ein Lernpaket gewählt</li>
+          <li><strong>Datei-Selektor im Header</strong>: Button zeigt aktives Paket; Tipp öffnet Auswahlblatt</li>
+          <li><strong>Datei-Wechsel während Session</strong>: Bestätigungsdialog schützt vor ungewolltem Sitzungsabbruch</li>
+          <li>Sprach-Toggle auf der Startseite entfernt; Sprach-Tabs in Vokabeln und Statistik entfernt</li>
+          <li>Lernfortschritt jedes Pakets wird separat gespeichert und bleibt beim Wechseln erhalten</li>
+        </ul>
+      </div>
+
+      <!-- v1.2.2 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.2.2</span>
           <span style="color:var(--muted); font-size:0.82rem;">10. Mai 2026</span>
         </div>
         <h4 style="margin-bottom:0.4rem;">Bugfix: Lernstand bleibt nach App-Updates erhalten</h4>

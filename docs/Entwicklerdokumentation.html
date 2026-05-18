@@ -556,7 +556,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.2.2 · Mai 2026</div>
+    <div class="nav-version">Version 1.3.0 · Mai 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -565,7 +565,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.2.2</span>
+        <span class="badge">v1.3.0</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -634,14 +634,22 @@
         <hr class="ftn-divider">
 
         <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">components/</span><span class="ftn-c">Wiederverwendbare UI-Bausteine</span></div>
-        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Layout.tsx</span><span class="ftn-c">App-Rahmen mit Bottom-Navigation + &lt;Outlet&gt;</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Layout.tsx</span><span class="ftn-c">App-Rahmen: Header-Strip + Bottom-Navigation + &lt;Outlet&gt;</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">FileSelectorButton.tsx</span><span class="ftn-c">Persistenter Datei-Selektor-Button im Header</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">FileSelectorModal.tsx</span><span class="ftn-c">Bottom-Sheet zur Dateiauswahl mit Fortschrittsanzeige</span></div>
         <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">FlashCard.tsx</span><span class="ftn-c">Flip-Karteikarte (Vorder-/Rückseite, CSS-3D)</span></div>
         <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">SWStatusPanel.tsx</span><span class="ftn-c">Service-Worker-Debug-Panel (in Einstellungen)</span></div>
 
         <hr class="ftn-divider">
 
-        <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">constants/</span><span class="ftn-c">Anwendungskonstanten</span></div>
-        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">languages.ts</span><span class="ftn-c">LANGUAGE_CONFIG: Label, Flag, speechCode, placeholder</span></div>
+        <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">config/</span><span class="ftn-c">Zentrale Konfigurations- und Konstanten-Dateien</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">file_config.ts</span><span class="ftn-c">FILE_CONFIG: Manifest aller Vokabeldateien (ID, Sprache, Loader…)</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">storage_keys.ts</span><span class="ftn-c">Alle Storage-Schlüssel als benannte Konstanten</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">default_settings.ts</span><span class="ftn-c">DEFAULT_SETTINGS, makeEmptyFileState()</span></div>
+
+        <hr class="ftn-divider">
+
+        <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">constants/</span><span class="ftn-c">UI-Konstanten</span></div>
         <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">theme.ts</span><span class="ftn-c">Farben, BOX_INTERVALS, Box-Labels</span></div>
 
         <hr class="ftn-divider">
@@ -652,18 +660,32 @@
         <hr class="ftn-divider">
 
         <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">data/</span><span class="ftn-c">Vokabeldaten</span></div>
-        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">vocabulary_types.ts</span><span class="ftn-c">VocabularyItem &amp; Category Typ-Definitionen</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">vocabulary_types.ts</span><span class="ftn-c">Alle Typen: VocabularyItem, FileState, AppSettings, FileManifestEntry …</span></div>
         <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">vocabulary.ts</span><span class="ftn-c">Re-Exports + ALL_CATEGORIES Array</span></div>
         <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">vocabulary_en.ts</span><span class="ftn-c">VOCABULARY_EN – eingebaute englische Vokabeln</span></div>
         <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">vocabulary_es.ts</span><span class="ftn-c">VOCABULARY_ES – eingebaute spanische Vokabeln</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📁</span><span class="ftn-d">vocabulary/</span><span class="ftn-c">Lazy-Load-Wrapper pro Datei (Code Splitting)</span></div>
+        <div style="padding-left:6.6rem !important" class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">en-basic-v1.ts</span><span class="ftn-c">Re-Export VOCABULARY_EN_BASIC</span></div>
+        <div style="padding-left:6.6rem !important" class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">es-basic-v1.ts</span><span class="ftn-c">Re-Export VOCABULARY_ES_BASIC</span></div>
+
+        <hr class="ftn-divider">
+
+        <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">hooks/</span><span class="ftn-c">Custom React Hooks</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">useActiveFile.ts</span><span class="ftn-c">Typsicherer Zugriff auf Manifest + State + Vokabular der aktiven Datei</span></div>
+
+        <hr class="ftn-divider">
+
+        <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">migrations/</span><span class="ftn-c">Einmalige Datenmigration</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">v12_to_v13.ts</span><span class="ftn-c">Idempotente Migration v1.2-Blob → v1.3-Schema</span></div>
 
         <hr class="ftn-divider">
 
         <div class="ftn-l2"><span class="ftn-ico">📁</span><span class="ftn-d">pages/</span><span class="ftn-c">Eine Datei pro Route</span></div>
-        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Home.tsx</span><span class="ftn-c">/ – Startseite: Sprachauswahl, Tagesübersicht</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">FirstRun.tsx</span><span class="ftn-c">Willkommensseite bei erstem Start (kein activeFileId)</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Home.tsx</span><span class="ftn-c">/ – Tagesübersicht, Abfragerichtung, Lernen starten</span></div>
         <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Learn.tsx</span><span class="ftn-c">/learn – Lernsitzung (komplexeste Seite)</span></div>
         <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Vocabulary.tsx</span><span class="ftn-c">/vocabulary – Vokabelliste mit Suche &amp; Filtern</span></div>
-        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Statistics.tsx</span><span class="ftn-c">/statistics – Lernstatistiken</span></div>
+        <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Statistics.tsx</span><span class="ftn-c">/statistics – Lernstatistiken der aktiven Datei</span></div>
         <div class="ftn-l3"><span class="ftn-ico">📄</span><span class="ftn-f">Settings.tsx</span><span class="ftn-c">/settings – Alle Benutzereinstellungen</span></div>
 
         <hr class="ftn-divider">
@@ -715,7 +737,7 @@
           <div class="seq-left"><div class="seq-dot"></div><div class="seq-line"></div></div>
           <div class="seq-content">
             <div class="seq-title">Async: IndexedDB-Migration &amp; Laden</div>
-            <div class="seq-desc">Ein <code>useEffect</code> im Provider führt <code>migrateFromLocalStorage()</code> aus (einmalige Datenmigration), liest dann den Rohwert aus IndexedDB via <code>storageGet()</code> und parst das JSON. Falls alte Felder fehlen oder das Format veraltet ist, werden Migrations-Schritte nachgezogen (z.B. flaches <code>dailyStats</code> → per-Language, altes <code>customVocabulary</code> → Split EN/ES).</div>
+            <div class="seq-desc">Ein <code>useEffect</code> im Provider liest <code>vt:schemaVersion</code> aus IndexedDB. Liegt Version &lt; 3 vor (oder fehlt ganz), wird <code>migrateV12toV13()</code> aufgerufen: der v1.2-Blob unter <code>vokabeltrainer_state</code> wird in das neue Multi-Key-Schema (<code>vt:activeFileId</code>, <code>vt:settings</code>, <code>vt:file:&lt;id&gt;</code>) überführt und der alte Blob bleibt als Backup erhalten. Danach werden alle <code>vt:file:*</code>-Keys einzeln geladen.</div>
           </div>
         </div>
         <div class="seq-step">
@@ -735,7 +757,7 @@
       </div>
 
       <h3>App.tsx – Provider-Hierarchie und Routing</h3>
-      <p><code>App.tsx</code> legt die vollständige Komponentenhierarchie fest. Alle Seiten sind durch <code>LearningProvider</code> umschlossen, der den globalen State und die Geschäftslogik bereitstellt:</p>
+      <p><code>App.tsx</code> legt die vollständige Komponentenhierarchie fest. Alle Seiten sind durch <code>LearningProvider</code> umschlossen. Die innere <code>AppRoutes</code>-Komponente liest <code>activeFileId</code> aus dem Context: ist er <code>null</code>, wird der Erststart-Bildschirm gezeigt; sonst die normale Route-Struktur.</p>
 
       <div class="flow">
         <div class="flow-row">
@@ -743,13 +765,27 @@
           <div class="flow-arrow">→</div>
           <div class="flow-box">BrowserRouter</div>
           <div class="flow-arrow">→</div>
-          <div class="flow-box">Layout (Bottom-Nav)</div>
+          <div class="flow-box">AppRoutes</div>
+        </div>
+      </div>
+      <div class="flow" style="margin-top:0.5rem;">
+        <div class="flow-row" style="margin-left:2rem;">
+          <div class="flow-box" style="font-size:0.8rem;">activeFileId = null</div>
           <div class="flow-arrow">→</div>
-          <div class="flow-box purple">Seite (Route)</div>
+          <div class="flow-box purple" style="font-size:0.8rem;">FirstRun</div>
+        </div>
+      </div>
+      <div class="flow" style="margin-top:0.4rem;">
+        <div class="flow-row" style="margin-left:2rem;">
+          <div class="flow-box" style="font-size:0.8rem;">activeFileId gesetzt</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box" style="font-size:0.8rem;">Layout (Header + Bottom-Nav)</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box purple" style="font-size:0.8rem;">Seite (Route)</div>
         </div>
       </div>
 
-      <p>Alle fünf Seiten werden unter dem gemeinsamen <code>Layout</code> gerendert. Unbekannte Routen werden per <code>Navigate</code> auf <code>/</code> umgeleitet.</p>
+      <p style="margin-top:0.75rem;">Alle fünf Seiten werden unter dem gemeinsamen <code>Layout</code> gerendert. Der <code>Layout</code>-Header enthält den <code>FileSelectorButton</code>. Unbekannte Routen werden per <code>Navigate</code> auf <code>/</code> umgeleitet.</p>
 
       <h3>index.css</h3>
       <p>Enthält ausschließlich die CSS-Flip-Animation der Karteikarte (<code>.fc-scene</code>, <code>.fc-inner</code>, <code>.fc-face</code>, <code>.fc-back</code>) sowie Reset-Regeln für <code>html/body</code> und die iOS-Safe-Area-Variable. Alle anderen Styles sind als Inline-Styles in den jeweiligen Komponenten definiert.</p>
@@ -761,23 +797,24 @@
         <div class="section-num">4</div>
         <h2>Routing</h2>
       </div>
-      <p>React Router v6 mit <code>BrowserRouter</code>. Alle Routen sind flach unter einem einzigen <code>Layout</code>-Element verschachtelt.</p>
+      <p>React Router v6 mit <code>BrowserRouter</code>. Vor dem Routing prüft <code>AppRoutes</code>, ob bereits ein aktives Lernpaket gewählt wurde. Ist <code>activeFileId === null</code>, wird stattdessen <code>FirstRun</code> angezeigt. Sonst sind alle Routen flach unter einem einzigen <code>Layout</code>-Element verschachtelt.</p>
 
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Pfad</th><th>Komponente</th><th>Beschreibung</th></tr></thead>
+          <thead><tr><th>Pfad / Bedingung</th><th>Komponente</th><th>Beschreibung</th></tr></thead>
           <tbody>
-            <tr><td><code>/</code></td><td><code>Home.tsx</code></td><td>Startseite – Sprachauswahl, Tagesübersicht, Einstieg ins Lernen</td></tr>
+            <tr><td><em>activeFileId = null</em></td><td><code>FirstRun.tsx</code></td><td>Willkommensbildschirm – Lernpaket wählen (kein URL-Pfad, vor dem Router gerendert)</td></tr>
+            <tr><td><code>/</code></td><td><code>Home.tsx</code></td><td>Tagesübersicht, Abfragerichtung, Lernen starten</td></tr>
             <tr><td><code>/learn</code></td><td><code>Learn.tsx</code></td><td>Lernsitzung – Modus-Auswahl und Kartendurchlauf</td></tr>
-            <tr><td><code>/vocabulary</code></td><td><code>Vocabulary.tsx</code></td><td>Vokabelliste mit Filtern, Suche und Hinzufügen</td></tr>
-            <tr><td><code>/statistics</code></td><td><code>Statistics.tsx</code></td><td>Lernstatistiken und Trainings-Regelmäßigkeit</td></tr>
+            <tr><td><code>/vocabulary</code></td><td><code>Vocabulary.tsx</code></td><td>Vokabelliste des aktiven Pakets – Filtern, Suchen, Hinzufügen</td></tr>
+            <tr><td><code>/statistics</code></td><td><code>Statistics.tsx</code></td><td>Lernstatistiken und Trainings-Regelmäßigkeit des aktiven Pakets</td></tr>
             <tr><td><code>/settings</code></td><td><code>Settings.tsx</code></td><td>Alle Benutzereinstellungen</td></tr>
             <tr><td><code>*</code></td><td><code>Navigate to="/"</code></td><td>Alle unbekannten Pfade → Redirect zur Startseite</td></tr>
           </tbody>
         </table>
       </div>
 
-      <p>Die <code>Layout</code>-Komponente rendert die Bottom-Navigation mit fünf <code>NavLink</code>-Elementen und zeigt den aktiven Tab durch eine gelbe Farbe hervor. Der eigentliche Seiteninhalt wird via <code>&lt;Outlet /&gt;</code> eingesetzt.</p>
+      <p>Die <code>Layout</code>-Komponente rendert einen dunklen Header-Streifen mit <code>FileSelectorButton</code> sowie die Bottom-Navigation mit fünf <code>NavLink</code>-Elementen. Der eigentliche Seiteninhalt wird via <code>&lt;Outlet /&gt;</code> eingesetzt.</p>
     </section>
 
     <!-- ── 5 STATE MANAGEMENT ── -->
@@ -788,45 +825,63 @@
       </div>
       <p>Der gesamte Anwendungsstatus lebt in einem einzigen React Context: <code>LearningContext.tsx</code>. Es gibt keinen externen State-Manager (kein Redux, kein Zustand). Der Context exportiert sowohl den State als auch alle Methoden, die Seiten und Komponenten per <code>useLearning()</code> Hook abrufen.</p>
 
-      <h3>Zustand (LearningState)</h3>
+      <h3>Context-State (v1.3)</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Feld</th><th>Typ</th><th>Beschreibung</th></tr></thead>
           <tbody>
-            <tr><td><code>selectedLanguage</code></td><td><code>'english' | 'spanish'</code></td><td>Aktuell aktive Sprache</td></tr>
-            <tr><td><code>queryDirection</code></td><td><code>'de-to-foreign' | 'foreign-to-de' | 'random'</code></td><td>Richtung der Kartenabfrage</td></tr>
-            <tr><td><code>progress</code></td><td><code>Record&lt;string, CardProgress&gt;</code></td><td>Lernfortschritt je Karte und Sprache. Schlüssel: <code>{vocabId}_{lang}</code></td></tr>
-            <tr><td><code>customVocabularyEN</code></td><td><code>VocabularyItem[]</code></td><td>Eigene englische Vokabeln</td></tr>
-            <tr><td><code>customVocabularyES</code></td><td><code>VocabularyItem[]</code></td><td>Eigene spanische Vokabeln</td></tr>
-            <tr><td><code>dailyCardLimit</code></td><td><code>number</code></td><td>Max. fällige Karten pro Tag (0 = unbegrenzt)</td></tr>
-            <tr><td><code>dailyNewCardLimit</code></td><td><code>number</code></td><td>Max. neue Karten pro Tag (-1 = unbegrenzt, 0 = keine)</td></tr>
-            <tr><td><code>dailyStats</code></td><td><code>Record&lt;Language, {date, count}&gt;</code></td><td>Anzahl der heute bereits bewerteten Karten je Sprache</td></tr>
-            <tr><td><code>dailyNewStats</code></td><td><code>Record&lt;Language, {date, count}&gt;</code></td><td>Anzahl heute eingeführter neuer Karten je Sprache</td></tr>
-            <tr><td><code>quizAutoSpeak</code></td><td><code>boolean</code></td><td>Lösung im Quiz automatisch vorlesen</td></tr>
-            <tr><td><code>flashcardAutoSpeak</code></td><td><code>boolean</code></td><td>Rückseite beim Aufdecken automatisch vorlesen</td></tr>
-            <tr><td><code>typingTolerant</code></td><td><code>boolean</code></td><td>Kleine Tippfehler im Eingabe-Modus als richtig werten</td></tr>
-            <tr><td><code>trainingLog</code></td><td><code>Record&lt;Language, string[]&gt;</code></td><td>ISO-Datumsstrings der Tage, an denen eine Fällig-Karten-Sitzung abgeschlossen wurde</td></tr>
+            <tr><td><code>loaded</code></td><td><code>boolean</code></td><td>Bootstrap abgeschlossen; bis dahin rendert Provider <code>null</code></td></tr>
+            <tr><td><code>activeFileId</code></td><td><code>FileId | null</code></td><td>ID der aktiven Vokabeldatei; <code>null</code> = kein Paket gewählt → <code>FirstRun</code> wird gezeigt</td></tr>
+            <tr><td><code>fileStates</code></td><td><code>Record&lt;FileId, FileState&gt;</code></td><td>Fortschritts-State pro Datei (progress, customVocabulary, dailyStats, trainingLog …)</td></tr>
+            <tr><td><code>vocabularyByFile</code></td><td><code>Record&lt;FileId, VocabularyItem[]&gt;</code></td><td>Eingebaute Vokabeln je Datei; lazy geladen per Dynamic Import</td></tr>
+            <tr><td><code>settings</code></td><td><code>AppSettings</code></td><td>Globale Einstellungen: queryDirection, dailyCardLimit, dailyNewCardLimit, autoSpeak-Flags, typingTolerant</td></tr>
+            <tr><td><code>isSessionActive</code></td><td><code>boolean</code></td><td>Läuft gerade eine Lernsitzung? Schützt Datei-Wechsel mit Bestätigungsdialog</td></tr>
           </tbody>
         </table>
       </div>
+
+      <h3>FileState – Struktur pro Vokabeldatei</h3>
+      <pre><code>interface FileState {
+  fileId:          FileId;
+  schemaVersion:   3;
+  contentVersion:  number;       // Erhöht bei neuen eingebauten Vokabeln
+  progress:        Record&lt;string, CardProgress&gt;;  // Schlüssel: vocabId
+  customVocabulary: VocabularyItem[];
+  dailyStats:      { date: string; count: number };
+  dailyNewStats:   { date: string; count: number };
+  trainingLog:     string[];     // YYYY-MM-DD Strings
+  lastOpenedAt:    string | null;
+}</code></pre>
+
+      <h3>AppSettings – globale Einstellungen</h3>
+      <pre><code>interface AppSettings {
+  queryDirection:    'de-to-foreign' | 'foreign-to-de' | 'random';
+  dailyCardLimit:    number;   // 0 = unbegrenzt
+  dailyNewCardLimit: number;   // -1 = unbegrenzt, 0 = keine
+  quizAutoSpeak:     boolean;
+  flashcardAutoSpeak: boolean;
+  typingTolerant:    boolean;
+}</code></pre>
 
       <h3>Methoden des Context</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Methode</th><th>Beschreibung</th></tr></thead>
           <tbody>
-            <tr><td><code>getVocabularyForLang(lang)</code></td><td>Gibt eingebaute + eigene Vokabeln für eine Sprache zurück</td></tr>
-            <tr><td><code>getCardProgress(id, lang)</code></td><td>Gibt den <code>CardProgress</code> einer Karte zurück (Default: Box 1, nie reviewed)</td></tr>
-            <tr><td><code>markCard(id, lang, correct)</code></td><td>Aktualisiert Box, <code>nextDate</code>, Zähler; bucht dailyStats</td></tr>
-            <tr><td><code>getDueCards(lang)</code></td><td>Liefert heute fällige Karten, sortiert nach Box (ASC) und Datum, respektiert <code>dailyCardLimit</code></td></tr>
-            <tr><td><code>getNewCards(lang)</code></td><td>Liefert noch nie gesehene Karten bis zum <code>dailyNewCardLimit</code></td></tr>
-            <tr><td><code>addCustomVocabulary(item, lang)</code></td><td>Fügt eigene Vokabel hinzu; ID wird als <code>custom_{timestamp}</code> generiert</td></tr>
-            <tr><td><code>deleteCustomVocabulary(id)</code></td><td>Entfernt eigene Vokabel aus beiden Sprachlisten (ID ist eindeutig)</td></tr>
-            <tr><td><code>getBoxCounts(lang)</code></td><td>Array mit Anzahl Karten je Fach [Fach1, …, Fach6]</td></tr>
-            <tr><td><code>getTotalStats(lang)</code></td><td>Gesamtstatistik: total, learned, dueToday, successRate</td></tr>
-            <tr><td><code>recordTrainingDay(lang)</code></td><td>Trägt das heutige Datum ins trainingLog ein (idempotent)</td></tr>
-            <tr><td><code>getTrainingConsistency(lang, days)</code></td><td>Prozentsatz aktiver Trainingstage im Zeitfenster</td></tr>
-            <tr><td><code>resetProgress()</code></td><td>Setzt alle <code>progress</code>-Einträge zurück (eigene Vokabeln bleiben)</td></tr>
+            <tr><td><code>selectFile(fileId)</code></td><td>Wechselt die aktive Datei; lädt Vokabular lazy; setzt isSessionActive = false</td></tr>
+            <tr><td><code>updateSettings(patch)</code></td><td>Merged Partial&lt;AppSettings&gt; in die globalen Einstellungen</td></tr>
+            <tr><td><code>setSessionActive(active)</code></td><td>Setzt Session-Flag; Learn.tsx ruft true beim Start, false beim Ende auf</td></tr>
+            <tr><td><code>getCardProgress(id)</code></td><td>Gibt <code>CardProgress | undefined</code> für eine Karte in der aktiven Datei zurück</td></tr>
+            <tr><td><code>markCard(id, correct)</code></td><td>Aktualisiert Box, <code>nextDate</code>, Zähler; bucht dailyStats der aktiven Datei</td></tr>
+            <tr><td><code>getDueCards()</code></td><td>Fällige Karten der aktiven Datei, sortiert nach Box (ASC) + Datum, respektiert <code>dailyCardLimit</code></td></tr>
+            <tr><td><code>getNewCards()</code></td><td>Noch nie gesehene Karten bis zum <code>dailyNewCardLimit</code></td></tr>
+            <tr><td><code>addCustomVocab(item)</code></td><td>Fügt eigene Vokabel zur aktiven Datei hinzu; ID: <code>custom_{timestamp}</code></td></tr>
+            <tr><td><code>removeCustomVocab(id)</code></td><td>Entfernt eigene Vokabel + deren Progress-Eintrag aus der aktiven Datei</td></tr>
+            <tr><td><code>getBoxCounts()</code></td><td>Array [Fach1, …, Fach6] für die aktive Datei</td></tr>
+            <tr><td><code>getTotalStats()</code></td><td>Gesamtstatistik der aktiven Datei: total, learned, dueToday, successRate</td></tr>
+            <tr><td><code>recordTrainingDay()</code></td><td>Trägt heute in trainingLog der aktiven Datei ein (idempotent)</td></tr>
+            <tr><td><code>getTrainingConsistency(days)</code></td><td>Prozentsatz aktiver Trainingstage im Zeitfenster für die aktive Datei</td></tr>
+            <tr><td><code>resetProgress()</code></td><td>Setzt progress der aktiven Datei zurück (eigene Vokabeln bleiben)</td></tr>
           </tbody>
         </table>
       </div>
@@ -857,16 +912,29 @@
         </div>
       </div>
 
-      <h3>Persistenz des State</h3>
-      <p>Der gesamte State wird als ein einziges JSON-Objekt unter dem Schlüssel <code>vokabeltrainer_state</code> gespeichert. Beim Start liest ein <code>useEffect</code> den gespeicherten Zustand und hydriert den State; bis dieser Ladevorgang abgeschlossen ist, rendert der Provider <code>null</code> (kein Flackern).</p>
+      <h3>Persistenz des State (v1.3 Schema)</h3>
+      <p>Ab v1.3 wird der State unter mehreren Schlüsseln gespeichert — ein Schlüssel pro Lernpaket plus gemeinsame Keys für Schema-Version, aktive Datei und Einstellungen:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Schlüssel</th><th>Inhalt</th></tr></thead>
+          <tbody>
+            <tr><td><code>vt:schemaVersion</code></td><td><code>"3"</code> – Versionsnummer des Storage-Schemas</td></tr>
+            <tr><td><code>vt:activeFileId</code></td><td>ID der aktuell aktiven Vokabeldatei (z.B. <code>"en-basic-v1"</code>)</td></tr>
+            <tr><td><code>vt:settings</code></td><td>JSON-serialisiertes <code>AppSettings</code>-Objekt</td></tr>
+            <tr><td><code>vt:file:&lt;id&gt;</code></td><td>JSON-serialisiertes <code>FileState</code>-Objekt pro Lernpaket</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Beim Start liest ein <code>useEffect</code> alle relevanten Schlüssel und hydriert den State; bis dieser Ladevorgang abgeschlossen ist, rendert der Provider <code>null</code> (kein Flackern).</p>
 
       <h3>Datenmigration</h3>
-      <p>Beim ersten Start migriert der Context ältere Datenstände automatisch:</p>
+      <p>Die Migration <code>src/migrations/v12_to_v13.ts</code> läuft idempotent beim App-Start:</p>
       <ul>
-        <li>localStorage → IndexedDB (<code>migrateFromLocalStorage</code>)</li>
-        <li>Altes <code>customVocabulary</code>-Format (einzelne Liste) → <code>customVocabularyEN</code> + <code>customVocabularyES</code></li>
-        <li>Altes <code>trainingLog</code>-Format (flaches Array) → <code>Record&lt;Language, string[]&gt;</code></li>
-        <li>Altes <code>dailyStats</code>-Format (sprachunabhängig) → per-Language</li>
+        <li>Liest den v1.2-Blob unter <code>vokabeltrainer_state</code> aus IndexedDB (inkl. localStorage-Fallback)</li>
+        <li>Schreibt daraus <code>vt:activeFileId</code> (<code>"en-basic-v1"</code>), <code>vt:settings</code> und ein <code>vt:file:en-basic-v1</code>-Objekt</li>
+        <li>Setzt <code>vt:schemaVersion = "3"</code></li>
+        <li>Der v1.2-Blob bleibt unter seinem alten Schlüssel als Backup erhalten (kein Datenverlust)</li>
+        <li>Wurde die Migration bereits ausgeführt (<code>schemaVersion = "3"</code>), ist sie ein No-Op</li>
       </ul>
     </section>
 
@@ -901,8 +969,11 @@
 
       <p>Der Fortschritts-Schlüssel im <code>progress</code>-Objekt lautet immer <code>{vocabId}_{lang}</code>, z.B. <code>apple_english</code>. Dadurch ist der Fortschritt für jede Sprache separat gespeichert – eine englische Vokabel und eine spanische mit gleicher ID stören sich nicht.</p>
 
-      <h3>Vokabeldaten (vocabulary_en.ts / vocabulary_es.ts)</h3>
-      <p>Die eingebauten Vokabeln sind statische TypeScript-Arrays (<code>VOCABULARY_EN</code>, <code>VOCABULARY_ES</code>), die beim Build direkt in das Bundle kompiliert werden. Um neue eingebaute Vokabeln hinzuzufügen, wird der entsprechende Array in der jeweiligen Datei erweitert.</p>
+      <h3>Vokabeldaten (src/data/vocabulary/)</h3>
+      <p>Ab v1.3 liegen Vokabeldaten als schlanke Re-Export-Wrapper unter <code>src/data/vocabulary/</code>. Jede Datei re-exportiert ein Array unter einem File-spezifischen Namen:</p>
+      <pre><code>// src/data/vocabulary/en-basic-v1.ts
+export { VOCABULARY_EN as VOCABULARY_EN_BASIC } from '../vocabulary_en';</code></pre>
+      <p>Die eigentlichen Daten bleiben in <code>vocabulary_en.ts</code> / <code>vocabulary_es.ts</code>. Vite bündelt jeden Wrapper als eigenen Lazy-Chunk (<code>en-basic-v1</code>, <code>es-basic-v1</code>), der erst bei Auswahl des Lernpakets per <code>import()</code> geladen wird. Das Manifest <code>src/config/file_config.ts</code> verknüpft File-IDs mit dem jeweiligen Lazy-Import.</p>
 
       <h3>Kategorien</h3>
       <p><code>ALL_CATEGORIES</code> in <code>vocabulary.ts</code> ist das einzige definierte Array der 13 Kategorien. Dieses Array wird sowohl für Filter-UI als auch für das Formular beim Hinzufügen eigener Vokabeln verwendet. Neue Kategorien werden hier ergänzt und müssen auch in den <code>Category</code>-Typ in <code>vocabulary_types.ts</code> aufgenommen werden.</p>
@@ -1401,7 +1472,7 @@ function pickVoice(lang: string): SpeechSynthesisVoice | null {
       <h3>App-Version aktualisieren</h3>
       <p>Die Versionsnummer wird nur an einer Stelle gepflegt: <code>src/version.ts</code>. Sie wird auf der Startseite angezeigt und kann dort einfach hochgezählt werden.</p>
       <pre><code>// src/version.ts
-export const APP_VERSION = '1.2.2';</code></pre>
+export const APP_VERSION = '1.3.0';</code></pre>
 
       <h3>TypeScript-Konfiguration</h3>
       <p>Strikte TypeScript-Konfiguration. Alle React-Komponenten sind typisiert. Es gibt keine <code>any</code>-Verwendungen außer in den Migrations-Funktionen (dort explizit durch ESLint-Kommentar auskommentiert).</p>
@@ -1432,20 +1503,21 @@ export const APP_VERSION = '1.2.2';</code></pre>
         <li>Den gleichen String in das <code>ALL_CATEGORIES</code>-Array in <code>src/data/vocabulary.ts</code> eintragen.</li>
       </ol>
 
-      <h3>Neue Sprache hinzufügen</h3>
-      <p>Die App unterstützt beliebig viele Sprachen. Eine Schritt-für-Schritt-Anleitung dazu ist in <a href="neue-sprache-hinzufuegen.md" style="color: var(--accent2); font-weight: 600;">docs/neue-sprache-hinzufuegen.md</a> beschrieben.</p>
-      <p>Zusammengefasst sind folgende Schritte nötig:</p>
+      <h3>Neue Sprache / neues Lernpaket hinzufügen</h3>
+      <p>Ab v1.3 wird eine neue Sprache als eigenständiges Lernpaket in <code>src/config/file_config.ts</code> registriert. Folgende Schritte sind nötig:</p>
       <ol>
-        <li><code>src/data/vocabulary_XX.ts</code> anlegen und mit <code>VOCABULARY_XX</code> befüllen.</li>
-        <li>Re-Export in <code>src/data/vocabulary.ts</code> ergänzen.</li>
-        <li>Neuen Spracheintrag in <code>src/constants/languages.ts</code> zu <code>LANGUAGE_CONFIG</code> hinzufügen (Label, Flag, Abbr, speechCode, placeholder).</li>
-        <li><code>Language</code>-Typ in <code>languages.ts</code> um den neuen Wert erweitern.</li>
-        <li>Im <code>LearningContext</code>: Initialen State um die neue Sprache ergänzen (<code>customVocabularyXX</code>, <code>dailyStats</code>, <code>dailyNewStats</code>, <code>trainingLog</code>).</li>
+        <li>Vokabeldaten in <code>src/data/vocabulary_XX.ts</code> anlegen (Array <code>VOCABULARY_XX</code>).</li>
+        <li>Lazy-Wrapper <code>src/data/vocabulary/xx-basic-v1.ts</code> erstellen:<br>
+          <code>export { VOCABULARY_XX as VOCABULARY_XX_BASIC } from '../vocabulary_xx';</code></li>
+        <li>In <code>src/config/file_config.ts</code> einen neuen Eintrag in <code>FILE_CONFIG</code> ergänzen:<br>
+          <code>{ id: 'xx-basic-v1', language: 'xx', label: '...', shortLabel: '...', flag: '🏳️', voice: 'xx-XX', load: () => import('../data/vocabulary/xx-basic-v1').then(m => m.VOCABULARY_XX_BASIC) }</code></li>
+        <li>Den neuen Sprachcode zum <code>FileLanguage</code>-Union-Typ in <code>vocabulary_types.ts</code> hinzufügen.</li>
+        <li>Sprachausgabe: <code>src/utils/tts.ts</code> um den neuen <code>voice</code>-Code erweitern, falls ein spezieller Voice-Picker nötig ist.</li>
       </ol>
 
       <div class="callout info">
-        <strong>Kein zentrales Routing-Update nötig</strong>
-        Seiten wie Home, Statistics und Vocabulary lesen Sprachen dynamisch aus <code>ALL_LANGUAGES</code> (aus <code>constants/languages.ts</code>). Nach dem Hinzufügen einer Sprache erscheint sie automatisch in der Sprachauswahl und in den Filtern, ohne dass Seiten-Code angepasst werden muss.
+        <strong>Kein Routing- oder Context-Update nötig</strong>
+        Alle Seiten lesen das aktive Paket über <code>useActiveFile()</code> – nach dem Eintrag in <code>FILE_CONFIG</code> erscheint das neue Paket automatisch im <code>FileSelectorModal</code> und im <code>FirstRun</code>-Bildschirm. Der LearningContext legt <code>FileState</code> dynamisch per Key an.
       </div>
 
       <h3>Neuen Lernmodus hinzufügen</h3>
@@ -1465,10 +1537,38 @@ export const APP_VERSION = '1.2.2';</code></pre>
         <h2>Release Notes</h2>
       </div>
 
-      <!-- v1.2.2 -->
+      <!-- v1.3.0 -->
       <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
-          <span class="badge">v1.2.2</span>
+          <span class="badge">v1.3.0</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-05-18</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Architektur: Einzelne aktive Vokabeldatei</h4>
+        <p style="margin-bottom:0.5rem;">Ersetzt das Zwei-Sprachen-Parallelmodell durch eine flexible Einzeldatei-Architektur. Nur noch ein Lernpaket ist gleichzeitig aktiv; es kann jederzeit über einen Header-Selektor gewechselt werden.</p>
+        <h4 style="margin:0.6rem 0 0.4rem;">Sichtbare Änderungen</h4>
+        <ul>
+          <li><strong>FirstRun-Bildschirm</strong>: Beim ersten Start muss ein Lernpaket gewählt werden</li>
+          <li><strong>FileSelectorButton im Header</strong>: Zeigt aktives Paket; öffnet Bottom-Sheet zum Wechseln</li>
+          <li><strong>Home</strong>: Sprach-Toggle entfernt; Abfragerichtung bleibt</li>
+          <li><strong>Vokabeln / Statistik</strong>: Sprach-Tabs entfernt; Ansicht gilt für aktives Paket</li>
+          <li><strong>Einstellungen</strong>: „Lernsprache"-Abschnitt entfernt</li>
+          <li><strong>Datei-Wechsel während Session</strong>: Bestätigungsdialog schützt vor ungewolltem Sitzungsabbruch</li>
+        </ul>
+        <h4 style="margin:0.6rem 0 0.4rem;">Interne Änderungen</h4>
+        <ul>
+          <li><strong>Storage-Schema v3</strong>: Schlüssel <code>vt:schemaVersion</code>, <code>vt:activeFileId</code>, <code>vt:settings</code>, <code>vt:file:&lt;id&gt;</code></li>
+          <li><strong>Idempotente Migration v12→v13</strong>: Bestehender Lernstand wird automatisch übernommen; v1.2-Blob bleibt als Backup</li>
+          <li><strong>Lazy-Loading</strong>: Vokabeldaten per Dynamic Import (<code>import()</code>) als eigene Vite-Chunks</li>
+          <li><strong><code>file_config.ts</code></strong>: Zentrales Manifest für alle Lernpakete</li>
+          <li><strong><code>useActiveFile()</code> Hook</strong>: Typsicherer Zugriff auf Manifest + State + Vokabular</li>
+          <li><strong>PWA-Cache</strong>: <code>static-assets-v2</code> erzwingt Cache-Invalidierung beim Update</li>
+        </ul>
+      </div>
+
+      <!-- v1.2.2 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.2.2</span>
           <span style="color:var(--muted); font-size:0.82rem;">2026-05-10</span>
         </div>
         <h4 style="margin-bottom:0.4rem;">Bugfix: Lernstand-Persistenz bei SW-Updates</h4>

@@ -1,4 +1,5 @@
 import { Outlet, NavLink } from 'react-router-dom';
+import { FileSelectorButton } from './FileSelectorButton';
 
 const TABS = [
   { to: '/', icon: '🏠', label: 'Home', end: true },
@@ -11,6 +12,10 @@ const TABS = [
 export default function Layout() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--c-bg)' }}>
+      <header style={{ background: '#2D1B69', padding: '6px 16px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexShrink: 0 }}>
+        <FileSelectorButton />
+      </header>
+
       <main style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
         <Outlet />
       </main>

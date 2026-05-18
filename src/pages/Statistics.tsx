@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { useLearning, Language } from '../context/LearningContext';
-import { ALL_CATEGORIES, VocabularyItem } from '../data/vocabulary';
+import { useLearning } from '../context/LearningContext';
+import { useActiveFile } from '../hooks/useActiveFile';
+import { ALL_CATEGORIES } from '../data/vocabulary';
 import { Colors, BOX_LABELS } from '../constants/theme';
-import { LANGUAGE_CONFIG, ALL_LANGUAGES } from '../constants/languages';
 
 function localDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -21,33 +20,23 @@ function getLast7Days(trainingLog: string[]): { date: string; trained: boolean; 
   return days;
 }
 
-const langConfig = ALL_LANGUAGES.map(lang => ({
-  lang,
-  label: LANGUAGE_CONFIG[lang].label,
-  flag: LANGUAGE_CONFIG[lang].flag,
-}));
-
 export default function Statistics() {
-  const {
-    selectedLanguage, getTotalStats, getBoxCounts, getDueCards, getCardProgress,
-    resetProgress, getTrainingConsistency, trainingLog, getVocabularyForLang,
-  } = useLearning();
+  const { getTotalStats, getBoxCounts, getCardProgress, resetProgress, getTrainingConsistency } = useLearning();
+  const activeFile = useActiveFile();
+  const allVocabulary = activeFile?.allVocabulary ?? [];
+  const trainingLog = activeFile?.state.trainingLog ?? [];
 
-  const [detailLang, setDetailLang] = useState<Language>(selectedLanguage);
-
-  const getVocab = (lang: Language): VocabularyItem[] => getVocabularyForLang(lang);
-
-  const stats = getTotalStats(detailLang);
-  const boxCounts = getBoxCounts(detailLang);
-  const last7 = getLast7Days(trainingLog[detailLang] ?? []);
-  const c7 = getTrainingConsistency(detailLang, 7);
-  const c30 = getTrainingConsistency(detailLang, 30);
-  const c90 = getTrainingConsistency(detailLang, 90);
+  const stats = getTotalStats();
+  const boxCounts = getBoxCounts();
+  const last7 = getLast7Days(trainingLog);
+  const c7 = getTrainingConsistency(7);
+  const c30 = getTrainingConsistency(30);
+  const c90 = getTrainingConsistency(90);
 
   const catStats = ALL_CATEGORIES.map(cat => {
-    const vocabs = getVocab(detailLang).filter(v => v.category === cat);
-    const learned = vocabs.filter(v => getCardProgress(v.id, detailLang).box >= 6).length;
-    const started = vocabs.filter(v => { const p = getCardProgress(v.id, detailLang); return p.box > 1 && p.box < 6; }).length;
+    const vocabs = allVocabulary.filter(v => v.category === cat);
+    const learned = vocabs.filter(v => (getCardProgress(v.id)?.box ?? 1) >= 6).length;
+    const started = vocabs.filter(v => { const b = getCardProgress(v.id)?.box ?? 1; return b > 1 && b < 6; }).length;
     return { cat, total: vocabs.length, learned, started };
   }).filter(c => c.total > 0);
 
@@ -64,60 +53,6 @@ export default function Statistics() {
       </div>
 
       <div style={{ padding: '20px 20px 40px' }}>
-
-        {/* Language Overview Cards */}
-        <section style={{ marginBottom: 28 }}>
-          <p style={sectionTitle}>Übersicht je Sprache</p>
-          <div style={{ display: 'flex', gap: 10 }}>
-            {langConfig.map(({ lang, label, flag }) => {
-              const s = getTotalStats(lang);
-              const due = getDueCards(lang).length;
-              return (
-                <div
-                  key={lang}
-                  style={{
-                    flex: 1, background: Colors.card, borderRadius: 16, padding: '16px 14px',
-                    boxShadow: '0 2px 8px rgba(45,27,105,0.08)',
-                    borderTop: `4px solid ${due > 0 ? Colors.danger : Colors.success}`,
-                  }}
-                >
-                  <div style={{ fontSize: 16, fontWeight: 800, color: Colors.text, marginBottom: 10 }}>
-                    {flag} {label}
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <StatRow label="Fällig heute" value={due} color={due > 0 ? Colors.danger : Colors.success} />
-                    <StatRow label="Gelernt" value={s.learned} color={Colors.boxColors[5]} />
-                    <StatRow label="Gesamt" value={s.total} color={Colors.secondary} />
-                    <StatRow label="Erfolgsquote" value={`${s.successRate}%`} color={Colors.success} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Detail Language Tabs */}
-        <section style={{ marginBottom: 20 }}>
-          <p style={sectionTitle}>Detailansicht</p>
-          <div style={{ display: 'flex', gap: 10 }}>
-            {langConfig.map(({ lang, label, flag }) => (
-              <button
-                key={lang}
-                onClick={() => setDetailLang(lang)}
-                style={{
-                  flex: 1, padding: '11px 10px',
-                  border: `2px solid ${detailLang === lang ? Colors.purple : 'transparent'}`,
-                  borderRadius: 12, cursor: 'pointer', fontWeight: 700, fontSize: 14,
-                  background: detailLang === lang ? '#EDE8FF' : Colors.card,
-                  color: detailLang === lang ? Colors.purple : Colors.textMuted,
-                  boxShadow: '0 2px 8px rgba(45,27,105,0.08)',
-                }}
-              >
-                {flag} {label}
-              </button>
-            ))}
-          </div>
-        </section>
 
         {/* Phase 6 Boxes */}
         <section style={{ marginBottom: 28 }}>
@@ -222,15 +157,6 @@ export default function Statistics() {
           🔄  Fortschritt zurücksetzen
         </button>
       </div>
-    </div>
-  );
-}
-
-function StatRow({ label, value, color }: { label: string; value: number | string; color: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <span style={{ fontSize: 12, color: Colors.textMuted, fontWeight: 500 }}>{label}</span>
-      <span style={{ fontSize: 14, fontWeight: 800, color }}>{value}</span>
     </div>
   );
 }

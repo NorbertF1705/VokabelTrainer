@@ -1,87 +1,68 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { VOCABULARY_EN, VOCABULARY_ES, VocabularyItem } from '../data/vocabulary';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
+import { storageGet, storageSet } from '../utils/storage';
+import { migrateV12ToV13 } from '../migrations/v12_to_v13';
+import { DEFAULT_SETTINGS, makeEmptyFileState } from '../config/default_settings';
+import { ALL_FILE_IDS, fileExists, getFile } from '../config/file_config';
+import {
+  CURRENT_SCHEMA_VERSION,
+  KEY_ACTIVE_FILE,
+  KEY_SCHEMA_VERSION,
+  KEY_SETTINGS,
+  fileKey,
+} from '../config/storage_keys';
 import { BOX_INTERVALS } from '../constants/theme';
-import { storageGet, storageSet, migrateFromLocalStorage } from '../utils/storage';
-import { Language } from '../constants/languages';
+import type {
+  AppSettings,
+  CardProgress,
+  FileId,
+  FileState,
+  VocabularyItem,
+} from '../data/vocabulary_types';
 
-export type { Language } from '../constants/languages';
-export type QueryDirection = 'de-to-foreign' | 'foreign-to-de' | 'random';
+// Re-exports für Screens
+export type { Language, QueryDirection, CardProgress, FileId, FileState, AppSettings } from '../data/vocabulary_types';
 
-export interface CardProgress {
-  box: number;
-  lastReviewed: string | null;
-  nextDate: string | null;
-  correctCount: number;
-  incorrectCount: number;
-}
+// ── Context-Shape ─────────────────────────────────────────────────────────────
 
-type ProgressMap = Record<string, CardProgress>;
+interface LearningContextValue {
+  loaded: boolean;
+  activeFileId: FileId | null;
+  fileStates: Record<FileId, FileState>;
+  vocabularyByFile: Record<FileId, VocabularyItem[]>;
+  settings: AppSettings;
+  isSessionActive: boolean;
 
-interface LearningState {
-  selectedLanguage: Language;
-  queryDirection: QueryDirection;
-  progress: ProgressMap;
-  customVocabularyEN: VocabularyItem[];
-  customVocabularyES: VocabularyItem[];
-  dailyCardLimit: number;
-  dailyStats: Record<Language, { date: string; count: number }>;
-  quizAutoSpeak: boolean;
-  flashcardAutoSpeak: boolean;
-  typingTolerant: boolean;
-  dailyNewCardLimit: number; // -1 = unbegrenzt, 0 = keine neuen Karten, >0 = Limit
-  dailyNewStats: Record<Language, { date: string; count: number }>; // neue Karten heute eingeführt
-  trainingLog: Record<Language, string[]>; // per-language YYYY-MM-DD dates of completed due-card sessions
-}
+  updateSettings: (patch: Partial<AppSettings>) => void;
+  selectFile: (fileId: FileId) => Promise<void>;
+  setSessionActive: (active: boolean) => void;
 
-interface LearningContextType extends LearningState {
-  allVocabulary: VocabularyItem[];
-  setLanguage: (lang: Language) => void;
-  setQueryDirection: (dir: QueryDirection) => void;
-  setDailyCardLimit: (limit: number) => void;
-  setDailyNewCardLimit: (limit: number) => void;
-  getNewCards: (lang: Language) => VocabularyItem[];
-  setQuizAutoSpeak: (enabled: boolean) => void;
-  setFlashcardAutoSpeak: (enabled: boolean) => void;
-  setTypingTolerant: (enabled: boolean) => void;
-  getCardProgress: (vocabId: string, lang: Language) => CardProgress;
-  markCard: (vocabId: string, lang: Language, correct: boolean) => void;
-  addCustomVocabulary: (item: Omit<VocabularyItem, 'id' | 'isCustom'>, lang: Language) => void;
-  deleteCustomVocabulary: (id: string) => void;
-  getVocabularyForLang: (lang: Language) => VocabularyItem[];
-  getDueCards: (lang: Language) => VocabularyItem[];
-  getBoxCounts: (lang: Language) => number[];
+  addCustomVocab: (item: Omit<VocabularyItem, 'id' | 'isCustom'>) => void;
+  removeCustomVocab: (vocabId: string) => void;
+
+  markCard: (vocabId: string, correct: boolean) => void;
+  getCardProgress: (vocabId: string) => CardProgress | undefined;
+  getDueCards: () => VocabularyItem[];
+  getNewCards: () => VocabularyItem[];
   resetProgress: () => void;
-  getTotalStats: (lang: Language) => { total: number; learned: number; dueToday: number; successRate: number };
-  recordTrainingDay: (lang: Language) => void;
-  getTrainingConsistency: (lang: Language, days: number) => { rate: number; daysActive: number; totalDays: number };
+
+  getBoxCounts: () => number[];
+  getTotalStats: () => { total: number; learned: number; dueToday: number; successRate: number };
+  recordTrainingDay: () => void;
+  getTrainingConsistency: (days: number) => { rate: number; daysActive: number; totalDays: number };
 }
 
-// Hilfsfunktion: migriert altes Format (customVocabulary mit english+spanish) ins neue Format
-function migrateOldCustomVocab(raw: Record<string, unknown>): { en: VocabularyItem[]; es: VocabularyItem[] } {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const old: any[] = (raw as any).customVocabulary ?? [];
-  const en: VocabularyItem[] = old.map((v: any) => ({
-    id: v.id, german: v.german, translation: v.english ?? v.translation ?? '',
-    emoji: v.emoji, category: v.category, inflections: v.inflections, isCustom: true,
-  }));
-  const es: VocabularyItem[] = old.map((v: any) => ({
-    id: v.id + '_es', german: v.german, translation: v.spanish ?? v.translation ?? '',
-    emoji: v.emoji, category: v.category, inflections: v.inflections, isCustom: true,
-  }));
-  return { en, es };
-}
+const Ctx = createContext<LearningContextValue | null>(null);
 
-const STORAGE_KEY = 'vokabeltrainer_state';
-
-const defaultProgress = (): CardProgress => ({
-  box: 1,
-  lastReviewed: null,
-  nextDate: null,
-  correctCount: 0,
-  incorrectCount: 0,
-});
-
-const LearningContext = createContext<LearningContextType | null>(null);
+// ── SR-Hilfsfunktionen (1:1 aus v1.2) ────────────────────────────────────────
 
 function localDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -107,41 +88,152 @@ function isCardDue(progress: CardProgress): boolean {
   return diffDays >= interval;
 }
 
-export function LearningProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<LearningState>({
-    selectedLanguage: 'english',
-    queryDirection: 'de-to-foreign',
-    progress: {},
-    customVocabularyEN: [],
-    customVocabularyES: [],
-    dailyCardLimit: 20,
-    dailyStats: { english: { date: '', count: 0 }, spanish: { date: '', count: 0 } },
-    quizAutoSpeak: false,
-    flashcardAutoSpeak: false,
-    typingTolerant: false,
-    dailyNewCardLimit: 5,
-    dailyNewStats: { english: { date: '', count: 0 }, spanish: { date: '', count: 0 } },
-    trainingLog: { english: [], spanish: [] },
-  });
+// ── Content-Version-Reconcile ─────────────────────────────────────────────────
+
+function reconcileContentVersion(
+  state: FileState,
+  newVocabulary: VocabularyItem[],
+  newContentVersion: number,
+): FileState {
+  const validIds = new Set(newVocabulary.map((v) => v.id));
+  for (const v of state.customVocabulary) validIds.add(v.id);
+  const cleanedProgress: Record<string, CardProgress> = {};
+  for (const [id, p] of Object.entries(state.progress)) {
+    if (validIds.has(id)) cleanedProgress[id] = p;
+  }
+  return { ...state, progress: cleanedProgress, contentVersion: newContentVersion };
+}
+
+// ── Provider ──────────────────────────────────────────────────────────────────
+
+export function LearningProvider({ children }: { children: ReactNode }) {
   const [loaded, setLoaded] = useState(false);
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Always holds the latest state for synchronous flush handlers
-  const stateRef = useRef<LearningState>(state);
+  const [activeFileId, setActiveFileId] = useState<FileId | null>(null);
+  const [fileStates, setFileStates] = useState<Record<FileId, FileState>>({});
+  const [vocabularyByFile, setVocabularyByFile] = useState<Record<FileId, VocabularyItem[]>>({});
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  const [isSessionActive, setSessionActive] = useState(false);
 
-  // Keep stateRef in sync so pagehide handler always has the latest state
+  // Refs für pagehide-Flush (immer aktueller State ohne Stale-Closure-Risiko)
+  const fileStatesRef = useRef(fileStates);
+  const activeFileIdRef = useRef(activeFileId);
+  const settingsRef = useRef(settings);
+  const vocabularyByFileRef = useRef(vocabularyByFile);
+  useEffect(() => { fileStatesRef.current = fileStates; }, [fileStates]);
+  useEffect(() => { activeFileIdRef.current = activeFileId; }, [activeFileId]);
+  useEffect(() => { settingsRef.current = settings; }, [settings]);
+  useEffect(() => { vocabularyByFileRef.current = vocabularyByFile; }, [vocabularyByFile]);
+
+  // ── Bootstrap ───────────────────────────────────────────────────────────────
   useEffect(() => {
-    stateRef.current = state;
-  }, [state]);
+    let cancelled = false;
+    (async () => {
+      try {
+        if (navigator.storage?.persist) {
+          try { await navigator.storage.persist(); } catch { /* tolerieren */ }
+        }
 
-  // Flush state synchronously to localStorage backup before page unloads.
-  // This catches the 300ms debounce window that would otherwise be lost
-  // when a Service Worker update triggers a forced page reload on iOS.
+        await migrateV12ToV13();
+
+        const rawSettings = await storageGet(KEY_SETTINGS);
+        const loadedSettings: AppSettings = rawSettings
+          ? { ...DEFAULT_SETTINGS, ...JSON.parse(rawSettings) }
+          : DEFAULT_SETTINGS;
+
+        let loadedActiveId = await storageGet(KEY_ACTIVE_FILE);
+        if (!fileExists(loadedActiveId)) loadedActiveId = null;
+
+        const states: Record<FileId, FileState> = {};
+        for (const id of ALL_FILE_IDS) {
+          const raw = await storageGet(fileKey(id));
+          if (raw) {
+            try {
+              states[id] = JSON.parse(raw) as FileState;
+            } catch {
+              states[id] = makeEmptyFileState(id, getFile(id)!.contentVersion);
+            }
+          } else {
+            states[id] = makeEmptyFileState(id, getFile(id)!.contentVersion);
+          }
+        }
+
+        const vocabMap: Record<FileId, VocabularyItem[]> = {};
+        if (loadedActiveId) {
+          const manifest = getFile(loadedActiveId)!;
+          const { vocabulary } = await manifest.loader();
+          vocabMap[loadedActiveId] = vocabulary;
+          const state = states[loadedActiveId];
+          if (state.contentVersion !== manifest.contentVersion) {
+            states[loadedActiveId] = reconcileContentVersion(state, vocabulary, manifest.contentVersion);
+          }
+        }
+
+        if (cancelled) return;
+        setSettings(loadedSettings);
+        setActiveFileId(loadedActiveId);
+        setFileStates(states);
+        setVocabularyByFile(vocabMap);
+        setLoaded(true);
+      } catch (e) {
+        console.error('[LearningContext] Bootstrap-Fehler:', e);
+        if (!cancelled) {
+          setSettings(DEFAULT_SETTINGS);
+          setActiveFileId(null);
+          setFileStates({});
+          setVocabularyByFile({});
+          setLoaded(true);
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // ── Debounced Save pro FileState ────────────────────────────────────────────
+  const saveTimersRef = useRef<Record<FileId, ReturnType<typeof setTimeout> | null>>({});
   useEffect(() => {
     if (!loaded) return;
+    for (const [id, state] of Object.entries(fileStates)) {
+      const existing = saveTimersRef.current[id];
+      if (existing) clearTimeout(existing);
+      saveTimersRef.current[id] = setTimeout(() => {
+        storageSet(fileKey(id), JSON.stringify(state)).catch((e) =>
+          console.error(`[LearningContext] Save fehlgeschlagen (${id}):`, e),
+        );
+      }, 300);
+    }
+  }, [fileStates, loaded]);
+
+  // ── Settings sofort speichern ───────────────────────────────────────────────
+  useEffect(() => {
+    if (!loaded) return;
+    storageSet(KEY_SETTINGS, JSON.stringify(settings)).catch((e) =>
+      console.error('[LearningContext] Settings-Save fehlgeschlagen:', e),
+    );
+  }, [settings, loaded]);
+
+  // ── ActiveFileId sofort speichern ───────────────────────────────────────────
+  useEffect(() => {
+    if (!loaded || !activeFileId) return;
+    storageSet(KEY_ACTIVE_FILE, activeFileId).catch((e) =>
+      console.error('[LearningContext] ActiveFileId-Save fehlgeschlagen:', e),
+    );
+  }, [activeFileId, loaded]);
+
+  // ── pagehide-Flush ──────────────────────────────────────────────────────────
+  useEffect(() => {
     const flush = () => {
       try {
-        localStorage.setItem(STORAGE_KEY + '_backup', JSON.stringify(stateRef.current));
-      } catch { /* ignore quota errors */ }
+        localStorage.setItem(KEY_SETTINGS, JSON.stringify(settingsRef.current));
+        localStorage.setItem(KEY_SCHEMA_VERSION, CURRENT_SCHEMA_VERSION);
+        if (activeFileIdRef.current) {
+          localStorage.setItem(KEY_ACTIVE_FILE, activeFileIdRef.current);
+        }
+        for (const [id, state] of Object.entries(fileStatesRef.current)) {
+          localStorage.setItem(fileKey(id) + '_backup', JSON.stringify(state));
+        }
+      } catch (e) {
+        console.warn('[LearningContext] pagehide-Flush fehlgeschlagen:', e);
+      }
     };
     window.addEventListener('pagehide', flush);
     const onVisibility = () => { if (document.visibilityState === 'hidden') flush(); };
@@ -150,107 +242,69 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('pagehide', flush);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [loaded]);
-
-  useEffect(() => {
-    (async () => {
-      // Request persistent storage — tells iOS not to evict IndexedDB data
-      if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
-
-      // Migrate any existing localStorage data to IndexedDB on first run
-      await migrateFromLocalStorage(STORAGE_KEY);
-
-      const raw = await storageGet(STORAGE_KEY);
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw);
-          // Migrate old flat dailyStats format to per-language
-          if (!parsed.dailyStats || !parsed.dailyStats.english) {
-            const old = parsed.dailyStats ?? { date: '', count: 0 };
-            parsed.dailyStats = {
-              english: { date: old.date ?? '', count: old.count ?? 0 },
-              spanish: { date: '', count: 0 },
-            };
-          }
-          // Migrate old flat array format to per-language record
-          if (!parsed.trainingLog || Array.isArray(parsed.trainingLog)) {
-            const old: string[] = Array.isArray(parsed.trainingLog) ? parsed.trainingLog : [];
-            parsed.trainingLog = { english: old, spanish: [] };
-          }
-          if (!parsed.trainingLog.english) parsed.trainingLog.english = [];
-          if (!parsed.trainingLog.spanish) parsed.trainingLog.spanish = [];
-
-          // Migration: altes Format hatte customVocabulary (mit english + spanish)
-          if (parsed.customVocabulary !== undefined && parsed.customVocabularyEN === undefined) {
-            const { en, es } = migrateOldCustomVocab(parsed);
-            parsed.customVocabularyEN = en;
-            parsed.customVocabularyES = es;
-            delete parsed.customVocabulary;
-          }
-          if (!parsed.customVocabularyEN) parsed.customVocabularyEN = [];
-          if (!parsed.customVocabularyES) parsed.customVocabularyES = [];
-          if (parsed.dailyNewCardLimit === undefined) parsed.dailyNewCardLimit = 5;
-          if (!parsed.dailyNewStats || !parsed.dailyNewStats.english) {
-            parsed.dailyNewStats = { english: { date: '', count: 0 }, spanish: { date: '', count: 0 } };
-          }
-
-          setState(parsed);
-        } catch {
-          // ignore parse errors
-        }
-      }
-      setLoaded(true);
-    })();
   }, []);
 
-  useEffect(() => {
-    if (!loaded) return;
-    // Debounce writes to avoid hammering IndexedDB on rapid state changes
-    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(() => {
-      storageSet(STORAGE_KEY, JSON.stringify(state));
-    }, 300);
-    return () => {
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    };
-  }, [state, loaded]);
+  // ── selectFile ──────────────────────────────────────────────────────────────
+  const selectFile = useCallback(async (fileId: FileId) => {
+    if (!fileExists(fileId)) {
+      console.warn(`[LearningContext] selectFile: unbekannte FileId ${fileId}`);
+      return;
+    }
+    const manifest = getFile(fileId)!;
 
-  const getVocabForLang = (lang: Language): VocabularyItem[] =>
-    lang === 'english'
-      ? [...VOCABULARY_EN, ...state.customVocabularyEN]
-      : [...VOCABULARY_ES, ...state.customVocabularyES];
+    // Vokabelliste lazy laden falls noch nicht im Cache
+    if (!vocabularyByFileRef.current[fileId]) {
+      try {
+        const { vocabulary } = await manifest.loader();
+        setVocabularyByFile((prev) => ({ ...prev, [fileId]: vocabulary }));
+      } catch (e) {
+        console.error(`[LearningContext] Vokabelladen fehlgeschlagen (${fileId}):`, e);
+      }
+    }
 
-  const allVocabulary = getVocabForLang(state.selectedLanguage);
+    setFileStates((prev) => {
+      const existing = prev[fileId];
+      if (existing) {
+        return { ...prev, [fileId]: { ...existing, lastOpenedAt: new Date().toISOString() } };
+      }
+      return {
+        ...prev,
+        [fileId]: { ...makeEmptyFileState(fileId, manifest.contentVersion), lastOpenedAt: new Date().toISOString() },
+      };
+    });
 
-  const setLanguage = (lang: Language) => setState(s => ({ ...s, selectedLanguage: lang }));
-  const setQueryDirection = (dir: QueryDirection) => setState(s => ({ ...s, queryDirection: dir }));
-  const setDailyCardLimit = (limit: number) => setState(s => ({ ...s, dailyCardLimit: limit }));
-  const setDailyNewCardLimit = (limit: number) => setState(s => ({ ...s, dailyNewCardLimit: limit }));
-  const setQuizAutoSpeak = (enabled: boolean) => setState(s => ({ ...s, quizAutoSpeak: enabled }));
-  const setFlashcardAutoSpeak = (enabled: boolean) => setState(s => ({ ...s, flashcardAutoSpeak: enabled }));
-  const setTypingTolerant = (enabled: boolean) => setState(s => ({ ...s, typingTolerant: enabled }));
+    setActiveFileId(fileId);
+    setSessionActive(false);
+  }, []);
 
-  const progressKey = (vocabId: string, lang: Language) => `${vocabId}_${lang}`;
+  // ── updateSettings ──────────────────────────────────────────────────────────
+  const updateSettings = useCallback((patch: Partial<AppSettings>) => {
+    setSettings((s) => ({ ...s, ...patch }));
+  }, []);
 
-  const getCardProgress = (vocabId: string, lang: Language): CardProgress =>
-    state.progress[progressKey(vocabId, lang)] ?? defaultProgress();
+  // ── Helfer: aktiven FileState mutieren ─────────────────────────────────────
+  const mutateActiveFile = useCallback((mutator: (s: FileState) => FileState) => {
+    setFileStates((prev) => {
+      const id = activeFileIdRef.current;
+      if (!id || !prev[id]) return prev;
+      return { ...prev, [id]: mutator(prev[id]) };
+    });
+  }, []);
 
-  const markCard = (vocabId: string, lang: Language, correct: boolean) => {
-    setState(s => {
-      const key = progressKey(vocabId, lang);
-      const current = s.progress[key] ?? defaultProgress();
-      const newBox = correct ? Math.min(current.box + 1, 6) : 1;
+  // ── markCard (SR-Logik aus v1.2, ohne lang-Parameter) ──────────────────────
+  const markCard = useCallback((vocabId: string, correct: boolean) => {
+    mutateActiveFile((s) => {
+      const current = s.progress[vocabId];
+      const newBox = correct ? Math.min((current?.box ?? 1) + 1, 6) : 1;
 
       const today = todayDate();
       const todayStr = localDateStr(today);
       let nextDate: string | null;
       if (!correct) {
-        // Falsch → Phase 1, morgen wieder fällig
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
         nextDate = localDateStr(tomorrow);
       } else if (newBox >= 6) {
-        // Phase 6 = gelernt, nie wieder fällig
         nextDate = null;
       } else {
         const intervalDays = BOX_INTERVALS[newBox - 1] as number;
@@ -259,120 +313,183 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
         nextDate = localDateStr(next);
       }
 
-      const langStats = s.dailyStats?.[lang];
-      const prevDaily = langStats?.date === todayStr ? langStats : { date: todayStr, count: 0 };
-      const newLangStats = { date: todayStr, count: prevDaily.count + 1 };
-
-      const isNewCard = current.lastReviewed === null;
-      const prevNewCount = s.dailyNewStats?.[lang]?.date === todayStr ? s.dailyNewStats[lang].count : 0;
-      const newDailyNewStats = isNewCard
-        ? { ...s.dailyNewStats, [lang]: { date: todayStr, count: prevNewCount + 1 } }
-        : s.dailyNewStats;
+      const isNewCard = !current || current.lastReviewed === null;
+      const prevDailyCount = s.dailyStats.date === todayStr ? s.dailyStats.count : 0;
+      const prevNewCount = s.dailyNewStats.date === todayStr ? s.dailyNewStats.count : 0;
 
       return {
         ...s,
-        dailyStats: { ...s.dailyStats, [lang]: newLangStats },
-        dailyNewStats: newDailyNewStats,
         progress: {
           ...s.progress,
-          [key]: {
+          [vocabId]: {
             box: newBox,
             lastReviewed: new Date().toISOString(),
             nextDate,
-            correctCount: current.correctCount + (correct ? 1 : 0),
-            incorrectCount: current.incorrectCount + (correct ? 0 : 1),
+            correctCount: (current?.correctCount ?? 0) + (correct ? 1 : 0),
+            incorrectCount: (current?.incorrectCount ?? 0) + (correct ? 0 : 1),
           },
         },
+        dailyStats: { date: todayStr, count: prevDailyCount + 1 },
+        dailyNewStats: isNewCard
+          ? { date: todayStr, count: prevNewCount + 1 }
+          : s.dailyNewStats,
       };
     });
-  };
+  }, [mutateActiveFile]);
 
-  const addCustomVocabulary = (item: Omit<VocabularyItem, 'id' | 'isCustom'>, lang: Language) => {
+  // ── addCustomVocab ──────────────────────────────────────────────────────────
+  const addCustomVocab = useCallback((item: Omit<VocabularyItem, 'id' | 'isCustom'>) => {
     const newItem: VocabularyItem = { ...item, id: `custom_${Date.now()}`, isCustom: true };
-    if (lang === 'english') {
-      setState(s => ({ ...s, customVocabularyEN: [...s.customVocabularyEN, newItem] }));
-    } else {
-      setState(s => ({ ...s, customVocabularyES: [...s.customVocabularyES, newItem] }));
-    }
-  };
-
-  const deleteCustomVocabulary = (id: string) => {
-    setState(s => ({
+    mutateActiveFile((s) => ({
       ...s,
-      customVocabularyEN: s.customVocabularyEN.filter(v => v.id !== id),
-      customVocabularyES: s.customVocabularyES.filter(v => v.id !== id),
+      customVocabulary: [...s.customVocabulary, newItem],
     }));
-  };
+  }, [mutateActiveFile]);
 
-  const getNewCards = (lang: Language): VocabularyItem[] => {
-    if (state.dailyNewCardLimit === 0) return [];
-    const todayStr = localDateStr(todayDate());
-    const introducedToday = state.dailyNewStats?.[lang]?.date === todayStr
-      ? state.dailyNewStats[lang].count : 0;
-    const remaining = state.dailyNewCardLimit === -1
-      ? Infinity
-      : Math.max(0, state.dailyNewCardLimit - introducedToday);
-    if (remaining === 0) return [];
-    const cards = getVocabForLang(lang).filter(v => getCardProgress(v.id, lang).lastReviewed === null);
-    return isFinite(remaining) ? cards.slice(0, remaining) : cards;
-  };
+  // ── removeCustomVocab ───────────────────────────────────────────────────────
+  const removeCustomVocab = useCallback((vocabId: string) => {
+    mutateActiveFile((s) => {
+      const nextProgress = { ...s.progress };
+      delete nextProgress[vocabId];
+      return {
+        ...s,
+        customVocabulary: s.customVocabulary.filter((v) => v.id !== vocabId),
+        progress: nextProgress,
+      };
+    });
+  }, [mutateActiveFile]);
 
-  const getDueCards = (lang: Language): VocabularyItem[] => {
+  // ── resetProgress ───────────────────────────────────────────────────────────
+  const resetProgress = useCallback(() => {
+    mutateActiveFile((s) => ({ ...s, progress: {} }));
+  }, [mutateActiveFile]);
+
+  // ── recordTrainingDay ───────────────────────────────────────────────────────
+  const recordTrainingDay = useCallback(() => {
+    const today = localDateStr(new Date());
+    mutateActiveFile((s) => {
+      if (s.trainingLog.includes(today)) return s;
+      return { ...s, trainingLog: [...s.trainingLog, today] };
+    });
+  }, [mutateActiveFile]);
+
+  // ── getCardProgress ─────────────────────────────────────────────────────────
+  const getCardProgress = useCallback((vocabId: string): CardProgress | undefined => {
+    const id = activeFileIdRef.current;
+    if (!id) return undefined;
+    return fileStatesRef.current[id]?.progress[vocabId];
+  }, []);
+
+  // ── getDueCards ─────────────────────────────────────────────────────────────
+  const getDueCards = useCallback((): VocabularyItem[] => {
+    const id = activeFileIdRef.current;
+    if (!id) return [];
+    const state = fileStatesRef.current[id];
+    const vocab = vocabularyByFileRef.current[id];
+    if (!state || !vocab) return [];
+
     const todayStr = localDateStr(todayDate());
-    const langStats = state.dailyStats?.[lang];
-    const reviewedToday = langStats?.date === todayStr ? langStats.count : 0;
-    const effectiveLimit = state.dailyCardLimit > 0
-      ? Math.max(0, state.dailyCardLimit - reviewedToday)
+    const reviewedToday = state.dailyStats.date === todayStr ? state.dailyStats.count : 0;
+    const { dailyCardLimit } = settingsRef.current;
+    const effectiveLimit = dailyCardLimit > 0
+      ? Math.max(0, dailyCardLimit - reviewedToday)
       : Infinity;
-
     if (effectiveLimit === 0) return [];
 
-    const due = getVocabForLang(lang)
-      .filter(v => isCardDue(getCardProgress(v.id, lang)))
+    const allVocab = [...vocab, ...state.customVocabulary];
+    const due = allVocab
+      .filter((v) => {
+        const p = state.progress[v.id];
+        return p && isCardDue(p);
+      })
       .sort((a, b) => {
-        const pa = getCardProgress(a.id, lang);
-        const pb = getCardProgress(b.id, lang);
-        // Phase ASC
+        const pa = state.progress[a.id];
+        const pb = state.progress[b.id];
         if (pa.box !== pb.box) return pa.box - pb.box;
-        // Datum ASC (null = neue Karte = höchste Priorität)
         if (!pa.nextDate && !pb.nextDate) return 0;
         if (!pa.nextDate) return -1;
         if (!pb.nextDate) return 1;
         return pa.nextDate.localeCompare(pb.nextDate);
       });
     return isFinite(effectiveLimit) ? due.slice(0, effectiveLimit) : due;
-  };
+  }, []);
 
-  const getBoxCounts = (lang: Language): number[] => {
+  // ── getNewCards ─────────────────────────────────────────────────────────────
+  const getNewCards = useCallback((): VocabularyItem[] => {
+    const id = activeFileIdRef.current;
+    if (!id) return [];
+    const state = fileStatesRef.current[id];
+    const vocab = vocabularyByFileRef.current[id];
+    if (!state || !vocab) return [];
+
+    const { dailyNewCardLimit } = settingsRef.current;
+    if (dailyNewCardLimit === 0) return [];
+
+    const todayStr = localDateStr(todayDate());
+    const introducedToday = state.dailyNewStats.date === todayStr ? state.dailyNewStats.count : 0;
+    const remaining = dailyNewCardLimit === -1
+      ? Infinity
+      : Math.max(0, dailyNewCardLimit - introducedToday);
+    if (remaining === 0) return [];
+
+    const allVocab = [...vocab, ...state.customVocabulary];
+    const newCards = allVocab.filter((v) => {
+      const p = state.progress[v.id];
+      return !p || p.lastReviewed === null;
+    });
+    return isFinite(remaining) ? newCards.slice(0, remaining) : newCards;
+  }, []);
+
+  // ── getBoxCounts ────────────────────────────────────────────────────────────
+  const getBoxCounts = useCallback((): number[] => {
+    const id = activeFileIdRef.current;
+    const state = id ? fileStatesRef.current[id] : null;
+    const vocab = id ? vocabularyByFileRef.current[id] : null;
     const counts = [0, 0, 0, 0, 0, 0];
-    getVocabForLang(lang).forEach(v => {
-      const prog = getCardProgress(v.id, lang);
-      counts[Math.min(Math.max(prog.box - 1, 0), 5)]++;
+    if (!state || !vocab) return counts;
+    const allVocab = [...vocab, ...state.customVocabulary];
+    allVocab.forEach((v) => {
+      const prog = state.progress[v.id];
+      const boxIdx = prog ? Math.min(Math.max(prog.box - 1, 0), 5) : 0;
+      counts[boxIdx]++;
     });
     return counts;
-  };
+  }, []);
 
-  const recordTrainingDay = (lang: Language) => {
-    const todayStr = localDateStr(new Date());
-    setState(s => {
-      const log = s.trainingLog[lang] ?? [];
-      if (log.includes(todayStr)) return s;
-      return { ...s, trainingLog: { ...s.trainingLog, [lang]: [...log, todayStr] } };
+  // ── getTotalStats ───────────────────────────────────────────────────────────
+  const getTotalStats = useCallback(() => {
+    const id = activeFileIdRef.current;
+    const state = id ? fileStatesRef.current[id] : null;
+    const vocab = id ? vocabularyByFileRef.current[id] : null;
+    if (!state || !vocab) return { total: 0, learned: 0, dueToday: 0, successRate: 0 };
+
+    const allVocab = [...vocab, ...state.customVocabulary];
+    let correct = 0, incorrect = 0, learned = 0, dueToday = 0;
+    allVocab.forEach((v) => {
+      const prog = state.progress[v.id];
+      if (prog) {
+        correct += prog.correctCount;
+        incorrect += prog.incorrectCount;
+        if (prog.box >= 6) learned++;
+        if (isCardDue(prog)) dueToday++;
+      }
     });
-  };
+    const successRate = correct + incorrect > 0 ? Math.round((correct / (correct + incorrect)) * 100) : 0;
+    return { total: allVocab.length, learned, dueToday, successRate };
+  }, []);
 
-  const getTrainingConsistency = (lang: Language, days: number): { rate: number; daysActive: number; totalDays: number } => {
-    const log = state.trainingLog[lang] ?? [];
+  // ── getTrainingConsistency (aus v1.2, ohne lang-Parameter) ─────────────────
+  const getTrainingConsistency = useCallback((days: number): { rate: number; daysActive: number; totalDays: number } => {
+    const id = activeFileIdRef.current;
+    const log = (id ? fileStatesRef.current[id]?.trainingLog : null) ?? [];
     const today = new Date();
 
-    // Denominator: only count days since the first recorded training day (can't be absent before tracking started)
     let effectiveDays = days;
     if (log.length > 0) {
       const firstEntry = [...log].sort()[0];
       const [y, m, d] = firstEntry.split('-').map(Number);
       const firstDate = new Date(y, m - 1, d);
-      const msPerDay = 1000 * 60 * 60 * 24;
-      const daysSinceFirst = Math.round((todayDate().getTime() - firstDate.getTime()) / msPerDay);
+      const daysSinceFirst = Math.round((todayDate().getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
       effectiveDays = Math.min(days, daysSinceFirst + 1);
     }
 
@@ -385,58 +502,45 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
 
     const rate = effectiveDays > 0 ? Math.round((daysActive / effectiveDays) * 100) : 0;
     return { rate, daysActive, totalDays: effectiveDays };
-  };
+  }, []);
 
-  const resetProgress = () => setState(s => ({ ...s, progress: {} }));
-
-  const getTotalStats = (lang: Language) => {
-    const vocab = getVocabForLang(lang);
-    const total = vocab.length;
-    let correct = 0, incorrect = 0, learned = 0;
-    vocab.forEach(v => {
-      const prog = getCardProgress(v.id, lang);
-      correct += prog.correctCount;
-      incorrect += prog.incorrectCount;
-      if (prog.box >= 6) learned++;
-    });
-    const successRate = correct + incorrect > 0 ? Math.round((correct / (correct + incorrect)) * 100) : 0;
-    const dueToday = getDueCards(lang).length;
-    return { total, learned, dueToday, successRate };
-  };
+  // ── Context-Wert ────────────────────────────────────────────────────────────
+  const value = useMemo<LearningContextValue>(() => ({
+    loaded,
+    activeFileId,
+    fileStates,
+    vocabularyByFile,
+    settings,
+    isSessionActive,
+    updateSettings,
+    selectFile,
+    setSessionActive,
+    addCustomVocab,
+    removeCustomVocab,
+    markCard,
+    getCardProgress,
+    getDueCards,
+    getNewCards,
+    resetProgress,
+    getBoxCounts,
+    getTotalStats,
+    recordTrainingDay,
+    getTrainingConsistency,
+  }), [
+    loaded, activeFileId, fileStates, vocabularyByFile, settings, isSessionActive,
+    updateSettings, selectFile, addCustomVocab, removeCustomVocab,
+    markCard, getCardProgress, getDueCards, getNewCards, resetProgress,
+    getBoxCounts, getTotalStats, recordTrainingDay, getTrainingConsistency,
+  ]);
 
   if (!loaded) return null;
-
-  return (
-    <LearningContext.Provider value={{
-      ...state,
-      allVocabulary,
-      getVocabularyForLang: getVocabForLang,
-      setLanguage,
-      setQueryDirection,
-      setDailyCardLimit,
-      setDailyNewCardLimit,
-      getNewCards,
-      setQuizAutoSpeak,
-      setFlashcardAutoSpeak,
-      setTypingTolerant,
-      getCardProgress,
-      markCard,
-      addCustomVocabulary,
-      deleteCustomVocabulary,
-      getDueCards,
-      getBoxCounts,
-      resetProgress,
-      getTotalStats,
-      recordTrainingDay,
-      getTrainingConsistency,
-    }}>
-      {children}
-    </LearningContext.Provider>
-  );
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
-export function useLearning() {
-  const ctx = useContext(LearningContext);
-  if (!ctx) throw new Error('useLearning must be used within LearningProvider');
-  return ctx;
+// ── Hook ──────────────────────────────────────────────────────────────────────
+
+export function useLearning(): LearningContextValue {
+  const v = useContext(Ctx);
+  if (!v) throw new Error('useLearning muss innerhalb LearningProvider verwendet werden');
+  return v;
 }

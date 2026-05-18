@@ -1,23 +1,29 @@
 # VokabelTrainer – Benutzerdokumentation
 
-**Version:** 1.2  
+**Version:** 1.3  
 **Stand:** Mai 2026
 
 ---
 
 ## Überblick
 
-VokabelTrainer ist eine offline-fähige Web-App zum Lernen englischer und spanischer Vokabeln. Die App nutzt ein Karteikartensystem mit intelligentem Wiederholungsalgorithmus (Spaced Repetition) und läuft vollständig auf dem iPhone – ohne Internetverbindung und ohne App Store.
+VokabelTrainer ist eine offline-fähige Web-App zum Lernen von Vokabeln. Die App nutzt ein Karteikartensystem mit intelligentem Wiederholungsalgorithmus (Spaced Repetition) und läuft vollständig auf dem iPhone – ohne Internetverbindung und ohne App Store.
+
+Es ist immer genau ein **Lernpaket** (Vokabeldatei) aktiv. Aktuell verfügbare Pakete:
+- 🇬🇧 Englisch – Grundwortschatz
+- 🇪🇸 Spanisch – Grundwortschatz
+
+Das aktive Paket kann jederzeit über den Selektor oben rechts gewechselt werden.
 
 Die App gliedert sich in fünf Bereiche, die über die Navigationsleiste am unteren Bildschirmrand erreichbar sind:
 
 | Tab | Funktion |
 |---|---|
-| 🏠 Home | Sprachauswahl, Tagesübersicht, Lernen starten |
+| 🏠 Home | Tagesübersicht, Lernen starten |
 | 🧠 Lernen | Karteikarten-Sitzung starten |
 | 📚 Vokabeln | Vokabeln durchsuchen und eigene hinzufügen |
 | 📊 Statistik | Lernfortschritt und Regelmäßigkeit |
-| ⚙️ Einstellungen | Sprache, Lernmodi, Limits konfigurieren |
+| ⚙️ Einstellungen | Lernmodi, Limits konfigurieren |
 
 ---
 
@@ -58,18 +64,24 @@ Die App erscheint als Icon auf dem Homescreen und kann jederzeit offline gestart
 
 ---
 
-## 2. Startseite (Home)
+## 2. Erststart und Lernpaket-Auswahl
+
+Beim allerersten Start der App erscheint ein Willkommensbildschirm. Hier wird das Lernpaket gewählt, mit dem gestartet werden soll. Die Auswahl lässt sich später jederzeit über den Selektor im Header ändern.
+
+---
+
+## 3. Lernpaket wechseln
+
+Am oberen Rand der App befindet sich ein kleiner Button, der den Namen des aktiven Lernpakets anzeigt (z. B. „🇬🇧 Englisch · Grundwortschatz ▾"). Ein Tipp öffnet ein Auswahlblatt mit allen verfügbaren Paketen.
+
+- Der Lernfortschritt jedes Pakets wird separat gespeichert und bleibt beim Wechseln erhalten.
+- Läuft gerade eine Lernsitzung, erscheint ein Bestätigungsdialog, bevor die Sitzung beendet wird.
+
+---
+
+## 4. Startseite (Home)
 
 Die Startseite zeigt die Tagesübersicht und dient als schneller Einstieg ins Lernen.
-
-**Sprachauswahl**
-
-Oben auf der Startseite kann zwischen den zwei verfügbaren Sprachen gewechselt werden:
-
-- 🇬🇧 Englisch
-- 🇪🇸 Spanisch
-
-Die gewählte Sprache gilt für alle Bereiche der App.
 
 **Abfragerichtung**
 
@@ -95,7 +107,7 @@ Der Button „🚀 Lernen starten" führt direkt zum Lernen-Tab.
 
 ---
 
-## 3. Lernen
+## 5. Lernen
 
 Der Lernen-Tab bietet vier verschiedene Lernmodi. Vor dem Start wird ein Auswahlbildschirm angezeigt.
 
@@ -104,7 +116,7 @@ Der Lernen-Tab bietet vier verschiedene Lernmodi. Vor dem Start wird ein Auswahl
 | Modus | Beschreibung |
 |---|---|
 | 🎯 Fällige Karten | Zeigt alle heute fälligen Wiederholungen plus neue Karten (bis zum konfigurierten Tageslimit) |
-| 🔁 Alle Vokabeln | Zeigt alle Karten der gewählten Sprache in zufälliger Reihenfolge als Karteikarten |
+| 🔁 Alle Vokabeln | Zeigt alle Karten des aktiven Pakets in zufälliger Reihenfolge als Karteikarten |
 | 🧩 Quiz | Multiple-Choice mit vier Antwortmöglichkeiten |
 | ✍️ Eingabe-Modus | Antwort wird getippt und auf Korrektheit geprüft |
 
@@ -137,7 +149,7 @@ Der Lernen-Tab bietet vier verschiedene Lernmodi. Vor dem Start wird ein Auswahl
    - ✗ Falsch – mit Anzeige der richtigen Antwort
 5. **Weiter** antippen oder **Enter** drücken
 
-> Ob „fast richtig" als korrekt gewertet wird, hängt von der Einstellung **Tipptolerant** ab (siehe Kapitel 7).
+> Ob „fast richtig" als korrekt gewertet wird, hängt von der Einstellung **Tipptolerant** ab (siehe Kapitel 8).
 
 ### Audio
 
@@ -154,13 +166,13 @@ Nach der letzten Karte erscheint eine Auswertung mit:
 
 ---
 
-## 4. Vokabeln
+## 6. Vokabeln
 
-Der Vokabeln-Tab zeigt alle Vokabeln der App und erlaubt das Hinzufügen eigener Einträge.
+Der Vokabeln-Tab zeigt alle Vokabeln des aktiven Lernpakets und erlaubt das Hinzufügen eigener Einträge.
 
 ### Anzeige und Filter
 
-Oben kann zwischen 🇬🇧 Englisch und 🇪🇸 Spanisch gewechselt werden. Das Suchfeld filtert nach deutschem Wort oder Übersetzung.
+Das Suchfeld filtert nach deutschem Wort oder Übersetzung.
 
 Zusätzlich stehen zwei scrollbare Filterzeilen bereit:
 
@@ -176,14 +188,15 @@ Jeder Listeneintrag zeigt: Emoji, deutsches Wort, Übersetzung, Beugungsformen (
 
 | Feld | Beschreibung |
 |---|---|
-| Sprache | 🇬🇧 Englisch oder 🇪🇸 Spanisch (Pflicht) |
 | Emoji | Symbol zur Veranschaulichung (Standard: 📝) |
 | Deutsch | Deutsches Wort (Pflicht) |
-| Englisch / Spanisch | Fremdsprachige Übersetzung (Pflicht) |
+| Fremdsprache | Übersetzung in der aktiven Sprache (Pflicht) |
 | Beugungsformen | Plural, Konjugation o. Ä. (optional) |
 | Kategorie | Thematische Zuordnung |
 
 3. **Speichern** antippen
+
+Die neue Vokabel wird dem aktiven Lernpaket hinzugefügt.
 
 ### Eigene Vokabel löschen
 
@@ -193,7 +206,7 @@ Eigene Vokabeln sind mit einem 🗑️-Symbol gekennzeichnet. Antippen → Lösc
 
 ---
 
-## 5. Spaced Repetition (Wiederholungsalgorithmus)
+## 7. Spaced Repetition (Wiederholungsalgorithmus)
 
 Die App verwendet ein 6-Fach-Karteikartensystem. Je öfter eine Vokabel korrekt beantwortet wird, desto länger der Abstand bis zur nächsten Wiederholung.
 
@@ -212,21 +225,9 @@ Die App verwendet ein 6-Fach-Karteikartensystem. Je öfter eine Vokabel korrekt 
 
 ---
 
-## 6. Statistik
+## 8. Statistik
 
-Der Statistik-Tab gibt einen Überblick über den Lernfortschritt beider Sprachen.
-
-**Übersicht je Sprache**
-
-Zwei nebeneinanderstehende Kacheln zeigen für Englisch und Spanisch:
-- Fällig heute
-- Gelernt (Fach 6)
-- Gesamt
-- Erfolgsquote
-
-**Detailansicht**
-
-Nach Auswahl einer Sprache werden angezeigt:
+Der Statistik-Tab gibt einen Überblick über den Lernfortschritt des aktiven Lernpakets.
 
 - **Lernkartei – Fächer:** Balkendiagramm mit der Verteilung der Karten auf Fach 1–6
 - **Trainings-Regelmäßigkeit:** Kalenderansicht der letzten 7 Tage; darunter Prozentwerte für 7, 30 und 90 Tage
@@ -234,15 +235,14 @@ Nach Auswahl einer Sprache werden angezeigt:
 
 **Fortschritt zurücksetzen**
 
-Der Button am Ende der Seite setzt alle Karten auf Fach 1 zurück. Eigene Vokabeln bleiben dabei erhalten.
+Der Button am Ende der Seite setzt alle Karten des aktiven Pakets auf Fach 1 zurück. Eigene Vokabeln bleiben dabei erhalten.
 
 ---
 
-## 7. Einstellungen
+## 9. Einstellungen
 
 | Einstellung | Beschreibung |
 |---|---|
-| **Lernsprache** | Aktive Sprache (Englisch oder Spanisch) |
 | **Abfragerichtung** | DE → Fremdsprache, Fremdsprache → DE, Zufällig |
 | **Quiz – Lösung vorlesen** | Spricht die richtige Antwort beim Antippen vor |
 | **Karteikarten – Lösung vorlesen** | Spricht die Rückseite automatisch beim Aufdecken vor |
@@ -250,19 +250,21 @@ Der Button am Ende der Seite setzt alle Karten auf Fach 1 zurück. Eigene Vokabe
 | **Karten pro Tag** | Begrenzt die fälligen Karten pro Sitzung: 10 / 20 / 30 / 50 / ∞ |
 | **Neue Karten pro Tag** | Wie viele unbekannte Karten pro Sitzung eingeführt werden: 0 / 3 / 5 / 10 / ∞ |
 
-**Fortschritt zurücksetzen** setzt alle Karten auf Fach 1 zurück (eigene Vokabeln bleiben erhalten).
+**Fortschritt zurücksetzen** setzt alle Karten des aktiven Pakets auf Fach 1 zurück (eigene Vokabeln bleiben erhalten).
 
 ---
 
-## 8. Datenspeicherung & Datenschutz
+## 10. Datenspeicherung & Datenschutz
 
 Alle Daten (Vokabeln, Lernfortschritt, Einstellungen) werden **ausschließlich lokal auf dem Gerät** gespeichert (IndexedDB mit localStorage als Fallback). Es werden keine Daten an externe Server übertragen.
+
+Der Lernfortschritt jedes Lernpakets wird getrennt gespeichert und bleibt beim Paket-Wechsel erhalten.
 
 > **Hinweis:** Wird in Safari „Verlauf und Website-Daten löschen" ausgeführt, können auch App-Daten betroffen sein. Für dauerhaften Schutz die App über das Homescreen-Icon starten (nicht direkt im Safari-Browser).
 
 ---
 
-## 9. Häufige Fragen
+## 11. Häufige Fragen
 
 **Die App zeigt nach längerem Nichtbenutzen einen Fehler.**  
 → Mac einschalten, `npx serve -s dist` im Projektverzeichnis starten, App einmal über WLAN öffnen. Danach läuft sie wieder offline.
@@ -278,6 +280,9 @@ Alle Daten (Vokabeln, Lernfortschritt, Einstellungen) werden **ausschließlich l
 
 **Was passiert, wenn ich eine Vokabel falsch beantworte?**  
 → Die Karte fällt auf Fach 1 zurück und wird sofort wieder fällig.
+
+**Bleibt mein Lernfortschritt beim Wechsel des Lernpakets erhalten?**  
+→ Ja. Jedes Lernpaket hat seinen eigenen Fortschritt, der unabhängig gespeichert wird.
 
 ---
 
