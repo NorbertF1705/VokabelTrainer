@@ -2,6 +2,15 @@
 
 ---
 
+## v1.3.1 — 2026-05-19
+
+### Bugfixes
+
+- **Fällige Karten sofort korrekt anzeigen:** Beim App-Start und nach dem Wechsel des Lernpakets zeigte die Startseite kurzzeitig „0 Karten fällig", obwohl Karten vorhanden waren. Ursache war ein Timing-Problem: Die Berechnungsfunktionen lasen aus internen Zwischenspeichern (Refs), die erst nach dem ersten Render aktualisiert wurden. Die Funktionen lesen nun direkt aus dem aktuellen Zustand und zeigen sofort den richtigen Wert.
+- **Fach-3-Farbe in der Statistik:** Die Farbe für Fach 3 im Balkendiagramm „Lernkartei – Fächer" wurde von hellem Gelb (#FFE66D) auf kräftiges Amber (#D97706) geändert. Der Zahlenwert ist damit auf hellem Hintergrund deutlich besser lesbar.
+
+---
+
 ## v1.3.0 — 2026-05-18
 
 ### Architektur: Einzelne aktive Vokabeldatei

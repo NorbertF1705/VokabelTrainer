@@ -556,7 +556,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.3.0 · Mai 2026</div>
+    <div class="nav-version">Version 1.3.1 · Mai 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -565,7 +565,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.3.0</span>
+        <span class="badge">v1.3.1</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1472,7 +1472,7 @@ function pickVoice(lang: string): SpeechSynthesisVoice | null {
       <h3>App-Version aktualisieren</h3>
       <p>Die Versionsnummer wird nur an einer Stelle gepflegt: <code>src/version.ts</code>. Sie wird auf der Startseite angezeigt und kann dort einfach hochgezählt werden.</p>
       <pre><code>// src/version.ts
-export const APP_VERSION = '1.3.0';</code></pre>
+export const APP_VERSION = '1.3.1';</code></pre>
 
       <h3>TypeScript-Konfiguration</h3>
       <p>Strikte TypeScript-Konfiguration. Alle React-Komponenten sind typisiert. Es gibt keine <code>any</code>-Verwendungen außer in den Migrations-Funktionen (dort explizit durch ESLint-Kommentar auskommentiert).</p>
@@ -1537,10 +1537,23 @@ export const APP_VERSION = '1.3.0';</code></pre>
         <h2>Release Notes</h2>
       </div>
 
-      <!-- v1.3.0 -->
+      <!-- v1.3.1 -->
       <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
-          <span class="badge">v1.3.0</span>
+          <span class="badge">v1.3.1</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-05-19</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Bugfixes</h4>
+        <ul>
+          <li><strong>Stale-Ref-Bug in Query-Callbacks</strong>: <code>getDueCards</code>, <code>getNewCards</code>, <code>getBoxCounts</code>, <code>getTotalStats</code>, <code>getTrainingConsistency</code> und <code>getCardProgress</code> nutzten <code>useCallback([], [])</code> mit Refs. Die Refs wurden via <code>useEffect</code> erst nach dem Render synchronisiert — beim ersten Render und nach Paketwechsel lasen die Funktionen daher leere Refs und lieferten 0. Fix: alle Query-Callbacks lesen direkt aus State-Werten und listen diese als <code>useCallback</code>-Dependencies.</li>
+          <li><strong>Fach-3-Farbe</strong>: <code>boxColors[2]</code> von <code>#FFE66D</code> auf <code>#D97706</code> geändert; <code>boxColorsLight[2]</code> angepasst. Die Farbe ist auf hellem Hintergrund nun klar erkennbar.</li>
+        </ul>
+      </div>
+
+      <!-- v1.3.0 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.3.0</span>
           <span style="color:var(--muted); font-size:0.82rem;">2026-05-18</span>
         </div>
         <h4 style="margin-bottom:0.4rem;">Architektur: Einzelne aktive Vokabeldatei</h4>
