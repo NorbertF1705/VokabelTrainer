@@ -375,22 +375,20 @@ export function LearningProvider({ children }: { children: ReactNode }) {
 
   // ── getCardProgress ─────────────────────────────────────────────────────────
   const getCardProgress = useCallback((vocabId: string): CardProgress | undefined => {
-    const id = activeFileIdRef.current;
-    if (!id) return undefined;
-    return fileStatesRef.current[id]?.progress[vocabId];
-  }, []);
+    if (!activeFileId) return undefined;
+    return fileStates[activeFileId]?.progress[vocabId];
+  }, [activeFileId, fileStates]);
 
   // ── getDueCards ─────────────────────────────────────────────────────────────
   const getDueCards = useCallback((): VocabularyItem[] => {
-    const id = activeFileIdRef.current;
-    if (!id) return [];
-    const state = fileStatesRef.current[id];
-    const vocab = vocabularyByFileRef.current[id];
+    if (!activeFileId) return [];
+    const state = fileStates[activeFileId];
+    const vocab = vocabularyByFile[activeFileId];
     if (!state || !vocab) return [];
 
     const todayStr = localDateStr(todayDate());
     const reviewedToday = state.dailyStats.date === todayStr ? state.dailyStats.count : 0;
-    const { dailyCardLimit } = settingsRef.current;
+    const { dailyCardLimit } = settings;
     const effectiveLimit = dailyCardLimit > 0
       ? Math.max(0, dailyCardLimit - reviewedToday)
       : Infinity;
@@ -412,17 +410,16 @@ export function LearningProvider({ children }: { children: ReactNode }) {
         return pa.nextDate.localeCompare(pb.nextDate);
       });
     return isFinite(effectiveLimit) ? due.slice(0, effectiveLimit) : due;
-  }, []);
+  }, [activeFileId, fileStates, vocabularyByFile, settings]);
 
   // ── getNewCards ─────────────────────────────────────────────────────────────
   const getNewCards = useCallback((): VocabularyItem[] => {
-    const id = activeFileIdRef.current;
-    if (!id) return [];
-    const state = fileStatesRef.current[id];
-    const vocab = vocabularyByFileRef.current[id];
+    if (!activeFileId) return [];
+    const state = fileStates[activeFileId];
+    const vocab = vocabularyByFile[activeFileId];
     if (!state || !vocab) return [];
 
-    const { dailyNewCardLimit } = settingsRef.current;
+    const { dailyNewCardLimit } = settings;
     if (dailyNewCardLimit === 0) return [];
 
     const todayStr = localDateStr(todayDate());
@@ -438,13 +435,12 @@ export function LearningProvider({ children }: { children: ReactNode }) {
       return !p || p.lastReviewed === null;
     });
     return isFinite(remaining) ? newCards.slice(0, remaining) : newCards;
-  }, []);
+  }, [activeFileId, fileStates, vocabularyByFile, settings]);
 
   // ── getBoxCounts ────────────────────────────────────────────────────────────
   const getBoxCounts = useCallback((): number[] => {
-    const id = activeFileIdRef.current;
-    const state = id ? fileStatesRef.current[id] : null;
-    const vocab = id ? vocabularyByFileRef.current[id] : null;
+    const state = activeFileId ? fileStates[activeFileId] : null;
+    const vocab = activeFileId ? vocabularyByFile[activeFileId] : null;
     const counts = [0, 0, 0, 0, 0, 0];
     if (!state || !vocab) return counts;
     const allVocab = [...vocab, ...state.customVocabulary];
@@ -454,13 +450,12 @@ export function LearningProvider({ children }: { children: ReactNode }) {
       counts[boxIdx]++;
     });
     return counts;
-  }, []);
+  }, [activeFileId, fileStates, vocabularyByFile]);
 
   // ── getTotalStats ───────────────────────────────────────────────────────────
   const getTotalStats = useCallback(() => {
-    const id = activeFileIdRef.current;
-    const state = id ? fileStatesRef.current[id] : null;
-    const vocab = id ? vocabularyByFileRef.current[id] : null;
+    const state = activeFileId ? fileStates[activeFileId] : null;
+    const vocab = activeFileId ? vocabularyByFile[activeFileId] : null;
     if (!state || !vocab) return { total: 0, learned: 0, dueToday: 0, successRate: 0 };
 
     const allVocab = [...vocab, ...state.customVocabulary];
@@ -476,12 +471,11 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     });
     const successRate = correct + incorrect > 0 ? Math.round((correct / (correct + incorrect)) * 100) : 0;
     return { total: allVocab.length, learned, dueToday, successRate };
-  }, []);
+  }, [activeFileId, fileStates, vocabularyByFile]);
 
   // ── getTrainingConsistency (aus v1.2, ohne lang-Parameter) ─────────────────
   const getTrainingConsistency = useCallback((days: number): { rate: number; daysActive: number; totalDays: number } => {
-    const id = activeFileIdRef.current;
-    const log = (id ? fileStatesRef.current[id]?.trainingLog : null) ?? [];
+    const log = (activeFileId ? fileStates[activeFileId]?.trainingLog : null) ?? [];
     const today = new Date();
 
     let effectiveDays = days;
@@ -502,7 +496,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
 
     const rate = effectiveDays > 0 ? Math.round((daysActive / effectiveDays) * 100) : 0;
     return { rate, daysActive, totalDays: effectiveDays };
-  }, []);
+  }, [activeFileId, fileStates]);
 
   // ── Context-Wert ────────────────────────────────────────────────────────────
   const value = useMemo<LearningContextValue>(() => ({

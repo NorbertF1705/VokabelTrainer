@@ -11,8 +11,8 @@ export const Colors = {
   textMuted: '#8A7FB0',
   textLight: '#FFFFFF',
   border: '#E0D9F7',
-  boxColors: ['#FF6B6B', '#FF9F43', '#FFE66D', '#2ECC71', '#4ECDC4', '#A78BFA'],
-  boxColorsLight: ['#FFE5E5', '#FFF0E0', '#FFFBE0', '#E0F9EC', '#E0F7F5', '#EDE8FF'],
+  boxColors: ['#FF6B6B', '#FF9F43', '#D97706', '#2ECC71', '#4ECDC4', '#A78BFA'],
+  boxColorsLight: ['#FFE5E5', '#FFF0E0', '#FEF3C7', '#E0F9EC', '#E0F7F5', '#EDE8FF'],
 };
 
 export const BOX_INTERVALS = [0, 1, 3, 7, 14, Infinity];
