@@ -16,4 +16,6 @@ export const ALL_CATEGORIES = [
   'Orte',
   'Verben',
   'Diverses',
+  'Adjektive & Eigenschaften',
+  'Gefühle & Emotionen',
 ] as const;

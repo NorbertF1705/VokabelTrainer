@@ -13,6 +13,18 @@ export const FILE_CONFIG: Record<FileId, FileManifestEntry> = {
         vocabulary: m.VOCABULARY_EN_BASIC,
       })),
   },
+  'en-a2b1-v1': {
+    id: 'en-a2b1-v1',
+    language: 'en',
+    displayName: 'Englisch – Aufbauwortschatz (A2–B1)',
+    shortLabel: '🇬🇧 Englisch · Aufbauwortschatz',
+    voice: 'en-US',
+    contentVersion: 1,
+    loader: () =>
+      import('../data/vocabulary/en-a2b1-v1').then((m) => ({
+        vocabulary: m.VOCABULARY_EN_A2B1,
+      })),
+  },
   'es-basic-v1': {
     id: 'es-basic-v1',
     language: 'es',

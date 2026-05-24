@@ -13,7 +13,9 @@ export type Category =
   | 'Technologie'
   | 'Orte'
   | 'Verben'
-  | 'Diverses';
+  | 'Diverses'
+  | 'Adjektive & Eigenschaften'
+  | 'Gefühle & Emotionen';
 
 export interface VocabularyItem {
   id: string;
