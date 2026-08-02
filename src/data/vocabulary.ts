@@ -18,4 +18,5 @@ export const ALL_CATEGORIES = [
   'Diverses',
   'Adjektive & Eigenschaften',
   'Gefühle & Emotionen',
+  'Abstrakte Begriffe & Gesellschaft',
 ] as const;

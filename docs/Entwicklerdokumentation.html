@@ -574,7 +574,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.4.2 · August 2026</div>
+    <div class="nav-version">Version 1.4.3 · August 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -583,7 +583,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.4.2</span>
+        <span class="badge">v1.4.3</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1498,7 +1498,7 @@ function pickVoice(lang: string): SpeechSynthesisVoice | null {
       <h3>App-Version aktualisieren</h3>
       <p>Die Versionsnummer wird nur an einer Stelle gepflegt: <code>src/version.ts</code>. Sie wird auf der Startseite angezeigt und kann dort einfach hochgezählt werden.</p>
       <pre><code>// src/version.ts
-export const APP_VERSION = '1.4.2';</code></pre>
+export const APP_VERSION = '1.4.3';</code></pre>
 
       <h3>TypeScript-Konfiguration</h3>
       <p>Strikte TypeScript-Konfiguration. Alle React-Komponenten sind typisiert. Es gibt keine <code>any</code>-Verwendungen außer in den Migrations-Funktionen (dort explizit durch ESLint-Kommentar auskommentiert).</p>
@@ -1625,10 +1625,23 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
         <h2>Release Notes</h2>
       </div>
 
-      <!-- v1.4.2 -->
+      <!-- v1.4.3 -->
       <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
-          <span class="badge">v1.4.2</span>
+          <span class="badge">v1.4.3</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-08-02</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Neu</h4>
+        <ul>
+          <li><strong>Lernpaket <code>en-grund2-v1</code></strong> (<code>src/data/vocabulary/en-grund2-v1.ts</code>, 500 Einträge) in <code>FILE_CONFIG</code> registriert. Wortauswahl: NGSL-Headwords (<code>lpmi-13/machine_readable_wordlists</code>, Cambridge-Corpus-Frequenzbänder 1–2801) minus Wortfamilien, die bereits in <code>en-basic-v1</code>/<code>en-a2b1-v1</code> vorkommen (974 normalisierte Tokens) minus Stoppwörter — die ersten 500 verbleibenden Kandidaten in Frequenzreihenfolge. Deutsche Übersetzung/Emoji/Kategorie sind KI-Erstentwürfe (Kommentarkopf in der Datei), nicht menschlich gegengelesen.</li>
+          <li><strong>Neue Kategorie <code>'Abstrakte Begriffe & Gesellschaft'</code></strong> im <code>Category</code>-Union (<code>vocabulary_types.ts</code>) und in <code>ALL_CATEGORIES</code> (<code>vocabulary.ts</code>) ergänzt — 144 der 500 neuen Wörter (z. B. <code>however</code>, <code>society</code>, <code>industry</code>) passten in keine der 15 bestehenden Kategorien. Additive Änderung, keine Auswirkung auf bestehende Daten/Kategorien.</li>
+        </ul>
+      </div>
+
+      <!-- v1.4.2 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.4.2</span>
           <span style="color:var(--muted); font-size:0.82rem;">2026-08-02</span>
         </div>
         <h4 style="margin-bottom:0.4rem;">Geändert</h4>
