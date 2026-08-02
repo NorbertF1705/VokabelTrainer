@@ -608,7 +608,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.4.1 · August 2026</div>
+    <div class="nav-version">Version 1.4.2 · August 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -617,7 +617,7 @@
     <div class="page-header">
       <h1>Benutzerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.4.1</span>
+        <span class="badge">v1.4.2</span>
         <span>Offline-PWA · iPhone</span>
         <span>Stand: August 2026</span>
       </div>
@@ -773,7 +773,7 @@ npx serve -s dist</code></pre>
           <div class="mode-card-icon">🔁</div>
           <div class="mode-card-title">Alle Vokabeln</div>
           <div class="mode-card-desc">Alle Karten des aktiven Lernpakets in zufälliger Reihenfolge als Karteikarten. Gut für freies Üben ohne Tageslimit.</div>
-          <span class="mode-card-tag sr">Fächer aktiv</span>
+          <span class="mode-card-tag all">Ohne Fortschritt</span>
         </div>
         <div class="mode-card">
           <div class="mode-card-icon">🧩</div>
@@ -790,8 +790,8 @@ npx serve -s dist</code></pre>
       </div>
 
       <div class="callout">
-        <strong>Alle Modi beeinflussen den Lernfortschritt</strong>
-        In jedem Modus wird jede Bewertung (richtig / falsch) im Spaced-Repetition-System gespeichert. Die Karte rückt das Fach vor oder fällt zurück – egal welchen Modus du wählst.
+        <strong>Fällige Karten, Quiz und Eingabe beeinflussen den Lernfortschritt – „Alle Vokabeln" nicht</strong>
+        In „Fällige Karten", „Quiz" und „Eingabe" wird jede Bewertung (richtig / falsch) im Spaced-Repetition-System gespeichert – die Karte rückt das Fach vor oder fällt zurück. „Alle Vokabeln" ist bewusst folgenlos: keine Fach-Änderung, keine Trainings-Streak, und die Sitzung zählt nicht gegen das Tageslimit für fällige Karten. Ideal zum entspannten Auffrischen ohne Risiko, eine Karte "kaputt" zu machen.
       </div>
 
       <h3>Karteikarten-Modus (Fällige Karten / Alle Vokabeln)</h3>
@@ -1185,8 +1185,8 @@ npx serve -s dist</code></pre>
           <i class="faq-arrow">▾</i>
         </div>
         <div class="faq-a">
-          „Fällige Karten" zeigt nur Karten, die laut Wiederholungsplan heute dran sind – plus neue Karten bis zum Tageslimit. Das ist der effiziente Alltagsmodus.<br><br>
-          „Alle Vokabeln" zeigt alle Karten des aktiven Lernpakets ohne Rücksicht auf den Plan – gut zum freien Üben oder Auffrischen. Beide Modi beeinflussen den Fach-Fortschritt gleichermaßen.
+          „Fällige Karten" zeigt nur Karten, die laut Wiederholungsplan heute dran sind – plus neue Karten bis zum Tageslimit. Jede Bewertung verändert das Fach der Karte. Das ist der effiziente Alltagsmodus.<br><br>
+          „Alle Vokabeln" zeigt alle Karten des aktiven Lernpakets ohne Rücksicht auf den Plan – gut zum freien Üben oder Auffrischen. Dieser Modus ist bewusst <strong>ohne jede Auswirkung</strong>: Fach-Fortschritt, Trainings-Streak und Tageslimit bleiben unverändert.
         </div>
       </div>
 
@@ -1259,10 +1259,22 @@ npx serve -s dist</code></pre>
         <h2>Release Notes</h2>
       </div>
 
-      <!-- v1.4.1 -->
+      <!-- v1.4.2 -->
       <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
-          <span class="badge">v1.4.1</span>
+          <span class="badge">v1.4.2</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2. August 2026</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>„Alle Vokabeln" jetzt ohne Auswirkung:</strong> Dieser Modus verändert ab sofort weder den Fach-Fortschritt einer Karte noch die Trainings-Streak, und die Sitzung zählt nicht mehr gegen das Tageslimit für fällige Karten. Gedacht als reiner Auffrisch-Modus ohne Risiko.</li>
+        </ul>
+      </div>
+
+      <!-- v1.4.1 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.4.1</span>
           <span style="color:var(--muted); font-size:0.82rem;">2. August 2026</span>
         </div>
         <h4 style="margin-bottom:0.4rem;">Bugfix</h4>
