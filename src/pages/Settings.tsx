@@ -202,8 +202,6 @@ export default function Settings() {
                 {idx > 0 && <div style={{ height: 1, background: Colors.border, margin: '0 16px' }} />}
                 <a
                   href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'transparent', textDecoration: 'none' }}
                 >
                   <span style={{ fontSize: 22, width: 32, textAlign: 'center' }}>{emoji}</span>
@@ -211,7 +209,7 @@ export default function Settings() {
                     <div style={{ fontSize: 16, fontWeight: 600, color: Colors.text }}>{label}</div>
                     <div style={{ fontSize: 12, color: Colors.textMuted, marginTop: 2 }}>{sub}</div>
                   </div>
-                  <span style={{ fontSize: 16, color: Colors.textMuted }}>↗</span>
+                  <span style={{ fontSize: 16, color: Colors.textMuted }}>›</span>
                 </a>
               </div>
             ))}
