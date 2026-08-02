@@ -403,11 +403,15 @@ export function LearningProvider({ children }: { children: ReactNode }) {
       .sort((a, b) => {
         const pa = state.progress[a.id];
         const pb = state.progress[b.id];
-        if (pa.box !== pb.box) return pa.box - pb.box;
-        if (!pa.nextDate && !pb.nextDate) return 0;
+        // Primär nach Überfälligkeit (ältestes nextDate zuerst), damit hohe Fächer
+        // (z.B. Fach 5) beim Kappen durch dailyCardLimit nicht systematisch von
+        // niedrigen Fächern verdrängt werden. Fach nur noch als Tiebreaker.
+        if (!pa.nextDate && !pb.nextDate) return pa.box - pb.box;
         if (!pa.nextDate) return -1;
         if (!pb.nextDate) return 1;
-        return pa.nextDate.localeCompare(pb.nextDate);
+        const cmp = pa.nextDate.localeCompare(pb.nextDate);
+        if (cmp !== 0) return cmp;
+        return pa.box - pb.box;
       });
     return isFinite(effectiveLimit) ? due.slice(0, effectiveLimit) : due;
   }, [activeFileId, fileStates, vocabularyByFile, settings]);
