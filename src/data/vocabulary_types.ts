@@ -15,7 +15,8 @@ export type Category =
   | 'Verben'
   | 'Diverses'
   | 'Adjektive & Eigenschaften'
-  | 'Gefühle & Emotionen';
+  | 'Gefühle & Emotionen'
+  | 'Abstrakte Begriffe & Gesellschaft';
 
 export interface VocabularyItem {
   id: string;

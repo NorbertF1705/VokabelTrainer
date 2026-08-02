@@ -25,6 +25,18 @@ export const FILE_CONFIG: Record<FileId, FileManifestEntry> = {
         vocabulary: m.VOCABULARY_EN_A2B1,
       })),
   },
+  'en-grund2-v1': {
+    id: 'en-grund2-v1',
+    language: 'en',
+    displayName: 'Englisch – Grundwortschatz 2',
+    shortLabel: '🇬🇧 Englisch · Grundwortschatz 2',
+    voice: 'en-US',
+    contentVersion: 1,
+    loader: () =>
+      import('../data/vocabulary/en-grund2-v1').then((m) => ({
+        vocabulary: m.VOCABULARY_EN_GRUND2,
+      })),
+  },
   'es-basic-v1': {
     id: 'es-basic-v1',
     language: 'es',
