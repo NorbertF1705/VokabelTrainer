@@ -32,8 +32,11 @@ export default defineConfig({
         skipWaiting: true,
 
         // SPA-Navigation: immer index.html aus dem Precache liefern (kein Ablaufdatum)
+        // /docs/ und die Standalone-Demoseite ausgenommen – das sind eigenständige
+        // statische HTML-Seiten, keine SPA-Routen, und werden direkt aus dem
+        // Precache unter ihrer eigenen URL bedient.
         navigateFallback: 'index.html',
-        navigateFallbackDenylist: [/^\/api\//, /^\/cdn-cgi\//],
+        navigateFallbackDenylist: [/^\/api\//, /^\/cdn-cgi\//, /^\/docs\//, /^\/vokabeltrainer\.html$/],
 
         runtimeCaching: [
           {
