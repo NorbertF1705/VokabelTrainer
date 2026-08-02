@@ -548,6 +548,7 @@
     <ul>
       <li><a href="#pwa"><span class="nav-icon">📱</span> PWA & Service Worker</a></li>
       <li><a href="#build"><span class="nav-icon">🔧</span> Build & Entwicklung</a></li>
+      <li><a href="#deployment"><span class="nav-icon">☁️</span> Deployment & Hosting</a></li>
       <li><a href="#erweitern"><span class="nav-icon">➕</span> App erweitern</a></li>
     </ul>
 
@@ -1478,10 +1479,72 @@ export const APP_VERSION = '1.3.2';</code></pre>
       <p>Strikte TypeScript-Konfiguration. Alle React-Komponenten sind typisiert. Es gibt keine <code>any</code>-Verwendungen außer in den Migrations-Funktionen (dort explizit durch ESLint-Kommentar auskommentiert).</p>
     </section>
 
-    <!-- ── 13 ERWEITERN ── -->
-    <section id="erweitern">
+    <!-- ── 13 DEPLOYMENT ── -->
+    <section id="deployment">
       <div class="section-header">
         <div class="section-num">13</div>
+        <h2>Deployment &amp; Hosting</h2>
+      </div>
+
+      <p>Es gibt keine separate CI/CD-Konfiguration (kein <code>.github/workflows</code>) – das Deployment läuft vollständig über die native Git-Integration von Vercel. Jeder Push nach GitHub löst dort automatisch einen Build aus.</p>
+
+      <h3>Hosting-Setup</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Was</th><th>Wert</th></tr></thead>
+          <tbody>
+            <tr><td>Repository</td><td><code>NorbertF1705/VokabelTrainer</code> (GitHub)</td></tr>
+            <tr><td>Produktions-Branch</td><td><code>main</code></td></tr>
+            <tr><td>Hosting</td><td>Vercel (verbunden mit dem GitHub-Repo)</td></tr>
+            <tr><td>Produktions-URL</td><td><code>https://vokabeltrainer-beta.vercel.app/</code></td></tr>
+            <tr><td>Build-Kommando (Vercel)</td><td><code>npm run build</code> → Ausgabe <code>dist/</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Die installierte PWA/Chrome-App-Verknüpfung „Norbert's VokabelTrainer" auf den Endgeräten zeigt direkt auf die Produktions-URL. Es gibt aktuell nur diese eine Umgebung – kein separates Staging.</p>
+
+      <h3>Ablauf: Eine Änderung live bringen</h3>
+      <div class="algo-steps">
+        <div class="algo-step">
+          <div class="algo-step-num">1</div>
+          <div class="algo-step-body"><strong>Feature-Branch erstellen</strong><br><code>git checkout -b fix/…</code> von <code>main</code>. Es wird nicht direkt auf <code>main</code> committet.</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">2</div>
+          <div class="algo-step-body"><strong>Commit + Push</strong><br><code>git push -u origin &lt;branch&gt;</code>. Vercel erkennt den Branch automatisch und baut eine <strong>Preview-Deployment</strong> unter einer eigenen, temporären URL – unabhängig von der Produktions-URL.</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">3</div>
+          <div class="algo-step-body"><strong>Pull Request auf GitHub</strong><br><code>gh pr create</code> gegen <code>main</code>. Die Preview-URL kann vor dem Merge zum Testen genutzt werden.</div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">4</div>
+          <div class="algo-step-body"><strong>Merge nach <code>main</code></strong><br>Erst der Merge löst das <strong>Produktions-Deployment</strong> aus. Ein offener, nicht gemergter PR hat <em>keinerlei</em> Effekt auf die Live-Version – das ist ein häufiger Verwechslungspunkt.</div>
+        </div>
+        <div class="algo-step result-ok">
+          <div class="algo-step-num">5</div>
+          <div class="algo-step-body"><strong>Vercel baut automatisch</strong><br>Erfahrungsgemäß dauert der Build für dieses Projekt unter einer Minute. Die Produktions-URL zeigt danach sofort auf den neuen Build.</div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <strong>Live ≠ sofort auf jedem Gerät sichtbar</strong>
+        Ein erfolgreiches Produktions-Deployment bedeutet nur, dass der <em>Server</em> die neue Version ausliefert. Bereits installierte/geöffnete Instanzen der PWA laufen weiter mit ihrem eigenen, lokal aktiven Service Worker und dessen Precache (siehe Abschnitt „PWA &amp; Service Worker") – sie bekommen die neue Version erst, wenn ihr Update-Zyklus greift (stündlicher Check, oder Vordergrund-Wechsel bei bestehender Internetverbindung). Das kann nach einem Deployment für bereits genutzte Geräte bis zu einer Stunde dauern.
+        <br><br>
+        Sofort erzwingen: App auf dem Gerät vollständig schließen und mit Internetverbindung neu öffnen, oder die Website-/App-Daten des Browsers für die Domain löschen. Zur Kontrolle: Die Versionsnummer auf der Startseite (<code>APP_VERSION</code> aus <code>src/version.ts</code>) mit dem zuletzt gemergten Stand vergleichen.
+      </div>
+
+      <h3>Verifikation nach dem Deployment</h3>
+      <p>Ohne Vercel-CLI-Zugriff lässt sich ein Deployment auch von außen prüfen: Die Produktions-Seite laden und im gelieferten JS-Bundle nach der Versionsnummer suchen, z. B.:</p>
+      <pre><code>curl -s https://vokabeltrainer-beta.vercel.app/ | grep -oE '/assets/index-[^"]+\.js'
+curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | grep -o '1\.[0-9]\.[0-9]'</code></pre>
+      <p>Das zeigt die tatsächlich vom Server ausgelieferte Version – unabhängig davon, was ein Browser-Tab mit altem Service-Worker-Cache gerade anzeigt.</p>
+    </section>
+
+    <!-- ── 14 ERWEITERN ── -->
+    <section id="erweitern">
+      <div class="section-header">
+        <div class="section-num">14</div>
         <h2>App erweitern</h2>
       </div>
 
