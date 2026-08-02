@@ -228,12 +228,16 @@ export default function Learn() {
 
   const advanceCard = (correct: boolean) => {
     if (!currentCard || !sessionCards) return;
-    markCard(currentCard.id, correct);
+    if (sessionMode !== 'all') {
+      markCard(currentCard.id, correct);
+    }
     const newStats = { correct: sessionStats.correct + (correct ? 1 : 0), incorrect: sessionStats.incorrect + (correct ? 0 : 1) };
     setSessionStats(newStats);
     const nextIndex = currentIndex + 1;
     if (nextIndex >= sessionCards.length) {
-      recordTrainingDay();
+      if (sessionMode !== 'all') {
+        recordTrainingDay();
+      }
       setSessionDone(true);
       setSessionActive(false);
     } else {

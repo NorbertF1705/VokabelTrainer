@@ -574,7 +574,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.4.1 · August 2026</div>
+    <div class="nav-version">Version 1.4.2 · August 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -583,7 +583,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.4.1</span>
+        <span class="badge">v1.4.2</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1355,14 +1355,14 @@ export { VOCABULARY_EN as VOCABULARY_EN_BASIC } from '../vocabulary_en';</code><
           <div class="algo-step-num">④</div>
           <div class="algo-step-body">
             <strong>Karte bewerten: <code>markCard()</code></strong><br>
-            Nach jeder Bewertung wird <code>markCard(id, lang, correct)</code> im Context aufgerufen. Der nächste <code>currentIndex++</code>-Schritt blendet die nächste Karte ein.
+            Nach jeder Bewertung wird <code>markCard(id, correct)</code> im Context aufgerufen – <strong>außer im Modus „Alle Vokabeln"</strong> (<code>sessionMode === 'all'</code>): dort ist <code>advanceCard()</code> bewusst folgenlos, es findet keine Fach-Änderung statt. <code>sessionStats</code> (richtig/falsch für die Auswertungsansicht) wird in jedem Modus aktualisiert. Der nächste <code>currentIndex++</code>-Schritt blendet die nächste Karte ein.
           </div>
         </div>
         <div class="algo-step result-ok">
           <div class="algo-step-num">⑤</div>
           <div class="algo-step-body">
             <strong>Sitzung beendet – Auswertungsansicht</strong><br>
-            Wenn <code>currentIndex &gt;= sessionCards.length</code>, wechselt die Darstellung zur Ergebnisansicht (richtige, falsche, Gesamtzahl). Bei Fällig-Karten-Sitzungen wird <code>recordTrainingDay(lang)</code> aufgerufen (idempotent – nur einmal pro Tag).
+            Wenn <code>currentIndex &gt;= sessionCards.length</code>, wechselt die Darstellung zur Ergebnisansicht (richtige, falsche, Gesamtzahl). <code>recordTrainingDay()</code> wird aufgerufen (idempotent – nur einmal pro Tag) – ebenfalls mit Ausnahme von <code>sessionMode === 'all'</code>, sodass eine „Alle Vokabeln"-Sitzung auch die Trainings-Streak nicht beeinflusst.
           </div>
         </div>
       </div>
@@ -1498,7 +1498,7 @@ function pickVoice(lang: string): SpeechSynthesisVoice | null {
       <h3>App-Version aktualisieren</h3>
       <p>Die Versionsnummer wird nur an einer Stelle gepflegt: <code>src/version.ts</code>. Sie wird auf der Startseite angezeigt und kann dort einfach hochgezählt werden.</p>
       <pre><code>// src/version.ts
-export const APP_VERSION = '1.4.1';</code></pre>
+export const APP_VERSION = '1.4.2';</code></pre>
 
       <h3>TypeScript-Konfiguration</h3>
       <p>Strikte TypeScript-Konfiguration. Alle React-Komponenten sind typisiert. Es gibt keine <code>any</code>-Verwendungen außer in den Migrations-Funktionen (dort explizit durch ESLint-Kommentar auskommentiert).</p>
@@ -1625,10 +1625,22 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
         <h2>Release Notes</h2>
       </div>
 
-      <!-- v1.4.1 -->
+      <!-- v1.4.2 -->
       <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
-          <span class="badge">v1.4.1</span>
+          <span class="badge">v1.4.2</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-08-02</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong><code>advanceCard()</code> in <code>Learn.tsx</code> ist im Modus „Alle Vokabeln" folgenlos</strong>: <code>markCard()</code> wird nur noch aufgerufen, wenn <code>sessionMode !== 'all'</code>; ebenso <code>recordTrainingDay()</code> beim Sitzungsende. <code>sessionStats</code> (richtig/falsch für die Auswertungsansicht) wird weiterhin in jedem Modus aktualisiert – nur die persistierte Fach-Progression, die Trainings-Streak und (als Nebeneffekt, da <code>getDueCards()</code> gegen <code>dailyStats</code> prüft) das Tageslimit für fällige Karten bleiben unberührt. Details siehe Abschnitt „Seiten (Pages)" → Learn.tsx.</li>
+        </ul>
+      </div>
+
+      <!-- v1.4.1 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.4.1</span>
           <span style="color:var(--muted); font-size:0.82rem;">2026-08-02</span>
         </div>
         <h4 style="margin-bottom:0.4rem;">Bugfix</h4>
