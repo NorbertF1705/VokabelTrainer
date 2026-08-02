@@ -574,7 +574,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.4.3 · August 2026</div>
+    <div class="nav-version">Version 1.4.4 · August 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -583,7 +583,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.4.3</span>
+        <span class="badge">v1.4.4</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1333,14 +1333,14 @@ export { VOCABULARY_EN as VOCABULARY_EN_BASIC } from '../vocabulary_en';</code><
           <div class="algo-step-num">①</div>
           <div class="algo-step-body">
             <strong>Lobby</strong> – Kein aktiver Session-State.<br>
-            Zeigt die vier Modus-Buttons: <em>Fällige Karten</em>, <em>Alle Karten</em>, <em>Quiz</em>, <em>Tippen</em>. Jeder Button kennt seine Kartenquelle (getDueCards vs. getNewCards + getDueCards vs. alle).
+            Zeigt die vier Modus-Buttons: <em>Fällige Karten</em>, <em>Alle Karten</em>, <em>Quiz</em>, <em>Tippen</em>. Jeder Button kennt seine Kartenquelle (<code>getDueCards</code>+<code>getNewCards</code> / alle / <code>getQuizCards</code> / <code>getDueCards</code>+<code>getNewCards</code>).
           </div>
         </div>
         <div class="algo-step branch">
           <div class="algo-step-num">②</div>
           <div class="algo-step-body">
             <strong>startSession(mode)</strong> – Übergang Lobby → aktive Sitzung.<br>
-            Lädt die Kartenliste je nach Modus. Bei <em>Fällige Karten</em>: <code>getDueCards()</code> + <code>getNewCards()</code>, gemischt. Bei <em>Alle Karten</em>: alle Vokabeln der Sprache. Bei <em>Quiz</em> und <em>Tippen</em>: fällige + neue Karten. Setzt <code>sessionCards</code>, <code>currentIndex = 0</code>.
+            Lädt die Kartenliste je nach Modus. Bei <em>Fällige Karten</em> und <em>Tippen</em>: <code>getDueCards()</code> + <code>getNewCards()</code>, gemischt. Bei <em>Alle Karten</em>: alle Vokabeln der Sprache. Bei <em>Quiz</em> (ab v1.4.4): <code>getQuizCards()</code> – Karten mit <code>box === 1</code> oder <code>lastReviewed === null</code>, ungefiltert nach Fälligkeit oder Tageslimit, ohne Kappung. Setzt <code>sessionCards</code>, <code>currentIndex = 0</code>.
           </div>
         </div>
         <div class="algo-step">
@@ -1355,7 +1355,7 @@ export { VOCABULARY_EN as VOCABULARY_EN_BASIC } from '../vocabulary_en';</code><
           <div class="algo-step-num">④</div>
           <div class="algo-step-body">
             <strong>Karte bewerten: <code>markCard()</code></strong><br>
-            Nach jeder Bewertung wird <code>markCard(id, correct)</code> im Context aufgerufen – <strong>außer im Modus „Alle Vokabeln"</strong> (<code>sessionMode === 'all'</code>): dort ist <code>advanceCard()</code> bewusst folgenlos, es findet keine Fach-Änderung statt. <code>sessionStats</code> (richtig/falsch für die Auswertungsansicht) wird in jedem Modus aktualisiert. Der nächste <code>currentIndex++</code>-Schritt blendet die nächste Karte ein.
+            Nach jeder Bewertung wird <code>markCard(id, correct)</code> im Context aufgerufen – <strong>außer im Modus „Alle Vokabeln"</strong> (<code>sessionMode === 'all'</code>): dort ist <code>advanceCard()</code> bewusst folgenlos, es findet keine Fach-Änderung statt. Im Modus <strong>„Quiz"</strong> wird <code>markCard(id, correct, { skipDailyStats: true })</code> aufgerufen: Fach/<code>nextDate</code>/Zähler werden wie gewohnt aktualisiert, <code>dailyStats</code>/<code>dailyNewStats</code> (Tageslimit-Zähler) bleiben aber unverändert. Da <code>getQuizCards()</code> nur Fach-1/neue Karten liefert, führt eine richtige Quiz-Antwort maximal zu Fach 2 – die Karte fällt danach automatisch aus dem Quiz-Pool heraus; ein Aufstieg über Fach 2 hinaus ist damit strukturell ausgeschlossen, ganz ohne explizite Kappungslogik in <code>markCard</code>. <code>sessionStats</code> (richtig/falsch für die Auswertungsansicht) wird in jedem Modus aktualisiert. Der nächste <code>currentIndex++</code>-Schritt blendet die nächste Karte ein.
           </div>
         </div>
         <div class="algo-step result-ok">
@@ -1498,7 +1498,7 @@ function pickVoice(lang: string): SpeechSynthesisVoice | null {
       <h3>App-Version aktualisieren</h3>
       <p>Die Versionsnummer wird nur an einer Stelle gepflegt: <code>src/version.ts</code>. Sie wird auf der Startseite angezeigt und kann dort einfach hochgezählt werden.</p>
       <pre><code>// src/version.ts
-export const APP_VERSION = '1.4.3';</code></pre>
+export const APP_VERSION = '1.4.4';</code></pre>
 
       <h3>TypeScript-Konfiguration</h3>
       <p>Strikte TypeScript-Konfiguration. Alle React-Komponenten sind typisiert. Es gibt keine <code>any</code>-Verwendungen außer in den Migrations-Funktionen (dort explizit durch ESLint-Kommentar auskommentiert).</p>
@@ -1625,10 +1625,22 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
         <h2>Release Notes</h2>
       </div>
 
-      <!-- v1.4.3 -->
+      <!-- v1.4.4 -->
       <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
-          <span class="badge">v1.4.3</span>
+          <span class="badge">v1.4.4</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-08-02</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>Quiz-Modus neu ausgerichtet</strong>: Neue Selektor-Funktion <code>getQuizCards()</code> in <code>LearningContext.tsx</code> liefert nur Karten mit <code>box === 1</code> oder <code>lastReviewed === null</code>, ohne Fälligkeits- (<code>nextDate</code>) oder Tageslimit-Filter. <code>markCard()</code> um optionalen dritten Parameter <code>options?: { skipDailyStats?: boolean }</code> erweitert; <code>Learn.tsx</code> ruft ihn im Quiz-Modus mit <code>{ skipDailyStats: true }</code> auf, sodass Fach-Fortschritt zwar aktualisiert wird, <code>dailyStats</code>/<code>dailyNewStats</code> aber unangetastet bleiben. Da der Pool nur Fach-1/neue Karten enthält, führt eine richtige Antwort maximal zu Fach 2 — die Karte fällt danach aus dem Pool heraus, ein Aufstieg über Fach 2 ist damit strukturell (nicht durch explizite Kappung) ausgeschlossen. <code>startSession('quiz')</code> nutzt den Pool ungekappt (kein <code>dailyCardLimit</code>-Slice mehr); Lobby-Subtitle und <code>sessionNewCards</code>-Berechnung entsprechend angepasst. Distraktor-Quelle (<code>generateQuizOptions</code>, komplettes aktives Vokabelpaket) bewusst unverändert.</li>
+        </ul>
+      </div>
+
+      <!-- v1.4.3 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.4.3</span>
           <span style="color:var(--muted); font-size:0.82rem;">2026-08-02</span>
         </div>
         <h4 style="margin-bottom:0.4rem;">Neu</h4>

@@ -48,10 +48,11 @@ interface LearningContextValue {
   addCustomVocab: (item: Omit<VocabularyItem, 'id' | 'isCustom'>) => void;
   removeCustomVocab: (vocabId: string) => void;
 
-  markCard: (vocabId: string, correct: boolean) => void;
+  markCard: (vocabId: string, correct: boolean, options?: { skipDailyStats?: boolean }) => void;
   getCardProgress: (vocabId: string) => CardProgress | undefined;
   getDueCards: () => VocabularyItem[];
   getNewCards: () => VocabularyItem[];
+  getQuizCards: () => VocabularyItem[];
   resetProgress: () => void;
 
   getBoxCounts: () => number[];
@@ -292,7 +293,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // ── markCard (SR-Logik aus v1.2, ohne lang-Parameter) ──────────────────────
-  const markCard = useCallback((vocabId: string, correct: boolean) => {
+  const markCard = useCallback((vocabId: string, correct: boolean, options?: { skipDailyStats?: boolean }) => {
     mutateActiveFile((s) => {
       const current = s.progress[vocabId];
       const newBox = correct ? Math.min((current?.box ?? 1) + 1, 6) : 1;
@@ -329,10 +330,14 @@ export function LearningProvider({ children }: { children: ReactNode }) {
             incorrectCount: (current?.incorrectCount ?? 0) + (correct ? 0 : 1),
           },
         },
-        dailyStats: { date: todayStr, count: prevDailyCount + 1 },
-        dailyNewStats: isNewCard
-          ? { date: todayStr, count: prevNewCount + 1 }
-          : s.dailyNewStats,
+        dailyStats: options?.skipDailyStats
+          ? s.dailyStats
+          : { date: todayStr, count: prevDailyCount + 1 },
+        dailyNewStats: options?.skipDailyStats
+          ? s.dailyNewStats
+          : isNewCard
+            ? { date: todayStr, count: prevNewCount + 1 }
+            : s.dailyNewStats,
       };
     });
   }, [mutateActiveFile]);
@@ -441,6 +446,25 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     return isFinite(remaining) ? newCards.slice(0, remaining) : newCards;
   }, [activeFileId, fileStates, vocabularyByFile, settings]);
 
+  // ── getQuizCards ────────────────────────────────────────────────────────────
+  // Fach 1 + nie gezeigte Karten, unabhängig von Fälligkeit (nextDate) und
+  // Tageslimit. Quiz dient dem Ersteinstieg/Erkennen neuer Vokabeln; ein
+  // Aufstieg über Fach 2 hinaus ist bewusst nicht vorgesehen (siehe markCard-
+  // Aufruf mit skipDailyStats in Learn.tsx) – sobald eine Karte Fach 2 erreicht,
+  // fällt sie automatisch aus diesem Pool heraus.
+  const getQuizCards = useCallback((): VocabularyItem[] => {
+    if (!activeFileId) return [];
+    const state = fileStates[activeFileId];
+    const vocab = vocabularyByFile[activeFileId];
+    if (!state || !vocab) return [];
+
+    const allVocab = [...vocab, ...state.customVocabulary];
+    return allVocab.filter((v) => {
+      const p = state.progress[v.id];
+      return !p || p.lastReviewed === null || p.box === 1;
+    });
+  }, [activeFileId, fileStates, vocabularyByFile]);
+
   // ── getBoxCounts ────────────────────────────────────────────────────────────
   const getBoxCounts = useCallback((): number[] => {
     const state = activeFileId ? fileStates[activeFileId] : null;
@@ -519,6 +543,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     getCardProgress,
     getDueCards,
     getNewCards,
+    getQuizCards,
     resetProgress,
     getBoxCounts,
     getTotalStats,
@@ -527,7 +552,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
   }), [
     loaded, activeFileId, fileStates, vocabularyByFile, settings, isSessionActive,
     updateSettings, selectFile, addCustomVocab, removeCustomVocab,
-    markCard, getCardProgress, getDueCards, getNewCards, resetProgress,
+    markCard, getCardProgress, getDueCards, getNewCards, getQuizCards, resetProgress,
     getBoxCounts, getTotalStats, recordTrainingDay, getTrainingConsistency,
   ]);
 
