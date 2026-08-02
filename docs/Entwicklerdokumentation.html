@@ -56,6 +56,22 @@
       flex-direction: column;
     }
 
+    .back-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0 1rem 1.25rem;
+      padding: 0.6rem 0.9rem;
+      background: rgba(255,255,255,0.12);
+      border-radius: 8px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .back-link:hover { background: rgba(255,255,255,0.22); }
+
     .nav-logo {
       padding: 0 1.5rem 1.5rem;
       border-bottom: 1px solid rgba(255,255,255,0.15);
@@ -517,6 +533,7 @@
 
   <!-- ── SIDEBAR ── -->
   <nav>
+    <a href="/" class="back-link">← Zurück zum VokabelTrainer</a>
     <div class="nav-logo">
       <div class="app-name">🛠️ VokabelTrainer</div>
       <div class="app-sub">Entwicklerdokumentation</div>
@@ -557,7 +574,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.4.0 · August 2026</div>
+    <div class="nav-version">Version 1.4.1 · August 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -566,7 +583,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.4.0</span>
+        <span class="badge">v1.4.1</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1431,6 +1448,7 @@ function pickVoice(lang: string): SpeechSynthesisVoice | null {
         <strong>navigateFallbackDenylist ist bei neuen statischen Seiten Pflicht</strong>
         Die <code>NavigationRoute</code> des generierten Service Workers liefert standardmäßig für <em>jede</em> Navigation <code>index.html</code> aus (SPA-Fallback) – auch für <code>/docs/Benutzerdokumentation.html</code>. Ohne Eintrag in <code>navigateFallbackDenylist</code> (<code>vite.config.ts</code>) würde ein Klick auf eine solche Seite im Produktions-Build nur die App selbst anzeigen, obwohl die Datei korrekt im Precache liegt. Für jedes neue statische HTML-Verzeichnis/Datei außerhalb der SPA muss ein passendes Regex-Muster ergänzt werden (aktuell: <code>/^\/docs\//</code>, <code>/^\/vokabeltrainer\.html$/</code>). Im Dev-Modus fällt das nicht auf, da dort kein Service Worker aktiv ist – nur mit <code>npm run build &amp;&amp; npm run preview</code> sichtbar.
       </div>
+      <p><strong>Rückweg (ab v1.4.1):</strong> Statische Seiten außerhalb der SPA haben keine Browser-Navigation, wenn sie als installierte PWA ohne Adressleiste laufen. Beide Doku-Seiten haben deshalb einen fest verlinkten <code>&lt;a href="/" class="back-link"&gt;</code> oben in der Sidebar. Bei jeder neuen statischen Seite prüfen, ob ein vergleichbarer Rückweg nötig ist.</p>
     </section>
 
     <!-- ── 12 BUILD ── -->
@@ -1480,7 +1498,7 @@ function pickVoice(lang: string): SpeechSynthesisVoice | null {
       <h3>App-Version aktualisieren</h3>
       <p>Die Versionsnummer wird nur an einer Stelle gepflegt: <code>src/version.ts</code>. Sie wird auf der Startseite angezeigt und kann dort einfach hochgezählt werden.</p>
       <pre><code>// src/version.ts
-export const APP_VERSION = '1.4.0';</code></pre>
+export const APP_VERSION = '1.4.1';</code></pre>
 
       <h3>TypeScript-Konfiguration</h3>
       <p>Strikte TypeScript-Konfiguration. Alle React-Komponenten sind typisiert. Es gibt keine <code>any</code>-Verwendungen außer in den Migrations-Funktionen (dort explizit durch ESLint-Kommentar auskommentiert).</p>
@@ -1607,10 +1625,22 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
         <h2>Release Notes</h2>
       </div>
 
-      <!-- v1.4.0 -->
+      <!-- v1.4.1 -->
       <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
-          <span class="badge">v1.4.0</span>
+          <span class="badge">v1.4.1</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-08-02</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Bugfix</h4>
+        <ul>
+          <li><strong>Kein Rückweg aus den Doku-Seiten</strong>: Die Links in <code>Settings.tsx</code> hatten <code>target="_blank"</code>; in der installierten PWA (kein Adressleisten-/Tab-Chrome) führte das je nach Plattform zu einem zweiten, chromlosen Fenster ohne Möglichkeit, zur App zurückzukehren. Fix: <code>target="_blank"</code>/<code>rel</code> entfernt (Navigation im selben Kontext), und beide statischen Doku-Seiten (<code>docs/Benutzerdokumentation.html</code>, <code>docs/Entwicklerdokumentation.html</code>) haben jetzt oben in der Sidebar einen fest verlinkten <code>&lt;a href="/" class="back-link"&gt;</code> als Escape-Hatch – unabhängig davon, ob die Seite im selben Fenster oder einem neuen Tab landet. Verifiziert per <code>npm run build &amp;&amp; npm run preview</code>, Hin- und Rückweg für beide Doku-Seiten.</li>
+        </ul>
+      </div>
+
+      <!-- v1.4.0 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.4.0</span>
           <span style="color:var(--muted); font-size:0.82rem;">2026-08-02</span>
         </div>
         <h4 style="margin-bottom:0.4rem;">Neu</h4>
