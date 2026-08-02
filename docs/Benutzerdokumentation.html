@@ -591,7 +591,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.3.1 · Mai 2026</div>
+    <div class="nav-version">Version 1.3.2 · August 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -600,9 +600,9 @@
     <div class="page-header">
       <h1>Benutzerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.3.1</span>
+        <span class="badge">v1.3.2</span>
         <span>Offline-PWA · iPhone</span>
-        <span>Stand: Mai 2026</span>
+        <span>Stand: August 2026</span>
       </div>
     </div>
 
@@ -1230,10 +1230,22 @@ npx serve -s dist</code></pre>
         <h2>Release Notes</h2>
       </div>
 
-      <!-- v1.3.1 -->
+      <!-- v1.3.2 -->
       <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
-          <span class="badge">v1.3.1</span>
+          <span class="badge">v1.3.2</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2. August 2026</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Bugfix</h4>
+        <ul>
+          <li><strong>Höhere Fächer wurden selten abgefragt:</strong> Bei großen Vokabelbeständen kam es vor, dass fällige Karten aus Fach 5/6 fast nie in der Lernsitzung auftauchten, weil das Tageslimit meist schon durch fällige Karten aus Fach 1–4 ausgeschöpft war. Fällige Karten werden jetzt zuerst nach Überfälligkeit sortiert (älteste zuerst) statt strikt nach Fach – dadurch kommen Karten aus höheren Fächern zuverlässig zum Zug, sobald sie fällig sind.</li>
+        </ul>
+      </div>
+
+      <!-- v1.3.1 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.3.1</span>
           <span style="color:var(--muted); font-size:0.82rem;">19. Mai 2026</span>
         </div>
         <h4 style="margin-bottom:0.4rem;">Bugfixes</h4>
