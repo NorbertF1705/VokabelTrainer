@@ -80,12 +80,12 @@ function speak(text: string, lang: string) {
 }
 
 export default function Learn() {
-  const { settings, getDueCards, getNewCards, getCardProgress, markCard, recordTrainingDay, setSessionActive } = useLearning();
+  const { settings, getDueCards, getNewCards, getQuizCards, getCardProgress, markCard, recordTrainingDay, setSessionActive } = useLearning();
   const activeFile = useActiveFile();
   const allVocabulary = activeFile?.allVocabulary ?? [];
   const voiceCode = activeFile?.manifest.voice ?? 'en-US';
   const langLabel = activeFile ? LANGUAGE_LABELS[activeFile.manifest.language] : '';
-  const { queryDirection, dailyCardLimit, quizAutoSpeak, flashcardAutoSpeak, typingTolerant } = settings;
+  const { queryDirection, quizAutoSpeak, flashcardAutoSpeak, typingTolerant } = settings;
 
   const [sessionMode, setSessionMode] = useState<SessionMode>('due');
   const [sessionCards, setSessionCards] = useState<VocabularyItem[] | null>(null);
@@ -105,6 +105,7 @@ export default function Learn() {
   const [sessionNewCards, setSessionNewCards] = useState(0);
 
   const dueCards = getDueCards();
+  const quizCards = getQuizCards();
 
   useEffect(() => {
     if (queryDirection === 'random') {
@@ -154,10 +155,10 @@ export default function Learn() {
       cards = [...revCards, ...newC];
       if (cards.length === 0) return;
     } else if (mode === 'quiz') {
-      const due = getDueCards();
-      const base = due.length > 0 ? due : allVocab;
-      const shuffled = shuffle(base);
-      cards = dailyCardLimit > 0 ? shuffled.slice(0, dailyCardLimit) : shuffled;
+      const pool = getQuizCards();
+      if (pool.length === 0) return;
+      newCount = pool.filter(v => getCardProgress(v.id)?.lastReviewed == null).length;
+      cards = shuffle(pool);
     } else {
       cards = shuffle([...allVocab]);
     }
@@ -175,7 +176,7 @@ export default function Learn() {
     setTypedAnswer('');
     setTypeResult(null);
     setSessionActive(true);
-  }, [activeFile, getDueCards, getNewCards, dailyCardLimit, setSessionActive]);
+  }, [activeFile, getDueCards, getNewCards, getQuizCards, getCardProgress, setSessionActive]);
 
   const speakWord = () => {
     if (!currentCard) return;
@@ -228,7 +229,9 @@ export default function Learn() {
 
   const advanceCard = (correct: boolean) => {
     if (!currentCard || !sessionCards) return;
-    if (sessionMode !== 'all') {
+    if (sessionMode === 'quiz') {
+      markCard(currentCard.id, correct, { skipDailyStats: true });
+    } else if (sessionMode !== 'all') {
       markCard(currentCard.id, correct);
     }
     const newStats = { correct: sessionStats.correct + (correct ? 1 : 0), incorrect: sessionStats.incorrect + (correct ? 0 : 1) };
@@ -284,7 +287,7 @@ export default function Learn() {
           {([
             { mode: 'due' as SessionMode, colors: ['#FF6B6B', '#FF8E53'], emoji: '🎯', title: 'Fällige Karten', sub: `${dueCards.length} Karten heute fällig` },
             { mode: 'all' as SessionMode, colors: ['#A78BFA', '#7C3AED'], emoji: '🔁', title: 'Alle Vokabeln', sub: `Alle ${allVocabulary.length} Karten üben` },
-            { mode: 'quiz' as SessionMode, colors: ['#4ECDC4', '#2ECC71'], emoji: '🧩', title: 'Quiz', sub: `Multiple Choice mit ${dailyCardLimit > 0 ? Math.min(dailyCardLimit, (dueCards.length || allVocabulary.length)) : (dueCards.length || allVocabulary.length)} Karten` },
+            { mode: 'quiz' as SessionMode, colors: ['#4ECDC4', '#2ECC71'], emoji: '🧩', title: 'Quiz', sub: `${quizCards.length} neue/unbekannte Wörter (Fach 1)` },
             { mode: 'type' as SessionMode, colors: ['#F59E0B', '#D97706'], emoji: '✍️', title: 'Eingabe-Modus', sub: 'Antworte durch Tippen' },
           ] as const).map(({ mode, colors, emoji, title, sub }) => (
             <button
