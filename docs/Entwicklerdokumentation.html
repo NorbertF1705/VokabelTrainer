@@ -574,7 +574,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.4.4 · August 2026</div>
+    <div class="nav-version">Version 1.4.5 · August 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -583,7 +583,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.4.4</span>
+        <span class="badge">v1.4.5</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1498,7 +1498,7 @@ function pickVoice(lang: string): SpeechSynthesisVoice | null {
       <h3>App-Version aktualisieren</h3>
       <p>Die Versionsnummer wird nur an einer Stelle gepflegt: <code>src/version.ts</code>. Sie wird auf der Startseite angezeigt und kann dort einfach hochgezählt werden.</p>
       <pre><code>// src/version.ts
-export const APP_VERSION = '1.4.4';</code></pre>
+export const APP_VERSION = '1.4.5';</code></pre>
 
       <h3>TypeScript-Konfiguration</h3>
       <p>Strikte TypeScript-Konfiguration. Alle React-Komponenten sind typisiert. Es gibt keine <code>any</code>-Verwendungen außer in den Migrations-Funktionen (dort explizit durch ESLint-Kommentar auskommentiert).</p>
@@ -1625,10 +1625,22 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
         <h2>Release Notes</h2>
       </div>
 
-      <!-- v1.4.4 -->
+      <!-- v1.4.5 -->
       <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
-          <span class="badge">v1.4.4</span>
+          <span class="badge">v1.4.5</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-08-02</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>Reihenfolge in <code>FILE_CONFIG</code></strong> (<code>file_config.ts</code>): <code>en-grund2-v1</code> vor <code>en-a2b1-v1</code> verschoben. <code>ALL_FILE_IDS</code>/<code>listFiles()</code>/<code>groupFilesByLanguage()</code> geben die Objekt-Insertion-Order zurück, daher genügt die reine Reihenfolge im Objektliteral – keine Logikänderung nötig.</li>
+        </ul>
+      </div>
+
+      <!-- v1.4.4 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.4.4</span>
           <span style="color:var(--muted); font-size:0.82rem;">2026-08-02</span>
         </div>
         <h4 style="margin-bottom:0.4rem;">Geändert</h4>
