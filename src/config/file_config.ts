@@ -49,6 +49,18 @@ export const FILE_CONFIG: Record<FileId, FileManifestEntry> = {
         vocabulary: m.VOCABULARY_ES_BASIC,
       })),
   },
+  'tr-basic-v1': {
+    id: 'tr-basic-v1',
+    language: 'tr',
+    displayName: 'Türkisch – Grundwortschatz',
+    shortLabel: '🇹🇷 Türkisch · Grundwortschatz',
+    voice: 'tr-TR',
+    contentVersion: 1,
+    loader: () =>
+      import('../data/vocabulary/tr-basic-v1').then((m) => ({
+        vocabulary: m.VOCABULARY_TR_BASIC,
+      })),
+  },
 };
 
 export const ALL_FILE_IDS: ReadonlyArray<FileId> = Object.keys(FILE_CONFIG) as FileId[];
@@ -81,6 +93,7 @@ export function groupFilesByLanguage(): Array<{ language: Language; files: FileM
 export const LANGUAGE_LABELS: Record<Language, string> = {
   en: 'Englisch',
   es: 'Spanisch',
+  tr: 'Türkisch',
 };
 
 /** Mapping v1.2-selectedLanguage → v1.3-FileId (nur für Migration). */
