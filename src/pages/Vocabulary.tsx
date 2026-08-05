@@ -13,7 +13,11 @@ export default function Vocabulary() {
   const activeFile = useActiveFile();
   const allVocabulary = activeFile?.allVocabulary ?? [];
   const transLabel = activeFile ? LANGUAGE_LABELS[activeFile.manifest.language] : 'Fremdsprache';
-  const transPlaceholder = activeFile?.manifest.language === 'es' ? 'Palabra en español' : 'English word';
+  const transPlaceholder = activeFile?.manifest.language === 'es'
+    ? 'Palabra en español'
+    : activeFile?.manifest.language === 'tr'
+      ? 'Türkçe kelime'
+      : 'English word';
 
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'Alle'>('Alle');
