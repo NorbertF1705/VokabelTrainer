@@ -17,6 +17,16 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
+// Gewichtete Zufallsreihenfolge (A-ES-Verfahren): Karten mit höherem Gewicht
+// landen tendenziell weiter vorne, ohne dass die Reihenfolge starr blockweise
+// nach Fach sortiert wird. weight <= 0 ist unzulässig, daher min. 1.
+function weightedShuffle<T>(entries: { item: T; weight: number }[]): T[] {
+  return entries
+    .map(({ item, weight }) => ({ item, key: Math.pow(Math.random(), 1 / Math.max(weight, 1)) }))
+    .sort((a, b) => b.key - a.key)
+    .map((e) => e.item);
+}
+
 function levenshtein(a: string, b: string): number {
   const m = a.length, n = b.length;
   const dp: number[] = Array.from({ length: n + 1 }, (_, i) => i);
@@ -160,7 +170,12 @@ export default function Learn() {
       newCount = pool.filter(v => getCardProgress(v.id)?.lastReviewed == null).length;
       cards = shuffle(pool);
     } else {
-      cards = shuffle([...allVocab]);
+      // Karten aus höheren Fächern werden tendenziell bevorzugt (früher) abgefragt,
+      // damit die Reihenfolge nicht rein planlos ist. Hochstufung findet in diesem
+      // Modus bewusst nicht statt (siehe advanceCard: markCard wird übersprungen).
+      cards = weightedShuffle(
+        allVocab.map((v) => ({ item: v, weight: (getCardProgress(v.id)?.box ?? 0) + 1 }))
+      );
     }
     setSessionMode(mode);
     setSessionCards(cards);
