@@ -129,6 +129,9 @@
     main {
       padding: 3rem 4rem 5rem;
       max-width: 860px;
+      min-width: 0; /* sonst wächst der Grid-Item über den verfügbaren Platz hinaus,
+                       wenn .mode-grid breiter sein will, und erzwingt horizontales
+                       Scrollen der Seite auf Mobilgeräten */
     }
 
     .page-header {
@@ -569,6 +572,37 @@
     .faq-item.open .faq-a { display: block; }
     .faq-item.open .faq-arrow { transform: rotate(180deg); }
 
+    /* ── FLOATING APP-RETURN BUTTON (mobile) ── */
+    .float-back {
+      position: fixed;
+      right: max(1.25rem, env(safe-area-inset-right, 0px));
+      bottom: max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 1rem));
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.1rem;
+      min-height: 44px;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 999px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.22);
+      z-index: 1000;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .float-back:hover,
+    .float-back:focus-visible { background: var(--accent2); transform: translateY(-1px); }
+    .float-back:active { transform: translateY(0); }
+
+    /* Auf Desktop bleibt die Sidebar dank position:sticky durchgehend sichtbar —
+       dort ist der Button redundant und würde nur Inhalte verdecken. */
+    @media (min-width: 769px) {
+      .float-back { display: none; }
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       .page-grid { grid-template-columns: 1fr; }
@@ -585,7 +619,7 @@
 
   <!-- ── SIDEBAR ── -->
   <nav>
-    <a href="/" class="back-link">← Zurück zum VokabelTrainer</a>
+    <a href="/settings" class="back-link">← Zurück zum VokabelTrainer</a>
     <div class="nav-logo">
       <div class="app-name">📚 VokabelTrainer</div>
       <div class="app-sub">Benutzerdokumentation</div>
@@ -608,7 +642,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.4.6 · August 2026</div>
+    <div class="nav-version">Version 1.4.7 · August 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -617,7 +651,7 @@
     <div class="page-header">
       <h1>Benutzerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.4.6</span>
+        <span class="badge">v1.4.7</span>
         <span>Offline-PWA · iPhone</span>
         <span>Stand: August 2026</span>
       </div>
@@ -1260,6 +1294,18 @@ npx serve -s dist</code></pre>
         <h2>Release Notes</h2>
       </div>
 
+      <!-- v1.4.7 -->
+      <div style="border-left: 3px solid var(--accent2); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge">v1.4.7</span>
+          <span style="color:var(--muted); font-size:0.82rem;">11. August 2026</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>Nur noch Benutzerdokumentation aus der App aufrufbar:</strong> Die Entwicklerdokumentation wurde aus den Einstellungen entfernt und richtet sich künftig ausschließlich an Entwickler:innen, die direkt im Projektordner arbeiten. Der „Zurück"-Link führt jetzt zu den Einstellungen statt zur Startseite. Neu: ein dauerhaft sichtbarer „← App"-Button unten rechts sorgt dafür, dass der Rückweg auf dem iPhone auch nach dem Scrollen erreichbar bleibt (vorher verschwand der einzige Rückweg-Link mit der Sidebar aus dem sichtbaren Bereich).</li>
+        </ul>
+      </div>
+
       <!-- v1.4.6 -->
       <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
@@ -1458,7 +1504,11 @@ npx serve -s dist</code></pre>
     </section>
 
   </main>
-</div>
+</div><!-- /.page-grid -->
+
+<a href="/settings" class="float-back" aria-label="Zurück zum VokabelTrainer">
+  <span aria-hidden="true">←</span> App
+</a>
 
 <script>
   // FAQ accordion

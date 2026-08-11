@@ -533,7 +533,7 @@
 
   <!-- ── SIDEBAR ── -->
   <nav>
-    <a href="/" class="back-link">← Zurück zum VokabelTrainer</a>
+    <a href="/settings" class="back-link">← Zurück zum VokabelTrainer</a>
     <div class="nav-logo">
       <div class="app-name">🛠️ VokabelTrainer</div>
       <div class="app-sub">Entwicklerdokumentation</div>
@@ -574,7 +574,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.4.6 · August 2026</div>
+    <div class="nav-version">Version 1.4.7 · August 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -583,7 +583,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.4.6</span>
+        <span class="badge">v1.4.7</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1448,7 +1448,7 @@ function pickVoice(lang: string): SpeechSynthesisVoice | null {
         <strong>navigateFallbackDenylist ist bei neuen statischen Seiten Pflicht</strong>
         Die <code>NavigationRoute</code> des generierten Service Workers liefert standardmäßig für <em>jede</em> Navigation <code>index.html</code> aus (SPA-Fallback) – auch für <code>/docs/Benutzerdokumentation.html</code>. Ohne Eintrag in <code>navigateFallbackDenylist</code> (<code>vite.config.ts</code>) würde ein Klick auf eine solche Seite im Produktions-Build nur die App selbst anzeigen, obwohl die Datei korrekt im Precache liegt. Für jedes neue statische HTML-Verzeichnis/Datei außerhalb der SPA muss ein passendes Regex-Muster ergänzt werden (aktuell: <code>/^\/docs\//</code>, <code>/^\/vokabeltrainer\.html$/</code>). Im Dev-Modus fällt das nicht auf, da dort kein Service Worker aktiv ist – nur mit <code>npm run build &amp;&amp; npm run preview</code> sichtbar.
       </div>
-      <p><strong>Rückweg (ab v1.4.1):</strong> Statische Seiten außerhalb der SPA haben keine Browser-Navigation, wenn sie als installierte PWA ohne Adressleiste laufen. Beide Doku-Seiten haben deshalb einen fest verlinkten <code>&lt;a href="/" class="back-link"&gt;</code> oben in der Sidebar. Bei jeder neuen statischen Seite prüfen, ob ein vergleichbarer Rückweg nötig ist.</p>
+      <p><strong>Rückweg (ab v1.4.1, erweitert in v1.4.7):</strong> Statische Seiten außerhalb der SPA haben keine Browser-Navigation, wenn sie als installierte PWA ohne Adressleiste laufen. <code>docs/Benutzerdokumentation.html</code> (einzige noch aus der App verlinkte Doku-Seite seit v1.4.7) hat einen fest verlinkten <code>&lt;a href="/settings" class="back-link"&gt;</code> oben in der Sidebar sowie – da dieser auf dem iPhone unterhalb von 768px Breite wegen <code>position: static</code> aus dem sichtbaren Bereich scrollt – zusätzlich einen dauerhaft sichtbaren, fixierten <code>.float-back</code>-Button unten rechts (nur auf Mobilgeräten sichtbar). <code>docs/Entwicklerdokumentation.html</code> behält weiterhin nur den Sidebar-Rückweg, da sie nicht mehr aus der App aufrufbar ist. Bei jeder neuen statischen Seite prüfen, ob ein vergleichbarer Rückweg nötig ist – insbesondere, ob der einzige Rückweg auf Mobilgeräten aus dem sichtbaren Bereich scrollen kann.</p>
     </section>
 
     <!-- ── 12 BUILD ── -->
@@ -1623,6 +1623,20 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
       <div class="section-header">
         <div class="section-num">📋</div>
         <h2>Release Notes</h2>
+      </div>
+
+      <!-- v1.4.7 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.4.7</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-08-11</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>Entwicklerdokumentation nicht mehr aus der App verlinkt:</strong> Der zweite Eintrag im Dokumentation-Array in <code>Settings.tsx</code> wurde entfernt; nur noch die Benutzerdokumentation ist über die Einstellungen erreichbar. Die Datei selbst bleibt unter <code>docs/Entwicklerdokumentation.html</code> als Referenz für Entwickler:innen bestehen, ist aber nicht mehr in der Navigation verlinkt.</li>
+          <li><strong>Rückweg-Link jetzt Richtung <code>/settings</code></strong>: Der fest verlinkte <code>&lt;a class="back-link"&gt;</code> in <code>docs/Benutzerdokumentation.html</code> (und aus Konsistenzgründen auch in <code>docs/Entwicklerdokumentation.html</code>) zeigt jetzt auf <code>/settings</code> statt <code>/</code> (einziger Aufrufer der Doku-Seite seit der Entfernung der Entwicklerdokumentation aus der App, siehe oben) — kein generischer Rückgabepfad-Mechanismus nötig.</li>
+          <li><strong>Neuer Escape-Hatch auf Mobilgeräten:</strong> Ab <code>max-width: 768px</code> wird <code>nav</code> in <code>docs/Benutzerdokumentation.html</code> <code>position: static</code> (siehe Abschnitt „Statische HTML-Seiten neben der SPA" unten) und scrollt mit dem Inhalt weg – der bisherige Sidebar-Rückweg war auf dem iPhone dadurch praktisch unerreichbar. Neue Klasse <code>.float-back</code>: <code>position: fixed</code>, unten rechts, <code>env(safe-area-inset-*)</code>-bewusst, <code>z-index: 1000</code>, min. 44×44pt Tap-Ziel gemäß Apple HIG, außerhalb von <code>.page-grid</code> platziert (direktes Kind von <code>&lt;body&gt;</code>, um unabhängig vom <code>overflow</code>/Sticky-Kontext der Sidebar zu bleiben). Nur auf Mobilgeräten sichtbar (<code>@media (min-width: 769px) { display: none; }</code>), da der Desktop-Sidebar-Rückweg wegen <code>position: sticky</code> dort bereits durchgehend sichtbar bleibt.</li>
+        </ul>
       </div>
 
       <!-- v1.4.6 -->

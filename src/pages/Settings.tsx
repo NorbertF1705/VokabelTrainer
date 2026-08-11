@@ -196,7 +196,6 @@ export default function Settings() {
           <div style={card}>
             {[
               { href: '/docs/Benutzerdokumentation.html', emoji: '📖', label: 'Benutzerdokumentation', sub: 'Anleitung: Funktionen, Spaced Repetition, FAQ' },
-              { href: '/docs/Entwicklerdokumentation.html', emoji: '🛠️', label: 'Entwicklerdokumentation', sub: 'Architektur, Datenmodell, Deployment' },
             ].map(({ href, emoji, label, sub }, idx) => (
               <div key={href}>
                 {idx > 0 && <div style={{ height: 1, background: Colors.border, margin: '0 16px' }} />}
