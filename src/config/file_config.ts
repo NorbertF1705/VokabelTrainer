@@ -37,6 +37,18 @@ export const FILE_CONFIG: Record<FileId, FileManifestEntry> = {
         vocabulary: m.VOCABULARY_EN_A2B1,
       })),
   },
+  'en-klett-v1': {
+    id: 'en-klett-v1',
+    language: 'en',
+    displayName: 'Englisch – Grundwortschatz (Klett)',
+    shortLabel: '🇬🇧 Englisch · Klett Grundwortschatz',
+    voice: 'en-US',
+    contentVersion: 1,
+    loader: () =>
+      import('../data/vocabulary/en-klett-v1').then((m) => ({
+        vocabulary: m.VOCABULARY_EN_KLETT,
+      })),
+  },
   'es-basic-v1': {
     id: 'es-basic-v1',
     language: 'es',
