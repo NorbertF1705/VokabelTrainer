@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Colors, BOX_LABELS } from '../constants/theme';
 
+function adaptiveFontSize(text: string, base: number): number {
+  if (text.length <= 12) return base;
+  if (text.length <= 22) return Math.round(base * 0.76);
+  if (text.length <= 36) return Math.round(base * 0.60);
+  return Math.round(base * 0.47);
+}
+
 interface FlashCardProps {
   frontText: string;
   backText: string;
@@ -65,7 +72,7 @@ export default function FlashCard({
           <span style={badge}>{BOX_LABELS[boxIdx]}</span>
           <span style={categoryLabel}>{category}</span>
           <span style={{ fontSize: 80, marginBottom: 16, lineHeight: 1 }}>{emoji}</span>
-          <span style={{ fontSize: 34, fontWeight: 800, color: Colors.text, textAlign: 'center', marginBottom: 20, letterSpacing: -0.5 }}>
+          <span style={{ fontSize: adaptiveFontSize(frontText, 34), fontWeight: 800, color: Colors.text, textAlign: 'center', marginBottom: 20, letterSpacing: -0.5 }}>
             {frontText}
           </span>
           <span style={{
@@ -84,7 +91,7 @@ export default function FlashCard({
         <div className="fc-face fc-back">
           <span style={badge}>{BOX_LABELS[boxIdx]}</span>
           <span style={{ fontSize: 80, marginBottom: 12, lineHeight: 1 }}>{emoji}</span>
-          <span style={{ fontSize: 36, fontWeight: 800, color: Colors.text, textAlign: 'center', marginBottom: 6, letterSpacing: -0.5 }}>
+          <span style={{ fontSize: adaptiveFontSize(backText, 36), fontWeight: 800, color: Colors.text, textAlign: 'center', marginBottom: 6, letterSpacing: -0.5 }}>
             {backText}
           </span>
           {inflections && (
