@@ -443,6 +443,11 @@ export function LearningProvider({ children }: { children: ReactNode }) {
       const p = state.progress[v.id];
       return !p || p.lastReviewed === null;
     });
+    // Zufällige Reihenfolge, damit nicht immer die gleichen Karten eingeführt werden
+    for (let i = newCards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newCards[i], newCards[j]] = [newCards[j], newCards[i]];
+    }
     return isFinite(remaining) ? newCards.slice(0, remaining) : newCards;
   }, [activeFileId, fileStates, vocabularyByFile, settings]);
 
