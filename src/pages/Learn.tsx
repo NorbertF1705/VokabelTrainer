@@ -195,11 +195,7 @@ export default function Learn() {
 
   const speakWord = () => {
     if (!currentCard) return;
-    const text = isFlipped ? backText : frontText;
-    const lang = isFlipped
-      ? (effectiveDirection === 'de-to-foreign' ? voiceCode : 'de-DE')
-      : (effectiveDirection === 'de-to-foreign' ? 'de-DE' : voiceCode);
-    speak(text, lang);
+    speak(currentCard.translation, voiceCode);
   };
 
   useEffect(() => {
@@ -274,9 +270,7 @@ export default function Learn() {
     setQuizAnswerCorrect(correct);
     setQuizFlipKey(k => k + 1);
     if (quizAutoSpeak) {
-      const textToSpeak = currentCard[answerField] as string;
-      const lang = answerField === 'translation' ? voiceCode : 'de-DE';
-      speak(textToSpeak, lang);
+      speak(currentCard.translation, voiceCode);
     }
   };
 
@@ -574,8 +568,7 @@ export default function Learn() {
             onFlip={(flipped) => {
               setIsFlipped(flipped);
               if (flipped && flashcardAutoSpeak && currentCard) {
-                const lang = effectiveDirection === 'de-to-foreign' ? voiceCode : 'de-DE';
-                speak(backText, lang);
+                speak(currentCard.translation, voiceCode);
               }
             }}
             forceReset={flipReset}
