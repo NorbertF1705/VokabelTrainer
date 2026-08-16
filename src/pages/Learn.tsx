@@ -137,7 +137,7 @@ export default function Learn() {
     setQuizOptions(generateQuizOptions(correct, allVocabulary, answerField));
     setSelectedAnswer(null);
     setQuizAnswerCorrect(null);
-  }, [currentIndex, sessionMode, currentCard]);
+  }, [currentIndex, sessionMode, currentCard, answerField]);
 
   const progress = sessionCards ? currentIndex / sessionCards.length : 0;
 
@@ -507,7 +507,7 @@ export default function Learn() {
               flipKey={quizFlipKey}
             />
           </div>
-          <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
             {quizOptions.map((option, idx) => {
               let bg = Colors.card, border = Colors.border, textColor = Colors.text;
               if (selectedAnswer !== null) {
@@ -519,9 +519,9 @@ export default function Learn() {
                   key={idx}
                   onClick={() => handleQuizAnswer(option)}
                   disabled={selectedAnswer !== null}
-                  style={{ background: bg, border: `2px solid ${border}`, borderRadius: 12, padding: '12px 16px', fontSize: 16, fontWeight: 700, color: textColor, cursor: selectedAnswer !== null ? 'default' : 'pointer', boxShadow: '0 2px 8px rgba(45,27,105,0.08)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left' }}
+                  style={{ background: bg, border: `2px solid ${border}`, borderRadius: 10, padding: '7px 12px', fontSize: 14, fontWeight: 700, color: textColor, cursor: selectedAnswer !== null ? 'default' : 'pointer', boxShadow: '0 1px 4px rgba(45,27,105,0.07)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left' }}
                 >
-                  <span style={{ minWidth: 24, height: 24, borderRadius: 6, background: selectedAnswer !== null ? 'rgba(0,0,0,0.08)' : 'rgba(45,27,105,0.1)', color: selectedAnswer !== null ? textColor : Colors.textMuted, fontSize: 13, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{idx + 1}</span>
+                  <span style={{ minWidth: 20, height: 20, borderRadius: 5, background: selectedAnswer !== null ? 'rgba(0,0,0,0.08)' : 'rgba(45,27,105,0.1)', color: selectedAnswer !== null ? textColor : Colors.textMuted, fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{idx + 1}</span>
                   {option}
                 </button>
               );
@@ -529,9 +529,9 @@ export default function Learn() {
             <button
               onClick={() => selectedAnswer !== null && advanceCard(quizAnswerCorrect!)}
               style={{
-                marginTop: 4, padding: '14px 0',
+                marginTop: 2, padding: '11px 0',
                 background: selectedAnswer !== null ? 'linear-gradient(90deg, #A78BFA, #7C3AED)' : Colors.border,
-                border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800,
+                border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 800,
                 color: selectedAnswer !== null ? '#fff' : Colors.textMuted,
                 cursor: selectedAnswer !== null ? 'pointer' : 'default',
                 boxShadow: selectedAnswer !== null ? '0 4px 16px rgba(45,27,105,0.25)' : 'none',
@@ -540,7 +540,7 @@ export default function Learn() {
             >
               Weiter
               {selectedAnswer !== null && (
-                <span style={{ display: 'inline-block', fontSize: 12, fontWeight: 500, opacity: 0.85, marginLeft: 8 }}>Enter / Leertaste</span>
+                <span style={{ display: 'inline-block', fontSize: 11, fontWeight: 500, opacity: 0.85, marginLeft: 8 }}>Enter / Leertaste</span>
               )}
             </button>
           </div>
