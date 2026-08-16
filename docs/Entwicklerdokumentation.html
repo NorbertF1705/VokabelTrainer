@@ -574,7 +574,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.4.7 · August 2026</div>
+    <div class="nav-version">Version 1.4.12 · August 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -583,7 +583,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.4.7</span>
+        <span class="badge">v1.4.12</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1333,14 +1333,14 @@ export { VOCABULARY_EN as VOCABULARY_EN_BASIC } from '../vocabulary_en';</code><
           <div class="algo-step-num">①</div>
           <div class="algo-step-body">
             <strong>Lobby</strong> – Kein aktiver Session-State.<br>
-            Zeigt die vier Modus-Buttons: <em>Fällige Karten</em>, <em>Alle Karten</em>, <em>Quiz</em>, <em>Tippen</em>. Jeder Button kennt seine Kartenquelle (<code>getDueCards</code>+<code>getNewCards</code> / alle / <code>getQuizCards</code> / <code>getDueCards</code>+<code>getNewCards</code>).
+            Zeigt die vier Modus-Buttons: <em>Fällige Karten</em>, <em>Alle Karten</em>, <em>Quiz</em>, <em>Tippen</em>. Jeder Button kennt seine Kartenquelle (<code>getDueCards</code>+<code>getNewCards</code> / alle / <code>startQuizPool</code> / <code>getDueCards</code>+<code>getNewCards</code>).
           </div>
         </div>
         <div class="algo-step branch">
           <div class="algo-step-num">②</div>
           <div class="algo-step-body">
             <strong>startSession(mode)</strong> – Übergang Lobby → aktive Sitzung.<br>
-            Lädt die Kartenliste je nach Modus. Bei <em>Fällige Karten</em> und <em>Tippen</em>: <code>getDueCards()</code> + <code>getNewCards()</code>, gemischt. Bei <em>Alle Karten</em>: alle Vokabeln der Sprache. Bei <em>Quiz</em> (ab v1.4.4): <code>getQuizCards()</code> – Karten mit <code>box === 1</code> oder <code>lastReviewed === null</code>, ungefiltert nach Fälligkeit oder Tageslimit, ohne Kappung. Setzt <code>sessionCards</code>, <code>currentIndex = 0</code>.
+            Lädt die Kartenliste je nach Modus. Bei <em>Fällige Karten</em> und <em>Tippen</em>: <code>getDueCards()</code> + <code>getNewCards()</code>, gemischt. Bei <em>Alle Karten</em>: alle Vokabeln der Sprache. Bei <em>Quiz</em> (ab v1.4.12): <code>startQuizPool()</code> – liefert alle Karten mit <code>box === 2</code>, aufgefüllt aus Fach 1 (<code>box === 1</code> oder <code>lastReviewed === null</code>) auf mindestens <code>QUIZ_MIN_POOL = 30</code>. Die aufgefüllten Karten werden dabei sofort (innerhalb desselben Aufrufs, per <code>mutateActiveFile</code>) dauerhaft auf <code>box: 2</code> gesetzt – <code>startQuizPool()</code> ist damit bewusst keine reine <code>get*</code>-Funktion und darf nur einmalig beim Sitzungsstart aufgerufen werden, nicht bei jedem Render. Setzt <code>sessionCards</code>, <code>currentIndex = 0</code>.
           </div>
         </div>
         <div class="algo-step">
@@ -1355,7 +1355,7 @@ export { VOCABULARY_EN as VOCABULARY_EN_BASIC } from '../vocabulary_en';</code><
           <div class="algo-step-num">④</div>
           <div class="algo-step-body">
             <strong>Karte bewerten: <code>markCard()</code></strong><br>
-            Nach jeder Bewertung wird <code>markCard(id, correct)</code> im Context aufgerufen – <strong>außer im Modus „Alle Vokabeln"</strong> (<code>sessionMode === 'all'</code>): dort ist <code>advanceCard()</code> bewusst folgenlos, es findet keine Fach-Änderung statt. Im Modus <strong>„Quiz"</strong> wird <code>markCard(id, correct, { skipDailyStats: true })</code> aufgerufen: Fach/<code>nextDate</code>/Zähler werden wie gewohnt aktualisiert, <code>dailyStats</code>/<code>dailyNewStats</code> (Tageslimit-Zähler) bleiben aber unverändert. Da <code>getQuizCards()</code> nur Fach-1/neue Karten liefert, führt eine richtige Quiz-Antwort maximal zu Fach 2 – die Karte fällt danach automatisch aus dem Quiz-Pool heraus; ein Aufstieg über Fach 2 hinaus ist damit strukturell ausgeschlossen, ganz ohne explizite Kappungslogik in <code>markCard</code>. <code>sessionStats</code> (richtig/falsch für die Auswertungsansicht) wird in jedem Modus aktualisiert. Der nächste <code>currentIndex++</code>-Schritt blendet die nächste Karte ein.
+            Nach jeder Bewertung wird <code>markCard(id, correct)</code> im Context aufgerufen – <strong>außer im Modus „Alle Vokabeln"</strong> (<code>sessionMode === 'all'</code>): dort ist <code>advanceCard()</code> bewusst folgenlos, es findet keine Fach-Änderung statt. Im Modus <strong>„Quiz"</strong> (ab v1.4.12) wird <code>markCard(id, correct, { skipDailyStats: true, lockBox: true })</code> aufgerufen: <code>lockBox</code> hält <code>box</code> und <code>nextDate</code> unverändert fest (weder Auf- noch Abstieg), nur <code>lastReviewed</code>/<code>correctCount</code>/<code>incorrectCount</code> werden wie gewohnt aktualisiert; <code>dailyStats</code>/<code>dailyNewStats</code> (Tageslimit-Zähler) bleiben wegen <code>skipDailyStats</code> ebenfalls unangetastet. Da <code>startQuizPool()</code> ausschließlich Fach-2-Karten liefert und <code>lockBox</code> jede Fach-Änderung im Quiz-Modus unterbindet, werden dieselben Karten Sitzung für Sitzung erneut abgefragt, bis sie über „Fällige Karten" regulär weiter aufsteigen. <code>sessionStats</code> (richtig/falsch für die Auswertungsansicht) wird in jedem Modus aktualisiert. Der nächste <code>currentIndex++</code>-Schritt blendet die nächste Karte ein.
           </div>
         </div>
         <div class="algo-step result-ok">
@@ -1623,6 +1623,20 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
       <div class="section-header">
         <div class="section-num">📋</div>
         <h2>Release Notes</h2>
+      </div>
+
+      <!-- v1.4.12 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.4.12</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-08-16</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>Quiz-Modus neu ausgerichtet – Fach 2 statt Fach 1:</strong> <code>getQuizCards()</code> in <code>LearningContext.tsx</code> ersetzt durch <code>startQuizPool(): { cards: VocabularyItem[]; promotedCount: number }</code>. Liefert alle Karten mit <code>box === 2</code>, aufgefüllt aus Fach 1 (zufällig via lokalem <code>shuffleArr</code>-Helfer) auf mindestens <code>QUIZ_MIN_POOL = 30</code>. Die Auffüll-Karten werden dabei sofort (per <code>mutateActiveFile</code>, noch innerhalb desselben Aufrufs) dauerhaft auf <code>box: 2</code> gesetzt, mit <code>lastReviewed: now</code> (damit sie nicht gleichzeitig als „neu" bei <code>getNewCards()</code> auftauchen) und <code>nextDate: null</code> (fällt auf die bestehende <code>BOX_INTERVALS</code>-Fallback-Berechnung in <code>isCardDue()</code> zurück). Da <code>startQuizPool()</code> damit einen Seiteneffekt hat, ist es keine reine <code>get*</code>-Funktion mehr und wird ausschließlich einmalig in <code>startSession('quiz')</code> aufgerufen, nicht bei jedem Render.</li>
+          <li><strong>Neue <code>markCard</code>-Option <code>lockBox</code>:</strong> <code>markCard(id, correct, { skipDailyStats, lockBox })</code> — mit <code>lockBox: true</code> bleiben <code>box</code> und <code>nextDate</code> exakt erhalten (kein Auf-/Abstieg mehr), nur <code>lastReviewed</code>/<code>correctCount</code>/<code>incorrectCount</code> werden aktualisiert. <code>Learn.tsx</code>s <code>advanceCard()</code> ruft im Quiz-Modus jetzt <code>markCard(id, correct, { skipDailyStats: true, lockBox: true })</code> auf. Dieselben Fach-2-Karten werden dadurch Sitzung für Sitzung wiederholt abgefragt, statt wie bisher nach einer richtigen Antwort aus dem Pool zu fallen.</li>
+          <li><strong>Lobby-Kachel:</strong> Der dynamische Zähler (<code>quizCards.length</code>) wich einem festen Beschreibungstext „Mindestens 30 Vokabeln in Fach 2 werden im Quizmodus abgefragt". <code>sessionNewCards</code> (bisher: Anzahl noch nie geübter Karten in der Session) zeigt im Quiz-Modus jetzt <code>promotedCount</code> — also wie viele Karten in dieser Sitzung neu von Fach 1 nach Fach 2 befördert wurden.</li>
+        </ul>
       </div>
 
       <!-- v1.4.7 -->

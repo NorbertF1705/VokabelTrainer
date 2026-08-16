@@ -642,7 +642,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.4.7 · August 2026</div>
+    <div class="nav-version">Version 1.4.12 · August 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -651,7 +651,7 @@
     <div class="page-header">
       <h1>Benutzerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.4.7</span>
+        <span class="badge">v1.4.12</span>
         <span>Offline-PWA · iPhone</span>
         <span>Stand: August 2026</span>
       </div>
@@ -812,8 +812,8 @@ npx serve -s dist</code></pre>
         <div class="mode-card">
           <div class="mode-card-icon">🧩</div>
           <div class="mode-card-title">Quiz</div>
-          <div class="mode-card-desc">Multiple-Choice, aber nur für Fach 1 und noch nie gezeigte Wörter – unabhängig vom Wiederholungsplan. Gedacht zum ersten Kennenlernen neuer Vokabeln.</div>
-          <span class="mode-card-tag" style="background:var(--tag-bg); color:var(--tag-text);">Nur Fach 1 → 2</span>
+          <div class="mode-card-desc">Multiple-Choice, gezielt für Fach 2 – bei Bedarf aus Fach 1 auf mindestens 30 Karten aufgefüllt. Das Fach ändert sich dabei nicht mehr.</div>
+          <span class="mode-card-tag" style="background:var(--tag-bg); color:var(--tag-text);">Fach 2, fix</span>
         </div>
         <div class="mode-card">
           <div class="mode-card-icon">✍️</div>
@@ -825,7 +825,7 @@ npx serve -s dist</code></pre>
 
       <div class="callout">
         <strong>Jeder Modus behandelt den Lernfortschritt anders</strong>
-        „Fällige Karten" und „Eingabe" folgen dem normalen Wiederholungsplan: jede Bewertung verschiebt die Karte ein Fach vor oder zurück auf Fach 1, bis hoch zu Fach 6. „Alle Vokabeln" ist bewusst komplett folgenlos: keine Fach-Änderung, keine Trainings-Streak, kein Verbrauch des Tageslimits – ideal zum entspannten Auffrischen ohne Risiko. „Quiz" ist ein Sonderfall dazwischen: Es zeigt ausschließlich Fach-1- und noch nie gezeigte Karten, richtige Antworten heben sie nach Fach 2 – mehr nicht. Ein Wort, das per Multiple-Choice erkannt wurde, gilt damit nicht automatisch als "gelernt"; das bleibt „Fällige Karten" vorbehalten. Quiz zählt außerdem nicht gegen das Tageslimit, wirkt sich aber weiterhin auf die Trainings-Streak aus.
+        „Fällige Karten" und „Eingabe" folgen dem normalen Wiederholungsplan: jede Bewertung verschiebt die Karte ein Fach vor oder zurück auf Fach 1, bis hoch zu Fach 6. „Alle Vokabeln" ist bewusst komplett folgenlos: keine Fach-Änderung, keine Trainings-Streak, kein Verbrauch des Tageslimits – ideal zum entspannten Auffrischen ohne Risiko. „Quiz" drillt gezielt Fach 2: Es zeigt ausschließlich Karten aus Fach 2 (aufgefüllt aus Fach 1, falls weniger als 30 vorhanden sind) und ändert das Fach dabei nicht mehr – weder Auf- noch Abstieg. Ein Wort, das per Multiple-Choice richtig beantwortet wurde, gilt damit nicht automatisch als "gelernt"; der weitere Aufstieg bleibt „Fällige Karten" vorbehalten. Quiz zählt außerdem nicht gegen das Tageslimit, wirkt sich aber weiterhin auf die Trainings-Streak aus.
       </div>
 
       <h3>Karteikarten-Modus (Fällige Karten / Alle Vokabeln)</h3>
@@ -854,7 +854,7 @@ npx serve -s dist</code></pre>
       </div>
 
       <h3>Quiz-Modus</h3>
-      <p>Quiz zeigt nur Karten aus Fach 1 sowie noch nie geübte Karten – unabhängig davon, ob sie laut Wiederholungsplan gerade fällig wären. Zweck: neue/unbekannte Vokabeln kennenlernen, ohne den normalen Wiederholungsrhythmus zu stören. Eine richtige Antwort hebt die Karte nach Fach 2; von dort übernimmt „Fällige Karten" die weitere Wiederholung. Eine falsche Antwort hält die Karte in Fach 1.</p>
+      <p>Quiz drillt gezielt Fach 2 – unabhängig davon, ob die Karten laut Wiederholungsplan gerade fällig wären. Hat Fach 2 weniger als 30 Karten, werden fehlende Karten zufällig aus Fach 1 nachgezogen und direkt zu Sitzungsbeginn dauerhaft nach Fach 2 verschoben. Danach ändert sich das Fach im Quiz-Modus nicht mehr: Weder eine richtige noch eine falsche Antwort verschiebt die Karte – sie bleibt in Fach 2 und wird in künftigen Quiz-Sitzungen erneut abgefragt. Der weitere Aufstieg über Fach 2 hinaus erfolgt ausschließlich über „Fällige Karten".</p>
       <div class="steps">
         <div class="step">
           <div class="step-body">
@@ -1292,6 +1292,18 @@ npx serve -s dist</code></pre>
       <div class="section-header">
         <div class="section-num">📋</div>
         <h2>Release Notes</h2>
+      </div>
+
+      <!-- v1.4.12 -->
+      <div style="border-left: 3px solid var(--accent2); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge">v1.4.12</span>
+          <span style="color:var(--muted); font-size:0.82rem;">16. August 2026</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>Quiz-Modus neu ausgerichtet – jetzt Fach 2 statt Fach 1:</strong> Quiz drillt gezielt Fach 2 (mindestens 30 Karten, bei Bedarf zu Sitzungsbeginn dauerhaft aus Fach 1 aufgefüllt) und ändert das Fach dabei nicht mehr – weder Auf- noch Abstieg. Dieselben Karten werden also so lange wiederholt abgefragt, bis sie über „Fällige Karten" regulär weiter aufsteigen.</li>
+        </ul>
       </div>
 
       <!-- v1.4.7 -->

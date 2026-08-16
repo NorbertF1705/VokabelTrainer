@@ -90,7 +90,7 @@ function speak(text: string, lang: string) {
 }
 
 export default function Learn() {
-  const { settings, getDueCards, getNewCards, getQuizCards, getCardProgress, markCard, recordTrainingDay, setSessionActive } = useLearning();
+  const { settings, getDueCards, getNewCards, startQuizPool, getCardProgress, markCard, recordTrainingDay, setSessionActive } = useLearning();
   const activeFile = useActiveFile();
   const allVocabulary = activeFile?.allVocabulary ?? [];
   const voiceCode = activeFile?.manifest.voice ?? 'en-US';
@@ -115,7 +115,6 @@ export default function Learn() {
   const [sessionNewCards, setSessionNewCards] = useState(0);
 
   const dueCards = getDueCards();
-  const quizCards = getQuizCards();
 
   useEffect(() => {
     if (queryDirection === 'random') {
@@ -165,9 +164,9 @@ export default function Learn() {
       cards = [...revCards, ...newC];
       if (cards.length === 0) return;
     } else if (mode === 'quiz') {
-      const pool = getQuizCards();
+      const { cards: pool, promotedCount } = startQuizPool();
       if (pool.length === 0) return;
-      newCount = pool.filter(v => getCardProgress(v.id)?.lastReviewed == null).length;
+      newCount = promotedCount;
       cards = shuffle(pool);
     } else {
       // Karten aus höheren Fächern werden tendenziell bevorzugt (früher) abgefragt,
@@ -191,7 +190,7 @@ export default function Learn() {
     setTypedAnswer('');
     setTypeResult(null);
     setSessionActive(true);
-  }, [activeFile, getDueCards, getNewCards, getQuizCards, getCardProgress, setSessionActive]);
+  }, [activeFile, getDueCards, getNewCards, startQuizPool, getCardProgress, setSessionActive]);
 
   const speakWord = () => {
     if (!currentCard) return;
@@ -241,7 +240,7 @@ export default function Learn() {
   const advanceCard = (correct: boolean) => {
     if (!currentCard || !sessionCards) return;
     if (sessionMode === 'quiz') {
-      markCard(currentCard.id, correct, { skipDailyStats: true });
+      markCard(currentCard.id, correct, { skipDailyStats: true, lockBox: true });
     } else if (sessionMode !== 'all') {
       markCard(currentCard.id, correct);
     }
@@ -296,7 +295,7 @@ export default function Learn() {
           {([
             { mode: 'due' as SessionMode, colors: ['#FF6B6B', '#FF8E53'], emoji: '🎯', title: 'Fällige Karten', sub: `${dueCards.length} Karten heute fällig` },
             { mode: 'all' as SessionMode, colors: ['#A78BFA', '#7C3AED'], emoji: '🔁', title: 'Alle Vokabeln', sub: `Alle ${allVocabulary.length} Karten üben` },
-            { mode: 'quiz' as SessionMode, colors: ['#4ECDC4', '#2ECC71'], emoji: '🧩', title: 'Quiz', sub: `${quizCards.length} neue/unbekannte Wörter (Fach 1)` },
+            { mode: 'quiz' as SessionMode, colors: ['#4ECDC4', '#2ECC71'], emoji: '🧩', title: 'Quiz', sub: 'Mindestens 30 Vokabeln in Fach 2 werden im Quizmodus abgefragt' },
             { mode: 'type' as SessionMode, colors: ['#F59E0B', '#D97706'], emoji: '✍️', title: 'Eingabe-Modus', sub: 'Antworte durch Tippen' },
           ] as const).map(({ mode, colors, emoji, title, sub }) => (
             <button

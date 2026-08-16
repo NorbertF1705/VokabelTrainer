@@ -48,12 +48,12 @@ interface LearningContextValue {
   addCustomVocab: (item: Omit<VocabularyItem, 'id' | 'isCustom'>) => void;
   removeCustomVocab: (vocabId: string) => void;
 
-  markCard: (vocabId: string, correct: boolean, options?: { skipDailyStats?: boolean }) => void;
+  markCard: (vocabId: string, correct: boolean, options?: { skipDailyStats?: boolean; lockBox?: boolean }) => void;
   getCardProgress: (vocabId: string) => CardProgress | undefined;
   getDueCards: () => VocabularyItem[];
   getNewCards: () => VocabularyItem[];
-  getQuizCards: () => VocabularyItem[];
   updateFileLimits: (patch: { dailyCardLimit?: number; dailyNewCardLimit?: number }) => void;
+  startQuizPool: () => { cards: VocabularyItem[]; promotedCount: number };
   resetProgress: () => void;
 
   getBoxCounts: () => number[];
@@ -89,6 +89,17 @@ function isCardDue(progress: CardProgress): boolean {
   const diffDays = (Date.now() - last.getTime()) / (1000 * 60 * 60 * 24);
   return diffDays >= interval;
 }
+
+function shuffleArr<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const QUIZ_MIN_POOL = 30;
 
 // ── Content-Version-Reconcile ─────────────────────────────────────────────────
 
@@ -294,15 +305,19 @@ export function LearningProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // ── markCard (SR-Logik aus v1.2, ohne lang-Parameter) ──────────────────────
-  const markCard = useCallback((vocabId: string, correct: boolean, options?: { skipDailyStats?: boolean }) => {
+  const markCard = useCallback((vocabId: string, correct: boolean, options?: { skipDailyStats?: boolean; lockBox?: boolean }) => {
     mutateActiveFile((s) => {
       const current = s.progress[vocabId];
-      const newBox = correct ? Math.min((current?.box ?? 1) + 1, 6) : 1;
+      const newBox = options?.lockBox
+        ? (current?.box ?? 2)
+        : (correct ? Math.min((current?.box ?? 1) + 1, 6) : 1);
 
       const today = todayDate();
       const todayStr = localDateStr(today);
       let nextDate: string | null;
-      if (!correct) {
+      if (options?.lockBox) {
+        nextDate = current?.nextDate ?? null;
+      } else if (!correct) {
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
         nextDate = localDateStr(tomorrow);
@@ -457,24 +472,49 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     return isFinite(remaining) ? newCards.slice(0, remaining) : newCards;
   }, [activeFileId, fileStates, vocabularyByFile]);
 
-  // ── getQuizCards ────────────────────────────────────────────────────────────
-  // Fach 1 + nie gezeigte Karten, unabhängig von Fälligkeit (nextDate) und
-  // Tageslimit. Quiz dient dem Ersteinstieg/Erkennen neuer Vokabeln; ein
-  // Aufstieg über Fach 2 hinaus ist bewusst nicht vorgesehen (siehe markCard-
-  // Aufruf mit skipDailyStats in Learn.tsx) – sobald eine Karte Fach 2 erreicht,
-  // fällt sie automatisch aus diesem Pool heraus.
-  const getQuizCards = useCallback((): VocabularyItem[] => {
-    if (!activeFileId) return [];
+  // ── startQuizPool ───────────────────────────────────────────────────────────
+  // Quiz drillt gezielt Fach 2. Ist Fach 2 kleiner als QUIZ_MIN_POOL, wird zufällig
+  // aus Fach 1 (inkl. nie geübter Karten) aufgefüllt und SOFORT dauerhaft auf Fach 2
+  // gesetzt (kein „Ausleihen" nur für die Sitzung). Fach 3+ wird ignoriert. Innerhalb
+  // des Quiz-Modus findet danach keine weitere Fach-Änderung mehr statt (siehe
+  // markCard-Aufruf mit lockBox in Learn.tsx) – dieselben Fach-2-Karten werden
+  // Sitzung für Sitzung wiederholt.
+  const startQuizPool = useCallback((): { cards: VocabularyItem[]; promotedCount: number } => {
+    if (!activeFileId) return { cards: [], promotedCount: 0 };
     const state = fileStates[activeFileId];
     const vocab = vocabularyByFile[activeFileId];
-    if (!state || !vocab) return [];
+    if (!state || !vocab) return { cards: [], promotedCount: 0 };
 
     const allVocab = [...vocab, ...state.customVocabulary];
-    return allVocab.filter((v) => {
+    const fach2 = allVocab.filter((v) => state.progress[v.id]?.box === 2);
+    const fach1 = allVocab.filter((v) => {
       const p = state.progress[v.id];
       return !p || p.lastReviewed === null || p.box === 1;
     });
-  }, [activeFileId, fileStates, vocabularyByFile]);
+
+    const needed = QUIZ_MIN_POOL - fach2.length;
+    const promoted = needed > 0 ? shuffleArr(fach1).slice(0, needed) : [];
+
+    if (promoted.length > 0) {
+      const nowIso = new Date().toISOString();
+      mutateActiveFile((s) => {
+        const nextProgress = { ...s.progress };
+        promoted.forEach((v) => {
+          const current = nextProgress[v.id];
+          nextProgress[v.id] = {
+            box: 2,
+            lastReviewed: nowIso,
+            nextDate: null,
+            correctCount: current?.correctCount ?? 0,
+            incorrectCount: current?.incorrectCount ?? 0,
+          };
+        });
+        return { ...s, progress: nextProgress };
+      });
+    }
+
+    return { cards: [...fach2, ...promoted], promotedCount: promoted.length };
+  }, [activeFileId, fileStates, vocabularyByFile, mutateActiveFile]);
 
   // ── getBoxCounts ────────────────────────────────────────────────────────────
   const getBoxCounts = useCallback((): number[] => {
@@ -554,8 +594,8 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     getCardProgress,
     getDueCards,
     getNewCards,
-    getQuizCards,
     updateFileLimits,
+    startQuizPool,
     resetProgress,
     getBoxCounts,
     getTotalStats,
@@ -564,7 +604,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
   }), [
     loaded, activeFileId, fileStates, vocabularyByFile, settings, isSessionActive,
     updateSettings, selectFile, addCustomVocab, removeCustomVocab,
-    markCard, getCardProgress, getDueCards, getNewCards, getQuizCards, updateFileLimits, resetProgress,
+    markCard, getCardProgress, getDueCards, getNewCards, updateFileLimits, startQuizPool, resetProgress,
     getBoxCounts, getTotalStats, recordTrainingDay, getTrainingConsistency,
   ]);
 
