@@ -49,8 +49,6 @@ export type QueryDirection = 'de-to-foreign' | 'foreign-to-de' | 'random';
 /** Globale App-Einstellungen — unabhängig von der aktiven Vokabeldatei. */
 export interface AppSettings {
   queryDirection: QueryDirection;
-  dailyCardLimit: number;
-  dailyNewCardLimit: number;
   quizAutoSpeak: boolean;
   flashcardAutoSpeak: boolean;
   typingTolerant: boolean;
@@ -72,6 +70,8 @@ export interface FileState {
   dailyNewStats: DailyStats;
   trainingLog: string[]; // YYYY-MM-DD-Daten der Lerntage
   lastOpenedAt: string | null;
+  dailyCardLimit: number;    // fällige Karten pro Tag (0 = unbegrenzt)
+  dailyNewCardLimit: number; // neue Karten pro Tag (-1 = unbegrenzt, 0 = keine)
 }
 
 /** Metadaten einer Vokabeldatei (statisch, in file_config.ts definiert). */

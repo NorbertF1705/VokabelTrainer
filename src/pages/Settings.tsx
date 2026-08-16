@@ -19,7 +19,11 @@ const CARD_LIMITS = [
 ];
 
 export default function Settings() {
-  const { settings, updateSettings, resetProgress } = useLearning();
+  const { settings, updateSettings, updateFileLimits, activeFileId, fileStates, resetProgress } = useLearning();
+
+  const activeState = activeFileId ? fileStates[activeFileId] : null;
+  const dailyCardLimit = activeState?.dailyCardLimit ?? 30;
+  const dailyNewCardLimit = activeState?.dailyNewCardLimit ?? 5;
 
   const handleReset = () => {
     if (window.confirm('Wirklich den gesamten Lernfortschritt löschen? Alle Karten werden auf Fach 1 zurückgesetzt. Eigene Vokabeln bleiben erhalten.')) {
@@ -154,13 +158,13 @@ export default function Settings() {
             {CARD_LIMITS.map(({ label, value }) => (
               <button
                 key={label}
-                onClick={() => updateSettings({ dailyCardLimit: value })}
+                onClick={() => updateFileLimits({ dailyCardLimit: value })}
                 style={{
                   flex: 1, padding: '13px 0',
-                  background: settings.dailyCardLimit === value ? '#EDE8FF' : Colors.card,
-                  border: `2px solid ${settings.dailyCardLimit === value ? Colors.purple : Colors.border}`,
+                  background: dailyCardLimit === value ? '#EDE8FF' : Colors.card,
+                  border: `2px solid ${dailyCardLimit === value ? Colors.purple : Colors.border}`,
                   borderRadius: 12, fontSize: 17, fontWeight: 700,
-                  color: settings.dailyCardLimit === value ? Colors.purple : Colors.textMuted,
+                  color: dailyCardLimit === value ? Colors.purple : Colors.textMuted,
                   cursor: 'pointer', boxShadow: '0 2px 6px rgba(45,27,105,0.06)',
                 }}
               >{label}</button>
@@ -176,13 +180,13 @@ export default function Settings() {
             {NEW_CARD_LIMITS.map(({ label, value }) => (
               <button
                 key={label}
-                onClick={() => updateSettings({ dailyNewCardLimit: value })}
+                onClick={() => updateFileLimits({ dailyNewCardLimit: value })}
                 style={{
                   flex: 1, padding: '13px 0',
-                  background: settings.dailyNewCardLimit === value ? '#FFF8E1' : Colors.card,
-                  border: `2px solid ${settings.dailyNewCardLimit === value ? '#F59E0B' : Colors.border}`,
+                  background: dailyNewCardLimit === value ? '#FFF8E1' : Colors.card,
+                  border: `2px solid ${dailyNewCardLimit === value ? '#F59E0B' : Colors.border}`,
                   borderRadius: 12, fontSize: 17, fontWeight: 700,
-                  color: settings.dailyNewCardLimit === value ? '#B45309' : Colors.textMuted,
+                  color: dailyNewCardLimit === value ? '#B45309' : Colors.textMuted,
                   cursor: 'pointer', boxShadow: '0 2px 6px rgba(45,27,105,0.06)',
                 }}
               >{label}</button>

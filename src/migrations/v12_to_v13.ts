@@ -1,5 +1,5 @@
 import { storageGet, storageSet } from '../utils/storage';
-import { DEFAULT_SETTINGS, EMPTY_DAILY_STATS } from '../config/default_settings';
+import { DEFAULT_DAILY_CARD_LIMIT, DEFAULT_DAILY_NEW_CARD_LIMIT, DEFAULT_SETTINGS, EMPTY_DAILY_STATS } from '../config/default_settings';
 import { FALLBACK_FILE_ID, LEGACY_LANGUAGE_TO_FILE, fileExists } from '../config/file_config';
 import {
   CURRENT_SCHEMA_VERSION,
@@ -119,16 +119,14 @@ export async function migrateV12ToV13(): Promise<MigrationResult> {
   try {
     await storageSet(KEY_BACKUP_V12, raw);
 
+    // Limits aus v12-Globaleinstellungen für die Migration in beide FileStates übernehmen
+    const migratedCardLimit =
+      typeof v12.dailyCardLimit === 'number' ? v12.dailyCardLimit : DEFAULT_DAILY_CARD_LIMIT;
+    const migratedNewCardLimit =
+      typeof v12.dailyNewCardLimit === 'number' ? v12.dailyNewCardLimit : DEFAULT_DAILY_NEW_CARD_LIMIT;
+
     const settings: AppSettings = {
       queryDirection: (v12.queryDirection as QueryDirection) ?? DEFAULT_SETTINGS.queryDirection,
-      dailyCardLimit:
-        typeof v12.dailyCardLimit === 'number'
-          ? v12.dailyCardLimit
-          : DEFAULT_SETTINGS.dailyCardLimit,
-      dailyNewCardLimit:
-        typeof v12.dailyNewCardLimit === 'number'
-          ? v12.dailyNewCardLimit
-          : DEFAULT_SETTINGS.dailyNewCardLimit,
       quizAutoSpeak: !!v12.quizAutoSpeak,
       flashcardAutoSpeak: !!v12.flashcardAutoSpeak,
       typingTolerant: !!v12.typingTolerant,
@@ -150,6 +148,8 @@ export async function migrateV12ToV13(): Promise<MigrationResult> {
       dailyNewStats: v12.dailyNewStats?.english ?? { ...EMPTY_DAILY_STATS },
       trainingLog: Array.isArray(v12.trainingLog?.english) ? v12.trainingLog!.english : [],
       lastOpenedAt: null,
+      dailyCardLimit: migratedCardLimit,
+      dailyNewCardLimit: migratedNewCardLimit,
     };
     const spanishFile: FileState = {
       fileId: spanishFileId,
@@ -161,6 +161,8 @@ export async function migrateV12ToV13(): Promise<MigrationResult> {
       dailyNewStats: v12.dailyNewStats?.spanish ?? { ...EMPTY_DAILY_STATS },
       trainingLog: Array.isArray(v12.trainingLog?.spanish) ? v12.trainingLog!.spanish : [],
       lastOpenedAt: null,
+      dailyCardLimit: migratedCardLimit,
+      dailyNewCardLimit: migratedNewCardLimit,
     };
 
     await storageSet(fileKey(englishFileId), JSON.stringify(englishFile));

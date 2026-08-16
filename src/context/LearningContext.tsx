@@ -10,7 +10,7 @@ import {
 } from 'react';
 import { storageGet, storageSet } from '../utils/storage';
 import { migrateV12ToV13 } from '../migrations/v12_to_v13';
-import { DEFAULT_SETTINGS, makeEmptyFileState } from '../config/default_settings';
+import { DEFAULT_DAILY_CARD_LIMIT, DEFAULT_DAILY_NEW_CARD_LIMIT, DEFAULT_SETTINGS, makeEmptyFileState } from '../config/default_settings';
 import { ALL_FILE_IDS, fileExists, getFile } from '../config/file_config';
 import {
   CURRENT_SCHEMA_VERSION,
@@ -53,6 +53,7 @@ interface LearningContextValue {
   getDueCards: () => VocabularyItem[];
   getNewCards: () => VocabularyItem[];
   getQuizCards: () => VocabularyItem[];
+  updateFileLimits: (patch: { dailyCardLimit?: number; dailyNewCardLimit?: number }) => void;
   resetProgress: () => void;
 
   getBoxCounts: () => number[];
@@ -369,6 +370,11 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     mutateActiveFile((s) => ({ ...s, progress: {} }));
   }, [mutateActiveFile]);
 
+  // ── updateFileLimits ────────────────────────────────────────────────────────
+  const updateFileLimits = useCallback((patch: { dailyCardLimit?: number; dailyNewCardLimit?: number }) => {
+    mutateActiveFile((s) => ({ ...s, ...patch }));
+  }, [mutateActiveFile]);
+
   // ── recordTrainingDay ───────────────────────────────────────────────────────
   const recordTrainingDay = useCallback(() => {
     const today = localDateStr(new Date());
@@ -393,7 +399,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
 
     const todayStr = localDateStr(todayDate());
     const reviewedToday = state.dailyStats.date === todayStr ? state.dailyStats.count : 0;
-    const { dailyCardLimit } = settings;
+    const dailyCardLimit = state.dailyCardLimit ?? DEFAULT_DAILY_CARD_LIMIT;
     const effectiveLimit = dailyCardLimit > 0
       ? Math.max(0, dailyCardLimit - reviewedToday)
       : Infinity;
@@ -419,7 +425,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
         return pa.box - pb.box;
       });
     return isFinite(effectiveLimit) ? due.slice(0, effectiveLimit) : due;
-  }, [activeFileId, fileStates, vocabularyByFile, settings]);
+  }, [activeFileId, fileStates, vocabularyByFile]);
 
   // ── getNewCards ─────────────────────────────────────────────────────────────
   const getNewCards = useCallback((): VocabularyItem[] => {
@@ -428,7 +434,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     const vocab = vocabularyByFile[activeFileId];
     if (!state || !vocab) return [];
 
-    const { dailyNewCardLimit } = settings;
+    const dailyNewCardLimit = state.dailyNewCardLimit ?? DEFAULT_DAILY_NEW_CARD_LIMIT;
     if (dailyNewCardLimit === 0) return [];
 
     const todayStr = localDateStr(todayDate());
@@ -449,7 +455,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
       [newCards[i], newCards[j]] = [newCards[j], newCards[i]];
     }
     return isFinite(remaining) ? newCards.slice(0, remaining) : newCards;
-  }, [activeFileId, fileStates, vocabularyByFile, settings]);
+  }, [activeFileId, fileStates, vocabularyByFile]);
 
   // ── getQuizCards ────────────────────────────────────────────────────────────
   // Fach 1 + nie gezeigte Karten, unabhängig von Fälligkeit (nextDate) und
@@ -549,6 +555,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     getDueCards,
     getNewCards,
     getQuizCards,
+    updateFileLimits,
     resetProgress,
     getBoxCounts,
     getTotalStats,
@@ -557,7 +564,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
   }), [
     loaded, activeFileId, fileStates, vocabularyByFile, settings, isSessionActive,
     updateSettings, selectFile, addCustomVocab, removeCustomVocab,
-    markCard, getCardProgress, getDueCards, getNewCards, getQuizCards, resetProgress,
+    markCard, getCardProgress, getDueCards, getNewCards, getQuizCards, updateFileLimits, resetProgress,
     getBoxCounts, getTotalStats, recordTrainingDay, getTrainingConsistency,
   ]);
 
