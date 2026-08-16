@@ -46,7 +46,7 @@ export const FILE_CONFIG: Record<FileId, FileManifestEntry> = {
     contentVersion: 1,
     loader: () =>
       import('../data/vocabulary/en-klett-v1').then((m) => ({
-        vocabulary: m.VOCABULARY_EN_KLETT,
+        vocabulary: m.enKlettV1,
       })),
   },
   'es-basic-v1': {
