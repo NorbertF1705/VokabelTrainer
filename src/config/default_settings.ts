@@ -2,12 +2,13 @@ import type { AppSettings, DailyStats, FileState, FileId } from '../data/vocabul
 
 export const DEFAULT_SETTINGS: AppSettings = {
   queryDirection: 'de-to-foreign',
-  dailyCardLimit: 20,
-  dailyNewCardLimit: 5,
   quizAutoSpeak: false,
   flashcardAutoSpeak: false,
   typingTolerant: false,
 };
+
+export const DEFAULT_DAILY_CARD_LIMIT = 30;
+export const DEFAULT_DAILY_NEW_CARD_LIMIT = 5;
 
 export const EMPTY_DAILY_STATS: DailyStats = { date: '', count: 0 };
 
@@ -22,5 +23,7 @@ export function makeEmptyFileState(fileId: FileId, contentVersion: number): File
     dailyNewStats: { ...EMPTY_DAILY_STATS },
     trainingLog: [],
     lastOpenedAt: null,
+    dailyCardLimit: DEFAULT_DAILY_CARD_LIMIT,
+    dailyNewCardLimit: DEFAULT_DAILY_NEW_CARD_LIMIT,
   };
 }
