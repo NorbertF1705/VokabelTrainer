@@ -71,7 +71,7 @@ export default function FlashCard({
         <div className="fc-face">
           <span style={badge}>{BOX_LABELS[boxIdx]}</span>
           <span style={categoryLabel}>{category}</span>
-          <span style={{ fontSize: 80, marginBottom: 16, lineHeight: 1 }}>{emoji}</span>
+          <span className="fc-emoji">{emoji}</span>
           <span style={{ fontSize: adaptiveFontSize(frontText, 34), fontWeight: 800, color: Colors.text, textAlign: 'center', marginBottom: 20, letterSpacing: -0.5 }}>
             {frontText}
           </span>
@@ -90,7 +90,7 @@ export default function FlashCard({
         {/* BACK */}
         <div className="fc-face fc-back">
           <span style={badge}>{BOX_LABELS[boxIdx]}</span>
-          <span style={{ fontSize: 80, marginBottom: 12, lineHeight: 1 }}>{emoji}</span>
+          <span className="fc-emoji">{emoji}</span>
           <span style={{ fontSize: adaptiveFontSize(backText, 36), fontWeight: 800, color: Colors.text, textAlign: 'center', marginBottom: 6, letterSpacing: -0.5 }}>
             {backText}
           </span>

@@ -89,6 +89,11 @@ function speak(text: string, lang: string) {
   window.speechSynthesis.speak(u);
 }
 
+function speakCard(card: VocabularyItem, lang: string) {
+  const text = card.inflections ? `${card.translation}. ${card.inflections}` : card.translation;
+  speak(text, lang);
+}
+
 export default function Learn() {
   const { settings, getDueCards, getNewCards, startQuizPool, getCardProgress, markCard, recordTrainingDay, setSessionActive } = useLearning();
   const activeFile = useActiveFile();
@@ -194,7 +199,7 @@ export default function Learn() {
 
   const speakWord = () => {
     if (!currentCard) return;
-    speak(currentCard.translation, voiceCode);
+    speakCard(currentCard, voiceCode);
   };
 
   useEffect(() => {
@@ -269,7 +274,7 @@ export default function Learn() {
     setQuizAnswerCorrect(correct);
     setQuizFlipKey(k => k + 1);
     if (quizAutoSpeak) {
-      speak(currentCard.translation, voiceCode);
+      speakCard(currentCard, voiceCode);
     }
   };
 
@@ -567,7 +572,7 @@ export default function Learn() {
             onFlip={(flipped) => {
               setIsFlipped(flipped);
               if (flipped && flashcardAutoSpeak && currentCard) {
-                speak(currentCard.translation, voiceCode);
+                speakCard(currentCard, voiceCode);
               }
             }}
             forceReset={flipReset}

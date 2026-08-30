@@ -47,21 +47,24 @@ export default function Home() {
         <section style={{ marginTop: 24 }}>
           <p style={sectionTitle}>Abfragerichtung</p>
           <div style={{ display: 'flex', gap: 10 }}>
-            {dirConfig.map(({ dir, label }) => (
-              <button
-                key={dir}
-                onClick={() => updateSettings({ queryDirection: dir })}
-                style={{
-                  ...toggleBtn,
-                  ...(settings.queryDirection === dir ? toggleBtnActive : {}),
-                }}
-              >
-                <span style={{
-                  fontSize: 16, fontWeight: 800,
-                  color: settings.queryDirection === dir ? Colors.purple : Colors.textMuted,
-                }}>{label}</span>
-              </button>
-            ))}
+            {dirConfig.map(({ dir, label }) => {
+              const active = settings.queryDirection === dir;
+              return (
+                <button
+                  key={dir}
+                  onClick={() => updateSettings({ queryDirection: dir })}
+                  style={{
+                    ...toggleBtn,
+                    ...(active ? toggleBtnActive : {}),
+                  }}
+                >
+                  <span style={{
+                    fontSize: 16, fontWeight: 800,
+                    color: active ? '#fff' : Colors.textMuted,
+                  }}>{label}</span>
+                </button>
+              );
+            })}
           </div>
         </section>
 
@@ -147,5 +150,7 @@ const toggleBtn: React.CSSProperties = {
 };
 
 const toggleBtnActive: React.CSSProperties = {
-  borderColor: Colors.purple, background: '#EDE8FF',
+  borderColor: 'transparent',
+  background: `linear-gradient(135deg, ${Colors.purple}, #7C3AED)`,
+  boxShadow: '0 4px 14px rgba(124,58,237,0.35)',
 };
