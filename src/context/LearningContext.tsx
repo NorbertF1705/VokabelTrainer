@@ -23,6 +23,7 @@ import { BOX_INTERVALS } from '../constants/theme';
 import type {
   AppSettings,
   CardProgress,
+  ExampleSentence,
   FileId,
   FileState,
   VocabularyItem,
@@ -38,6 +39,7 @@ interface LearningContextValue {
   activeFileId: FileId | null;
   fileStates: Record<FileId, FileState>;
   vocabularyByFile: Record<FileId, VocabularyItem[]>;
+  examplesByFile: Record<FileId, ExampleSentence[]>;
   settings: AppSettings;
   isSessionActive: boolean;
 
@@ -52,6 +54,8 @@ interface LearningContextValue {
   getCardProgress: (vocabId: string) => CardProgress | undefined;
   getDueCards: () => VocabularyItem[];
   getNewCards: () => VocabularyItem[];
+  ensureExamplesLoaded: (fileId: FileId) => Promise<boolean>;
+  getExampleFor: (vocabId: string) => ExampleSentence | null;
   updateFileLimits: (patch: { dailyCardLimit?: number; dailyNewCardLimit?: number }) => void;
   startQuizPool: () => { cards: VocabularyItem[]; promotedCount: number };
   resetProgress: () => void;
@@ -124,6 +128,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
   const [activeFileId, setActiveFileId] = useState<FileId | null>(null);
   const [fileStates, setFileStates] = useState<Record<FileId, FileState>>({});
   const [vocabularyByFile, setVocabularyByFile] = useState<Record<FileId, VocabularyItem[]>>({});
+  const [examplesByFile, setExamplesByFile] = useState<Record<FileId, ExampleSentence[]>>({});
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [isSessionActive, setSessionActive] = useState(false);
 
@@ -132,10 +137,12 @@ export function LearningProvider({ children }: { children: ReactNode }) {
   const activeFileIdRef = useRef(activeFileId);
   const settingsRef = useRef(settings);
   const vocabularyByFileRef = useRef(vocabularyByFile);
+  const examplesByFileRef = useRef(examplesByFile);
   useEffect(() => { fileStatesRef.current = fileStates; }, [fileStates]);
   useEffect(() => { activeFileIdRef.current = activeFileId; }, [activeFileId]);
   useEffect(() => { settingsRef.current = settings; }, [settings]);
   useEffect(() => { vocabularyByFileRef.current = vocabularyByFile; }, [vocabularyByFile]);
+  useEffect(() => { examplesByFileRef.current = examplesByFile; }, [examplesByFile]);
 
   // ── Bootstrap ───────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -472,6 +479,45 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     return isFinite(remaining) ? newCards.slice(0, remaining) : newCards;
   }, [activeFileId, fileStates, vocabularyByFile]);
 
+  // ── ensureExamplesLoaded (v1.5) ─────────────────────────────────────────────
+  // Lädt die Beispielsätze eines Pakets lazy nach (nur wenn das Paket einen
+  // examplesLoader hat). Kein Blocker für den Session-Start in Learn.tsx — schlägt
+  // das Laden fehl oder gibt es keine examplesLoader, liefert getExampleFor() unten
+  // einfach weiter null, die Session läuft ganz normal ohne Satzkarten.
+  const ensureExamplesLoaded = useCallback(async (fileId: FileId): Promise<boolean> => {
+    if (examplesByFileRef.current[fileId]) return true;
+    const manifest = getFile(fileId);
+    if (!manifest?.examplesLoader) return false;
+    try {
+      const { examples } = await manifest.examplesLoader();
+      setExamplesByFile((prev) => ({ ...prev, [fileId]: examples }));
+      return true;
+    } catch (e) {
+      console.error(`[LearningContext] Beispielsätze-Laden fehlgeschlagen (${fileId}):`, e);
+      return false;
+    }
+  }, []);
+
+  // ── getExampleFor (v1.5) ────────────────────────────────────────────────────
+  // Einzelkarten-Lookup statt eigener Kandidaten-Pool (siehe PLAN_V1.5.md,
+  // Strategiewechsel): liefert null, wenn (noch) keine Satzvariante möglich ist —
+  // Aufrufer fällt dann einfach auf die normale Wortkarte zurück. Schwelle ist
+  // "schon mindestens einmal abgefragt" (lastReviewed !== null), dasselbe
+  // Kriterium, das getNewCards() oben für "nicht mehr neu" verwendet.
+  const getExampleFor = useCallback((vocabId: string): ExampleSentence | null => {
+    if (!activeFileId || !settings.includeSentences) return null;
+    const state = fileStates[activeFileId];
+    const examples = examplesByFile[activeFileId];
+    if (!state || !examples) return null;
+
+    const progress = state.progress[vocabId];
+    if (!progress || progress.lastReviewed === null) return null;
+
+    const candidates = examples.filter((ex) => ex.vocabId === vocabId);
+    if (candidates.length === 0) return null;
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  }, [activeFileId, fileStates, examplesByFile, settings.includeSentences]);
+
   // ── startQuizPool ───────────────────────────────────────────────────────────
   // Quiz drillt gezielt Fach 2. Ist Fach 2 kleiner als QUIZ_MIN_POOL, wird zufällig
   // aus Fach 1 (inkl. nie geübter Karten) aufgefüllt und SOFORT dauerhaft auf Fach 2
@@ -583,6 +629,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     activeFileId,
     fileStates,
     vocabularyByFile,
+    examplesByFile,
     settings,
     isSessionActive,
     updateSettings,
@@ -594,6 +641,8 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     getCardProgress,
     getDueCards,
     getNewCards,
+    ensureExamplesLoaded,
+    getExampleFor,
     updateFileLimits,
     startQuizPool,
     resetProgress,
@@ -602,9 +651,10 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     recordTrainingDay,
     getTrainingConsistency,
   }), [
-    loaded, activeFileId, fileStates, vocabularyByFile, settings, isSessionActive,
+    loaded, activeFileId, fileStates, vocabularyByFile, examplesByFile, settings, isSessionActive,
     updateSettings, selectFile, addCustomVocab, removeCustomVocab,
-    markCard, getCardProgress, getDueCards, getNewCards, updateFileLimits, startQuizPool, resetProgress,
+    markCard, getCardProgress, getDueCards, getNewCards, ensureExamplesLoaded, getExampleFor,
+    updateFileLimits, startQuizPool, resetProgress,
     getBoxCounts, getTotalStats, recordTrainingDay, getTrainingConsistency,
   ]);
 

@@ -574,7 +574,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.4.12 · August 2026</div>
+    <div class="nav-version">Version 1.5.0 · August 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -583,7 +583,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.4.12</span>
+        <span class="badge">v1.5.0</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -852,7 +852,8 @@
             <tr><td><code>activeFileId</code></td><td><code>FileId | null</code></td><td>ID der aktiven Vokabeldatei; <code>null</code> = kein Paket gewählt → <code>FirstRun</code> wird gezeigt</td></tr>
             <tr><td><code>fileStates</code></td><td><code>Record&lt;FileId, FileState&gt;</code></td><td>Fortschritts-State pro Datei (progress, customVocabulary, dailyStats, trainingLog …)</td></tr>
             <tr><td><code>vocabularyByFile</code></td><td><code>Record&lt;FileId, VocabularyItem[]&gt;</code></td><td>Eingebaute Vokabeln je Datei; lazy geladen per Dynamic Import</td></tr>
-            <tr><td><code>settings</code></td><td><code>AppSettings</code></td><td>Globale Einstellungen: queryDirection, dailyCardLimit, dailyNewCardLimit, autoSpeak-Flags, typingTolerant</td></tr>
+            <tr><td><code>examplesByFile</code></td><td><code>Record&lt;FileId, ExampleSentence[]&gt;</code></td><td>Beispielsätze je Datei (v1.5); <strong>nicht</strong> beim Bootstrap geladen, sondern erst über <code>ensureExamplesLoaded()</code> beim Start einer Eingabe-Modus-Session</td></tr>
+            <tr><td><code>settings</code></td><td><code>AppSettings</code></td><td>Globale Einstellungen: queryDirection, dailyCardLimit, dailyNewCardLimit, autoSpeak-Flags, typingTolerant, includeSentences</td></tr>
             <tr><td><code>isSessionActive</code></td><td><code>boolean</code></td><td>Läuft gerade eine Lernsitzung? Schützt Datei-Wechsel mit Bestätigungsdialog</td></tr>
           </tbody>
         </table>
@@ -986,6 +987,21 @@
 }</code></pre>
 
       <p>Der Fortschritts-Schlüssel im <code>progress</code>-Objekt lautet immer <code>{vocabId}_{lang}</code>, z.B. <code>apple_english</code>. Dadurch ist der Fortschritt für jede Sprache separat gespeichert – eine englische Vokabel und eine spanische mit gleicher ID stören sich nicht.</p>
+
+      <h3>ExampleSentence (vocabulary_types.ts, ab v1.5)</h3>
+      <p>Beispielsatz zu einer Vokabel — KI-generiert oder aus Quellmaterial extrahiert (siehe <code>docs/PLAN_V1.5.md</code>, Block C):</p>
+      <pre><code>interface ExampleSentence {
+  id:           string;  // z.B. "g2001-1" (vocabId + laufende Nummer)
+  vocabId:      string;  // FK -> VocabularyItem.id
+  target:       string;  // Satz in der Zielsprache
+  native:       string;  // deutsche Übersetzung des Satzes
+  answer:       string;  // exakte Form der Vokabel in `target` (Cloze-Maskierung + Abgleich)
+  nativeAnswer: string;  // exakte Form der Vokabel in `native` (nur fürs Hervorheben)
+}</code></pre>
+      <p><code>answer</code>/<code>nativeAnswer</code> sind bewusst eigene Felder statt einer Ableitung aus <code>translation</code>/<code>german</code>: Die im Satz verwendete Wortform weicht oft von der Grundform ab ("to accept" → "accepted", "annehmen" → "nimmt … an"). Beide Felder müssen wortwörtlich als Teilstring in <code>target</code> bzw. <code>native</code> vorkommen — sonst funktionieren weder Maskierung noch Hervorhebung. <code>splitAt()</code> in <code>src/utils/sentenceHighlight.ts</code> zerlegt einen Satz an einer Teilphrase und wird von <code>SentenceCard.tsx</code> für beides genutzt; liefert die Phrase keinen Treffer, wird der Satz unverändert ohne Maskierung/Hervorhebung angezeigt (kein Absturz).</p>
+
+      <h3>Beispielsatz-Dateien (src/data/examples/, ab v1.5)</h3>
+      <p>Analog zu den Vokabeldateien liegt pro Paket eine eigene, lazy geladene Datei unter <code>src/data/examples/&lt;fileId&gt;.ts</code>. Verknüpfung über das optionale Feld <code>examplesLoader</code> auf <code>FileManifestEntry</code> in <code>file_config.ts</code> — fehlt es, bietet das Paket (noch) keine Satzkarten an (<code>hasExamples(id)</code> prüft das). Solange keine Inhalte vorliegen, enthält die Datei ein leeres Array; <code>getExampleFor()</code> im <code>LearningContext</code> liefert dann einfach <code>null</code>, der Eingabe-Modus fällt automatisch auf die normale Wortkarte zurück — es gibt keinen eigenen "Satzmodus" und keinen separaten Kandidaten-Pool, der leer laufen könnte.</p>
 
       <h3>Vokabeldaten (src/data/vocabulary/)</h3>
       <p>Ab v1.3 liegen Vokabeldaten als schlanke Re-Export-Wrapper unter <code>src/data/vocabulary/</code>. Jede Datei re-exportiert ein Array unter einem File-spezifischen Namen:</p>
@@ -1623,6 +1639,25 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
       <div class="section-header">
         <div class="section-num">📋</div>
         <h2>Release Notes</h2>
+      </div>
+
+      <!-- v1.5.0 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.5.0</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-08-30</span>
+        </div>
+        <p style="margin-bottom:0.5rem;">Grundlage für Beispielsätze im Eingabe-Modus. Vollständiger Plan mit Datenmodell-Diff, Strategiewechseln und Verifikationsnotizen: <code>docs/PLAN_V1.5.md</code>.</p>
+        <ul>
+          <li><strong>Kein eigener "Satzmodus":</strong> Erste Planfassung sah einen eigenständigen Session-Typ mit Kandidaten-Filter auf <code>box &gt;= 2</code> vor — dasselbe Pool-Problem wie beim bestehenden Quiz-Modus (dort mit <code>QUIZ_MIN_POOL</code> + Fach-1-Beförderung gelöst), hier aber ohne Sicherung. Stattdessen: <code>getExampleFor(vocabId)</code> als reiner Einzelkarten-Lookup, aufgerufen pro Karte innerhalb der bestehenden <code>'type'</code>-Session. Schwelle zusätzlich gelockert von <code>box &gt;= 2</code> auf <code>lastReviewed !== null</code> (dasselbe Kriterium wie <code>getNewCards()</code> für "nicht mehr neu"). Liefert die Funktion <code>null</code>, rendert <code>Learn.tsx</code> unverändert die normale Wortkarte — die Session kann dadurch strukturell nie leer werden.</li>
+          <li><strong>Neuer Typ <code>ExampleSentence</code></strong> (<code>vocabulary_types.ts</code>): <code>id</code>, <code>vocabId</code>, <code>target</code>, <code>native</code>, <code>answer</code>, <code>nativeAnswer</code>. Kein separat gespeichertes Cloze-Textfeld — Maskierung und Hervorhebung laufen zur Laufzeit über <code>splitAt()</code> (neu: <code>src/utils/sentenceHighlight.ts</code>) gegen <code>answer</code>/<code>nativeAnswer</code> als Teilstrings.</li>
+          <li><strong>Optionales Feld <code>examplesLoader</code></strong> auf <code>FileManifestEntry</code>, analog zum bestehenden <code>loader</code> für Vokabeln — Beispielsätze liegen als eigene Dateien unter <code>src/data/examples/&lt;fileId&gt;.ts</code>, per Dynamic Import in einem eigenen Chunk, getrennt vom Vokabel-Chunk desselben Pakets. Build verifiziert: <code>en-grund2-v1</code> erzeugt zwei getrennte Chunks (Vokabeln 49&nbsp;kB, Beispiele bei leerem Array 0,04&nbsp;kB).</li>
+          <li><strong><code>LearningContext.tsx</code></strong>: neuer State <code>examplesByFile</code> (nicht beim Bootstrap eager geladen), neue Methoden <code>ensureExamplesLoaded(fileId)</code> (lazy nachladen, fire-and-forget beim Start einer <code>'type'</code>-Session) und <code>getExampleFor(vocabId)</code> (Einzelkarten-Lookup, s.o.).</li>
+          <li><strong>Neue Komponente <code>SentenceCard.tsx</code></strong>: reine Anzeige (kein eigener Screen, kein Exit-Button, keine Fortschrittsleiste), ersetzt in <code>Learn.tsx</code>s <code>'type'</code>-Branch nur die "Frage"-Karte; Eingabefeld, Tastatur-Shortcuts und <code>evaluateTypedAnswer()</code> bleiben unverändert. <code>handleTypeSubmit()</code> und die lokale <code>effectiveCorrectAnswer</code>-Variable im <code>'type'</code>-Branch verwenden <code>example.answer</code> statt <code>currentCard[answerField]</code>, wenn eine Satzvariante aktiv ist — die gemeinsam mit dem Quiz-Modus genutzte Variable <code>correctAnswer</code> (ohne Suffix) bleibt davon bewusst unberührt.</li>
+          <li><strong>Neuer Settings-Schalter <code>includeSentences</code></strong> auf <code>AppSettings</code> (Default: <code>true</code>), UI in <code>Settings.tsx</code> unter "Eingabe-Modus". Schaltet die Beimischung vollständig ab, ohne die geladenen Beispieldaten zu verwerfen.</li>
+          <li><strong>Kein neues Storage-Schema:</strong> <code>CURRENT_SCHEMA_VERSION</code> bleibt <code>"3"</code>. Ein Satz zählt als Vertreter seiner Vokabel; <code>markCard()</code> läuft unverändert gegen die bestehende <code>progress[vocabId]</code>. Bewusst zurückgestellt: separate SR-Verfolgung pro Satz (würde Migration analog <code>v12_to_v13.ts</code> erfordern).</li>
+          <li><strong>Beispielsätze selbst:</strong> Block C (Beschaffung) bewusst zurückgestellt. Zwei geplante Quellen: KI-Generierung (Batch-API, mit automatisierter statt manueller Qualitätsprüfung) für die meisten Pakete, Extraktion aus den Original-Fotos des Klett-Grundwortschatz-Buchs für <code>en-klett-v1</code> (dieselbe Quelle, aus der die Vokabelliste selbst 2026-08 transkribiert wurde, Commits <code>83fa38d</code>…<code>e264417</code>). Bis dahin sind alle <code>examples/</code>-Dateien leere Platzhalter-Arrays.</li>
+        </ul>
       </div>
 
       <!-- v1.4.12 -->

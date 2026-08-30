@@ -5,6 +5,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   quizAutoSpeak: false,
   flashcardAutoSpeak: false,
   typingTolerant: false,
+  includeSentences: true,
 };
 
 export const DEFAULT_DAILY_CARD_LIMIT = 30;

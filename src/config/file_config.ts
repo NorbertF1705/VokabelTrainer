@@ -24,6 +24,10 @@ export const FILE_CONFIG: Record<FileId, FileManifestEntry> = {
       import('../data/vocabulary/en-grund2-v1').then((m) => ({
         vocabulary: m.VOCABULARY_EN_GRUND2,
       })),
+    examplesLoader: () =>
+      import('../data/examples/en-grund2-v1').then((m) => ({
+        examples: m.EXAMPLES_EN_GRUND2,
+      })),
   },
   'en-a2b1-v1': {
     id: 'en-a2b1-v1',
@@ -47,6 +51,10 @@ export const FILE_CONFIG: Record<FileId, FileManifestEntry> = {
     loader: () =>
       import('../data/vocabulary/en-klett-v1').then((m) => ({
         vocabulary: m.enKlettV1,
+      })),
+    examplesLoader: () =>
+      import('../data/examples/en-klett-v1').then((m) => ({
+        examples: m.EXAMPLES_EN_KLETT,
       })),
   },
   'es-basic-v1': {
@@ -86,6 +94,10 @@ export function getFile(id: FileId | null | undefined): FileManifestEntry | null
 
 export function fileExists(id: FileId | null | undefined): boolean {
   return !!getFile(id);
+}
+
+export function hasExamples(id: FileId | null | undefined): boolean {
+  return !!getFile(id)?.examplesLoader;
 }
 
 export function listFiles(): FileManifestEntry[] {

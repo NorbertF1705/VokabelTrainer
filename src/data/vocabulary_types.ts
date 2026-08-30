@@ -28,6 +28,16 @@ export interface VocabularyItem {
   isCustom?: boolean;
 }
 
+/** Ein Beispielsatz zu einer Vokabel (v1.5) — KI-generiert oder aus Quellmaterial extrahiert. */
+export interface ExampleSentence {
+  id: string;           // z. B. "g2001-1" (vocabId + laufende Nummer)
+  vocabId: string;      // FK -> VocabularyItem.id
+  target: string;       // Satz in der Zielsprache
+  native: string;       // deutsche Übersetzung des Satzes
+  answer: string;       // exakte Form der Vokabel in `target` (Cloze-Maskierung + Abgleich)
+  nativeAnswer: string; // exakte Form der Vokabel in `native` (nur fürs Hervorheben, kein Abgleich)
+}
+
 export interface CardProgress {
   box: number;
   lastReviewed: string | null;
@@ -52,6 +62,7 @@ export interface AppSettings {
   quizAutoSpeak: boolean;
   flashcardAutoSpeak: boolean;
   typingTolerant: boolean;
+  includeSentences: boolean; // Satzkarten im Eingabe-Modus einstreuen (v1.5)
 }
 
 export interface DailyStats {
@@ -83,4 +94,6 @@ export interface FileManifestEntry {
   voice: string; // BCP-47 für Web Speech API
   contentVersion: number;
   loader: () => Promise<{ vocabulary: VocabularyItem[] }>;
+  /** Fehlt dieses Feld, bietet das Paket (noch) keine Satzkarten an. */
+  examplesLoader?: () => Promise<{ examples: ExampleSentence[] }>;
 }

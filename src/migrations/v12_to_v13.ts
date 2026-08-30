@@ -130,6 +130,7 @@ export async function migrateV12ToV13(): Promise<MigrationResult> {
       quizAutoSpeak: !!v12.quizAutoSpeak,
       flashcardAutoSpeak: !!v12.flashcardAutoSpeak,
       typingTolerant: !!v12.typingTolerant,
+      includeSentences: DEFAULT_SETTINGS.includeSentences,
     };
     await storageSet(KEY_SETTINGS, JSON.stringify(settings));
 
