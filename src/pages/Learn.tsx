@@ -121,6 +121,8 @@ export default function Learn() {
   const [sessionNewCards, setSessionNewCards] = useState(0);
 
   const dueCards = getDueCards();
+  const newCards = getNewCards();
+  const dueOrNewCount = dueCards.length + newCards.length;
 
   useEffect(() => {
     if (queryDirection === 'random') {
@@ -305,18 +307,24 @@ export default function Learn() {
           <h2 style={{ fontSize: 26, fontWeight: 900, color: Colors.text, marginBottom: 24 }}>Sitzung starten</h2>
 
           {([
-            { mode: 'due' as SessionMode, colors: ['#FF6B6B', '#FF8E53'], emoji: '🎯', title: 'Fällige Karten', sub: `${dueCards.length} Karten heute fällig` },
-            { mode: 'all' as SessionMode, colors: ['#A78BFA', '#7C3AED'], emoji: '🔁', title: 'Alle Vokabeln', sub: `Alle ${allVocabulary.length} Karten üben` },
-            { mode: 'quiz' as SessionMode, colors: ['#4ECDC4', '#2ECC71'], emoji: '🧩', title: 'Quiz', sub: 'Mindestens 30 Vokabeln in Fach 2 werden im Quizmodus abgefragt' },
-            { mode: 'type' as SessionMode, colors: ['#F59E0B', '#D97706'], emoji: '✍️', title: 'Eingabe-Modus', sub: 'Antworte durch Tippen' },
-          ] as const).map(({ mode, colors, emoji, title, sub }) => (
+            { mode: 'due' as SessionMode, colors: ['#FF6B6B', '#FF8E53'], emoji: '🎯', title: 'Fällige Karten', sub: `${dueCards.length} Karten heute fällig`, disabledSub: 'Keine Karten heute fällig' },
+            { mode: 'all' as SessionMode, colors: ['#A78BFA', '#7C3AED'], emoji: '🔁', title: 'Alle Vokabeln', sub: `Alle ${allVocabulary.length} Karten üben`, disabledSub: 'Keine Vokabeln in diesem Paket' },
+            { mode: 'quiz' as SessionMode, colors: ['#4ECDC4', '#2ECC71'], emoji: '🧩', title: 'Quiz', sub: 'Mindestens 30 Vokabeln in Fach 2 werden im Quizmodus abgefragt', disabledSub: 'Noch keine 30 Vokabeln in Fach 2' },
+            { mode: 'type' as SessionMode, colors: ['#F59E0B', '#D97706'], emoji: '✍️', title: 'Eingabe-Modus', sub: 'Antworte durch Tippen', disabledSub: 'Keine fälligen oder neuen Karten übrig' },
+          ] as const).map(({ mode, colors, emoji, title, sub, disabledSub }) => {
+            const disabled = (mode === 'due' || mode === 'type') ? dueOrNewCount === 0
+              : mode === 'all' ? allVocabulary.length === 0
+              : false; // 'quiz' meldet einen leeren Pool selbst beim Klick (startQuizPool)
+            return (
             <button
               key={mode}
-              onClick={() => startSession(mode)}
+              onClick={() => !disabled && startSession(mode)}
+              disabled={disabled}
               style={{
-                width: '100%', border: 'none', cursor: 'pointer', padding: 0,
+                width: '100%', border: 'none', cursor: disabled ? 'default' : 'pointer', padding: 0,
                 borderRadius: 16, overflow: 'hidden', marginBottom: 14,
-                boxShadow: '0 4px 16px rgba(45,27,105,0.18)',
+                boxShadow: disabled ? 'none' : '0 4px 16px rgba(45,27,105,0.18)',
+                opacity: disabled ? 0.5 : 1,
               }}
             >
               <div style={{
@@ -326,11 +334,12 @@ export default function Learn() {
                 <span style={{ fontSize: 40 }}>{emoji}</span>
                 <div style={{ textAlign: 'left' }}>
                   <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>{title}</div>
-                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 500, marginTop: 2 }}>{sub}</div>
+                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 500, marginTop: 2 }}>{disabled ? disabledSub : sub}</div>
                 </div>
               </div>
             </button>
-          ))}
+            );
+          })}
 
           {dueCards.length === 0 && (
             <div style={{ background: Colors.card, borderRadius: 16, padding: 28, textAlign: 'center', marginTop: 16, boxShadow: '0 2px 8px rgba(45,27,105,0.08)' }}>
