@@ -137,6 +137,11 @@ export default function Learn() {
   }, [effectiveDirection]);
 
   const currentCard = sessionCards?.[currentIndex];
+  // Satzkarte (v1.5): in 'type' immer aktiv sofern verfügbar; in 'due'/'all' pro
+  // Karte, wenn ein Beispielsatz existiert — sonst normale Karteikarte. Im
+  // Quiz-Modus (Multiple-Choice) gibt es grundsätzlich keine Satzkarten.
+  const currentExample = currentCard && sessionMode !== 'quiz' ? getExampleFor(currentCard.id) : null;
+  const isSentenceCard = currentExample !== null;
 
   useEffect(() => {
     if (sessionMode !== 'quiz' || !currentCard) return;
@@ -162,7 +167,7 @@ export default function Learn() {
   }, [setSessionActive]);
 
   const startSession = useCallback((mode: SessionMode) => {
-    if (mode === 'type' && activeFile) {
+    if ((mode === 'type' || mode === 'due' || mode === 'all') && activeFile) {
       // fire-and-forget: Session startet auch, falls das Paket keine oder noch
       // nicht geladene Beispielsätze hat (getExampleFor() liefert dann null)
       ensureExamplesLoaded(activeFile.manifest.id);
@@ -213,7 +218,7 @@ export default function Learn() {
   useEffect(() => {
     if (!sessionCards || sessionDone) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (sessionMode === 'type') {
+      if (sessionMode === 'type' || isSentenceCard) {
         if (e.code === 'Enter') {
           e.preventDefault();
           if (typeResult !== null) {
@@ -248,7 +253,7 @@ export default function Learn() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sessionMode, sessionCards, sessionDone, isFlipped, quizOptions, selectedAnswer, quizAnswerCorrect, typeResult]);
+  }, [sessionMode, sessionCards, sessionDone, isFlipped, quizOptions, selectedAnswer, quizAnswerCorrect, typeResult, isSentenceCard]);
 
   const advanceCard = (correct: boolean) => {
     if (!currentCard || !sessionCards) return;
@@ -393,9 +398,8 @@ export default function Learn() {
   }
 
   // ── Eingabe-Modus ────────────────────────────────────────
-  if (sessionMode === 'type') {
+  if (sessionMode === 'type' || isSentenceCard) {
     const correctAnswer2 = currentCard ? (currentCard[answerField] as string) : '';
-    const currentExample = currentCard ? getExampleFor(currentCard.id) : null;
     const effectiveCorrectAnswer = currentExample ? currentExample.answer : correctAnswer2;
     const resultColors = {
       correct: { bg: '#E0F9EC', border: Colors.success, text: Colors.success, label: '✓ Richtig!' },
