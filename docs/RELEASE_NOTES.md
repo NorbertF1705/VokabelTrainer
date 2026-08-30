@@ -2,6 +2,46 @@
 
 ---
 
+## v1.5.0 — 2026-08-30
+
+### Grundlage für Beispielsätze im Eingabe-Modus
+
+Der Eingabe-Modus kann jetzt zu bereits mindestens einmal abgefragten Vokabeln
+gelegentlich einen **Lückensatz** statt der einzelnen Vokabel zeigen (Cloze-Test):
+Der Zielsatz erscheint mit maskierter Vokabel, darunter der deutsche Satz mit
+optisch hervorgehobenem Wort als Hilfestellung. Bewertet wird weiterhin exakt wie
+gewohnt (Eingabefeld, Tipptoleranz, Enter-Bestätigung).
+
+**Sichtbare Änderungen für den Benutzer:**
+
+- **Einstellungen → Eingabe-Modus:** neuer Schalter „Beispielsätze einstreuen"
+  (standardmäßig aktiv)
+- Kein neuer Lernmodus, keine neue Kachel — die Satzfrage ist eine Beimischung
+  innerhalb der bestehenden „Fällige Karten" / „Eingabe-Modus"-Sitzung
+
+**Inhalt:** Für **Englisch – Grundwortschatz (Klett)** stehen ab sofort 476
+Beispielsätze für 351 der 2056 Vokabeln bereit, extrahiert aus den Originalfotos
+des Lehrbuchs (S. 13–116). Für alle anderen Lernpakete legt diese Version zunächst
+nur die technische Grundlage (Datenmodell, Lazy-Loading, UI-Integration) — solange
+für ein Paket noch keine Beispielsätze vorliegen, verhält sich der Eingabe-Modus
+unverändert wie bisher.
+
+**Interne Änderungen:**
+
+- Neuer Typ `ExampleSentence` (`src/data/vocabulary_types.ts`), optionales Feld
+  `examplesLoader` auf `FileManifestEntry`
+- Beispielsätze liegen als eigene, lazy geladene Dateien unter
+  `src/data/examples/<fileId>.ts` — analog zum bestehenden Lazy-Loading der
+  Vokabeldateien selbst; kein neues Storage-Schema, kein Server
+- `LearningContext`: `getExampleFor(vocabId)` als reiner Einzelkarten-Lookup statt
+  eines eigenen Kandidaten-Pools — Session kann dadurch nie leer werden
+- Neue Komponente `SentenceCard.tsx` + Hilfsfunktion `splitAt()`
+  (`src/utils/sentenceHighlight.ts`) für Maskierung und Hervorhebung
+
+Details: `docs/PLAN_V1.5.md`
+
+---
+
 ## v1.3.1 — 2026-05-19
 
 ### Bugfixes

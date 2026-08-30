@@ -1,7 +1,7 @@
 # VokabelTrainer – Benutzerdokumentation
 
-**Version:** 1.3.1  
-**Stand:** Mai 2026
+**Version:** 1.5.0  
+**Stand:** August 2026
 
 ---
 
@@ -151,6 +151,23 @@ Der Lernen-Tab bietet vier verschiedene Lernmodi. Vor dem Start wird ein Auswahl
 
 > Ob „fast richtig" als korrekt gewertet wird, hängt von der Einstellung **Tipptolerant** ab (siehe Kapitel 8).
 
+#### Satzfragen (ab v1.5)
+
+Im Eingabe-Modus kann statt der einzelnen Vokabel gelegentlich ein **Lückensatz**
+erscheinen: Ein Beispielsatz in der Zielsprache mit einer Lücke anstelle der
+gesuchten Vokabel, darunter der deutsche Satz zur Orientierung — das entsprechende
+deutsche Wort ist darin hervorgehoben. Getippt und geprüft wird das fehlende Wort
+genau wie sonst auch.
+
+- Satzfragen erscheinen nur zu Vokabeln, die schon **mindestens einmal** abgefragt
+  wurden — brandneue Karten werden immer als einzelne Vokabel gezeigt
+- Aktuell verfügbar für **Englisch – Grundwortschatz (Klett)** (476 Beispielsätze
+  zu 351 der 2056 Vokabeln, aus dem Lehrbuch übernommen); für die übrigen
+  Lernpakete liegen noch keine Beispielsätze vor, dort verhält sich der
+  Eingabe-Modus wie gewohnt
+- Über **Einstellungen → Eingabe-Modus → Beispielsätze einstreuen** lässt sich diese
+  Beimischung ganz abschalten (siehe Kapitel 9)
+
 ### Audio
 
 In allen Lernmodi ist oben rechts der 🔈-Button verfügbar, der das aktuell angezeigte Wort vorliest. Alternativ kann das Vorlesen automatisch nach dem Aufdecken der Antwort aktiviert werden (siehe Einstellungen).
@@ -247,6 +264,7 @@ Der Button am Ende der Seite setzt alle Karten des aktiven Pakets auf Fach 1 zur
 | **Quiz – Lösung vorlesen** | Spricht die richtige Antwort beim Antippen vor |
 | **Karteikarten – Lösung vorlesen** | Spricht die Rückseite automatisch beim Aufdecken vor |
 | **Tipptolerant** | Kleine Tippfehler im Eingabe-Modus werden als richtig gewertet (Toleranz: 1–2 Zeichen je nach Wortlänge) |
+| **Beispielsätze einstreuen** | Zeigt im Eingabe-Modus gelegentlich einen Lückensatz statt der einzelnen Vokabel (ab v1.5, siehe Kapitel 5) |
 | **Karten pro Tag** | Begrenzt die fälligen Karten pro Sitzung: 10 / 20 / 30 / 50 / ∞ |
 | **Neue Karten pro Tag** | Wie viele unbekannte Karten pro Sitzung eingeführt werden: 0 / 3 / 5 / 10 / ∞ |
 

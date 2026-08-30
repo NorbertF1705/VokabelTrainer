@@ -44,7 +44,7 @@ export default defineConfig({
             urlPattern: /\.(?:js|css|woff2?|ttf|otf|eot|png|svg|ico|jpg|jpeg|webp|gif)$/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'static-assets-v2',
+              cacheName: 'static-assets-v3',
               expiration: {
                 maxEntries: 200,
                 maxAgeSeconds: 60 * 60 * 24 * 365, // 1 Jahr

@@ -147,6 +147,28 @@ export default function Settings() {
                 }} />
               </div>
             </button>
+            <div style={{ height: 1, background: Colors.border, margin: '0 16px' }} />
+            <button
+              onClick={() => updateSettings({ includeSentences: !settings.includeSentences })}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
+            >
+              <span style={{ fontSize: 22, width: 32, textAlign: 'center' }}>📝</span>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <div style={{ fontSize: 16, fontWeight: 600, color: Colors.text }}>Beispielsätze einstreuen</div>
+                <div style={{ fontSize: 12, color: Colors.textMuted, marginTop: 2 }}>Zeigt gelegentlich einen Lückensatz statt der einzelnen Vokabel</div>
+              </div>
+              <div style={{
+                width: 44, height: 26, borderRadius: 13,
+                background: settings.includeSentences ? Colors.purple : Colors.border,
+                position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+              }}>
+                <div style={{
+                  position: 'absolute', top: 3, left: settings.includeSentences ? 21 : 3,
+                  width: 20, height: 20, borderRadius: 10, background: '#fff',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.2)', transition: 'left 0.2s',
+                }} />
+              </div>
+            </button>
           </div>
         </section>
 

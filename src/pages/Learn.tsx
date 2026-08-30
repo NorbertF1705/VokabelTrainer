@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useLearning } from '../context/LearningContext';
 import { useActiveFile } from '../hooks/useActiveFile';
 import FlashCard from '../components/FlashCard';
+import SentenceCard from '../components/SentenceCard';
 import { Colors } from '../constants/theme';
 import { LANGUAGE_LABELS } from '../config/file_config';
 import { VocabularyItem } from '../data/vocabulary';
@@ -95,7 +96,7 @@ function speakCard(card: VocabularyItem, lang: string) {
 }
 
 export default function Learn() {
-  const { settings, getDueCards, getNewCards, startQuizPool, getCardProgress, markCard, recordTrainingDay, setSessionActive } = useLearning();
+  const { settings, getDueCards, getNewCards, startQuizPool, getCardProgress, markCard, recordTrainingDay, setSessionActive, ensureExamplesLoaded, getExampleFor } = useLearning();
   const activeFile = useActiveFile();
   const allVocabulary = activeFile?.allVocabulary ?? [];
   const voiceCode = activeFile?.manifest.voice ?? 'en-US';
@@ -159,6 +160,11 @@ export default function Learn() {
   }, [setSessionActive]);
 
   const startSession = useCallback((mode: SessionMode) => {
+    if (mode === 'type' && activeFile) {
+      // fire-and-forget: Session startet auch, falls das Paket keine oder noch
+      // nicht geladene Beispielsätze hat (getExampleFor() liefert dann null)
+      ensureExamplesLoaded(activeFile.manifest.id);
+    }
     const allVocab = activeFile?.allVocabulary ?? [];
     let cards: VocabularyItem[];
     let newCount = 0;
@@ -195,7 +201,7 @@ export default function Learn() {
     setTypedAnswer('');
     setTypeResult(null);
     setSessionActive(true);
-  }, [activeFile, getDueCards, getNewCards, startQuizPool, getCardProgress, setSessionActive]);
+  }, [activeFile, getDueCards, getNewCards, startQuizPool, getCardProgress, setSessionActive, ensureExamplesLoaded]);
 
   const speakWord = () => {
     if (!currentCard) return;
@@ -280,7 +286,8 @@ export default function Learn() {
 
   const handleTypeSubmit = () => {
     if (!currentCard || typeResult !== null || typedAnswer.trim() === '') return;
-    const correct = currentCard[answerField] as string;
+    const example = getExampleFor(currentCard.id);
+    const correct = example ? example.answer : (currentCard[answerField] as string);
     setTypeResult(evaluateTypedAnswer(typedAnswer, correct, typingTolerant));
   };
 
@@ -379,6 +386,8 @@ export default function Learn() {
   // ── Eingabe-Modus ────────────────────────────────────────
   if (sessionMode === 'type') {
     const correctAnswer2 = currentCard ? (currentCard[answerField] as string) : '';
+    const currentExample = currentCard ? getExampleFor(currentCard.id) : null;
+    const effectiveCorrectAnswer = currentExample ? currentExample.answer : correctAnswer2;
     const resultColors = {
       correct: { bg: '#E0F9EC', border: Colors.success, text: Colors.success, label: '✓ Richtig!' },
       almost:  { bg: '#FFF8E1', border: '#F59E0B',      text: '#B45309',      label: '~ Fast richtig' },
@@ -397,14 +406,18 @@ export default function Learn() {
           <div style={{ height: 4, background: Colors.accent, width: `${progress * 100}%`, transition: 'width 0.3s' }} />
         </div>
         <div style={{ flex: 1, padding: '24px 20px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* Frage */}
-          <div style={{ background: Colors.card, borderRadius: 16, padding: '24px 20px', textAlign: 'center', boxShadow: '0 2px 8px rgba(45,27,105,0.08)' }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
-              {effectiveDirection === 'de-to-foreign' ? 'Deutsch' : langLabel}
+          {/* Frage — Satzkarte (v1.5) wenn verfügbar, sonst normale Wortkarte */}
+          {currentExample ? (
+            <SentenceCard example={currentExample} langLabel={langLabel} />
+          ) : (
+            <div style={{ background: Colors.card, borderRadius: 16, padding: '24px 20px', textAlign: 'center', boxShadow: '0 2px 8px rgba(45,27,105,0.08)' }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+                {effectiveDirection === 'de-to-foreign' ? 'Deutsch' : langLabel}
+              </div>
+              <div style={{ fontSize: 26, fontWeight: 900, color: Colors.text }}>{frontText}</div>
+              {currentCard?.emoji && <div style={{ fontSize: 32, marginTop: 8 }}>{currentCard.emoji}</div>}
             </div>
-            <div style={{ fontSize: 26, fontWeight: 900, color: Colors.text }}>{frontText}</div>
-            {currentCard?.emoji && <div style={{ fontSize: 32, marginTop: 8 }}>{currentCard.emoji}</div>}
-          </div>
+          )}
 
           {/* Eingabefeld */}
           <div>
@@ -435,7 +448,7 @@ export default function Learn() {
               <div style={{ fontSize: 16, fontWeight: 800, color: rc.text }}>{rc.label}</div>
               {typeResult !== 'correct' && (
                 <div style={{ fontSize: 14, color: Colors.text, marginTop: 4 }}>
-                  Richtig: <strong>{correctAnswer2}</strong>
+                  Richtig: <strong>{effectiveCorrectAnswer}</strong>
                 </div>
               )}
               {typeResult === 'almost' && (

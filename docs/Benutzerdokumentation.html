@@ -642,7 +642,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.4.12 · August 2026</div>
+    <div class="nav-version">Version 1.5.0 · August 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -651,7 +651,7 @@
     <div class="page-header">
       <h1>Benutzerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.4.12</span>
+        <span class="badge">v1.5.0</span>
         <span>Offline-PWA · iPhone</span>
         <span>Stand: August 2026</span>
       </div>
@@ -908,6 +908,11 @@ npx serve -s dist</code></pre>
         </div>
       </div>
 
+      <div class="callout tip">
+        <strong>Satzfragen (ab v1.5)</strong>
+        Statt der einzelnen Vokabel kann gelegentlich ein Lückensatz erscheinen: ein Beispielsatz in der Zielsprache mit einer Lücke anstelle der gesuchten Vokabel, darunter der deutsche Satz zur Orientierung mit hervorgehobenem Wort. Satzfragen erscheinen nur zu bereits mindestens einmal abgefragten Vokabeln und aktuell nur für <strong>Englisch – Grundwortschatz (Klett)</strong> (476 Beispielsätze zu 351 der 2056 Vokabeln, aus dem Lehrbuch übernommen); für die übrigen Lernpakete liegen noch keine Beispielsätze vor. Über <strong>Einstellungen → Eingabe-Modus → Beispielsätze einstreuen</strong> lässt sich diese Beimischung abschalten.
+      </div>
+
       <h3>Tastatur-Kurzreferenz</h3>
       <div class="table-wrap">
         <table class="key-table">
@@ -1136,6 +1141,10 @@ npx serve -s dist</code></pre>
           <div class="settings-label">Tipptolerant</div>
           <div class="settings-desc">Im Eingabe-Modus werden kleine Tippfehler (bis zu 2 Zeichen Unterschied) als „fast richtig" gewertet und als korrekt gezählt. Empfehlenswert für lange oder schwierige Wörter.</div>
         </div>
+        <div class="settings-row">
+          <div class="settings-label">Beispielsätze einstreuen</div>
+          <div class="settings-desc">Zeigt gelegentlich einen Lückensatz statt der einzelnen Vokabel (ab v1.5, standardmäßig aktiv).</div>
+        </div>
       </div>
 
       <div class="settings-group">
@@ -1292,6 +1301,22 @@ npx serve -s dist</code></pre>
       <div class="section-header">
         <div class="section-num">📋</div>
         <h2>Release Notes</h2>
+      </div>
+
+      <!-- v1.5.0 -->
+      <div style="border-left: 3px solid var(--accent2); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge">v1.5.0</span>
+          <span style="color:var(--muted); font-size:0.82rem;">30. August 2026</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Neu</h4>
+        <ul>
+          <li><strong>Satzfragen im Eingabe-Modus:</strong> Statt der einzelnen Vokabel kann jetzt gelegentlich ein Lückensatz erscheinen (Zielsatz mit maskierter Vokabel, deutscher Satz mit hervorgehobenem Wort als Hilfestellung). Erscheint nur zu bereits abgefragten Vokabeln, per Einstellungs-Schalter „Beispielsätze einstreuen" abschaltbar.</li>
+        </ul>
+        <h4 style="margin:0.6rem 0 0.4rem;">Hinweis</h4>
+        <ul>
+          <li>Diese Version legt die technische Grundlage. Beispielsätze werden schrittweise pro Lernpaket ergänzt – bis dahin verhält sich der Eingabe-Modus für die betroffenen Pakete unverändert.</li>
+        </ul>
       </div>
 
       <!-- v1.4.12 -->
