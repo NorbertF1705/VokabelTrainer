@@ -2,6 +2,51 @@
 
 ---
 
+## v1.5.2 — 2026-08-31
+
+### Bugfix: Beugungsformen wurden doppelt vorgelesen und angezeigt
+
+Bei 103 unregelmäßigen Verben in „Englisch – Grundwortschatz (Klett)" (z. B. „to hold")
+stand die Beugungsform gleich zweimal in den Daten: einmal in Klammern direkt hinter der
+Vokabel (`to hold (held, held)`) und einmal separat im eigenen Beugungsformen-Feld
+(`held · held`). Auf der Karte erschien sie dadurch doppelt, und die Sprachausgabe las
+sie zweimal vor. Die redundante Klammer wurde aus den Vokabeldaten entfernt — betroffene
+Einträge zeigen die Beugungsform jetzt nur noch an der vorgesehenen Stelle unter der
+Vokabel. Übersetzungen mit eigenständigen Zusatzangaben in Klammern (z. B. „to think
+(of)") sind davon nicht betroffen.
+
+---
+
+## v1.5.1 — 2026-08-31
+
+### Bugfix: Kein ungewollter Tastatur-Sprung im Eingabe-Modus
+
+Auf Mobilgeräten öffnete sich beim Erscheinen jeder Karte im Eingabe-Modus (auch bei
+den Satzkarten aus v1.5.0) sofort die virtuelle Tastatur, wodurch die Fragekarte aus
+dem sichtbaren Bereich geschoben wurde, bevor sie gelesen werden konnte. Der
+Auto-Fokus wird jetzt nur noch auf Geräten mit Maus/physischer Tastatur gesetzt; auf
+Touch-Geräten bleibt die Karte sichtbar, bis aktiv auf das Eingabefeld getippt wird.
+
+---
+
+## v1.4.13 — 2026-08-30
+
+### Bugfixes: Sprachausgabe, Quiz-Karten-Darstellung, Auswahl-Kontrast
+
+- **Beugungsformen werden mitgesprochen:** Die Sprachausgabe las bisher nur die
+  Übersetzung vor, obwohl unregelmäßige Verbformen (z. B. „held · held") auf der
+  Karte sichtbar waren. Sie werden jetzt direkt im Anschluss mitgesprochen.
+- **Quiz-Karte nicht mehr abgeschnitten:** Die Karte im Quizmodus hatte eine feste,
+  nur an der Bildschirmhöhe orientierte Größe, die den tatsächlich verfügbaren Platz
+  neben den Antwortoptionen ignorierte — bei wenig Platz wurde das Icon oben
+  abgeschnitten. Größe und Emoji skalieren jetzt mit dem tatsächlich verfügbaren
+  Platz mit.
+- **Abfragerichtung-Auswahl besser erkennbar:** Der ausgewählte Button auf der
+  Startseite wirkte durch einen blassen Pastell-Hintergrund eher wie deaktiviert.
+  Er zeigt jetzt denselben kräftigen Farbverlauf wie andere aktive Elemente der App.
+
+---
+
 ## v1.5.0 — 2026-08-30
 
 ### Grundlage für Beispielsätze im Eingabe-Modus

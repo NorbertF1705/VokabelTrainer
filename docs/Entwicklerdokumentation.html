@@ -583,7 +583,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.5.0</span>
+        <span class="badge">v1.5.2</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1639,6 +1639,44 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
       <div class="section-header">
         <div class="section-num">📋</div>
         <h2>Release Notes</h2>
+      </div>
+
+      <!-- v1.5.2 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.5.2</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-08-31</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>Redundante Beugungsformen in <code>en-klett-v1.ts</code> bereinigt:</strong> 103 der 120 Einträge mit <code>inflections</code>-Feld hatten die Formen zusätzlich als Klammerzusatz direkt im <code>translation</code>-Feld stehen (z.&nbsp;B. <code>'to hold (held, held)'</code> neben <code>inflections: 'held · held'</code>) — Ursache vermutlich die direkte Übernahme aus den Buchfotos, bevor das separate <code>inflections</code>-Feld eingeführt wurde. Da <code>FlashCard.tsx</code> beide Felder unabhängig rendert und <code>speakCard()</code> (seit v1.4.13) beide zu einer Utterance zusammenfügt, erschien die Form doppelt auf der Karte und wurde doppelt vorgelesen. Per Skript identifiziert (Abgleich: enthält ein Klammerinhalt in <code>translation</code> dieselben Wortformen wie <code>inflections</code>?) und nur der redundante Klammerteil aus <code>translation</code> entfernt — eigenständige Zusatzangaben in Klammern ohne Bezug zu <code>inflections</code> (z.&nbsp;B. <code>'to think (of)'</code>, <code>'to seek (after, for)'</code>) blieben unangetastet, ebenso Einträge, bei denen <code>translation</code> die Formen gar nicht dupliziert (z.&nbsp;B. <code>'to beat'</code>). Nebeneffekt: Im Eingabe-Modus musste die Klammer bisher exakt mitgetippt werden, um als richtig zu gelten — das ist damit ebenfalls behoben.</li>
+        </ul>
+      </div>
+
+      <!-- v1.5.1 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.5.1</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-08-31</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>Kein Auto-Fokus mehr auf Touch-Geräten im Eingabe-Modus:</strong> Das <code>&lt;input autoFocus&gt;</code> in <code>Learn.tsx</code>s <code>'type'</code>-Branch (gilt seit v1.5.0 auch für Satzkarten, da <code>isSentenceCard</code> denselben Branch triggert) ließ beim Erscheinen jeder Karte sofort die virtuelle Tastatur aufklappen und schob die Fragekarte aus dem Sichtbereich, bevor sie gelesen werden konnte. Neue Modul-Konstante <code>prefersAutoFocus</code> prüft einmalig beim Laden <code>matchMedia('(pointer: fine) and (hover: hover)')</code> — auf Desktop (Maus + physische Tastatur) bleibt <code>autoFocus</code> aktiv, auf Touch-Geräten wird es weggelassen; die Karte bleibt sichtbar, bis das Feld aktiv angetippt wird.</li>
+        </ul>
+      </div>
+
+      <!-- v1.4.13 -->
+      <div style="border-left: 3px solid var(--border); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge" style="background:var(--tag-bg);color:var(--tag-text);">v1.4.13</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-08-30</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>Beugungsformen werden mitgesprochen:</strong> Neue Hilfsfunktion <code>speakCard(card, lang)</code> in <code>Learn.tsx</code> hängt bei vorhandenem <code>inflections</code>-Feld den Text als zweiten Satz an die Sprachausgabe an (<code>"${translation}. ${inflections}"</code>) statt wie bisher ausschließlich <code>translation</code> vorzulesen. Ersetzt alle drei bisherigen <code>speak()</code>-Aufrufstellen (Lautsprecher-Button, Auto-Speak beim Umdrehen, Auto-Speak im Quiz).</li>
+          <li><strong>Quiz-Karte reagiert jetzt auf verfügbaren Platz:</strong> <code>.fc-scene</code> (<code>index.css</code>) hatte eine feste, nur an <code>vh</code> orientierte Höhe (<code>clamp(220px, 42vh, 340px)</code>), die den tatsächlich verbleibenden Flex-Platz im Quizmodus ignorierte — bei knappem Platz (z.&nbsp;B. durch umbrechende Antwortoptionen) schnitt der <code>overflow: hidden</code>-Elterncontainer die Karte oben und unten ab. Neu: <code>height: 100%</code> mit <code>min-/max-height</code>-Grenzen, dazu <code>container-type: size</code> auf <code>.fc-scene</code> und eine neue <code>.fc-emoji</code>-Klasse, deren Schriftgröße/Abstand per <code>cqh</code>-Einheiten mit der tatsächlichen Kartenhöhe mitskaliert.</li>
+          <li><strong>Auswahl-Zustand der Abfragerichtung-Buttons:</strong> <code>toggleBtnActive</code> in <code>Home.tsx</code> nutzte einen blassen Pastell-Hintergrund (<code>#EDE8FF</code>) mit hellviolettem Text — niedrigerer Kontrast als der graue Text der nicht ausgewählten Buttons, wirkte dadurch eher wie „deaktiviert". Ersetzt durch denselben satten Farbverlauf (<code>Colors.purple → #7C3AED</code>) mit weißer Schrift, der auch für andere „aktive" Elemente in der App verwendet wird.</li>
+        </ul>
       </div>
 
       <!-- v1.5.0 -->

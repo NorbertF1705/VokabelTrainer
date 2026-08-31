@@ -63,6 +63,11 @@ function generateQuizOptions(correct: string, allVocab: VocabularyItem[], field:
   return [...wrong, correct].sort(() => Math.random() - 0.5);
 }
 
+// Auto-Fokus nur auf Geräten mit Maus/physischer Tastatur (Desktop): Auf Touch-
+// Geräten würde er sofort die virtuelle Tastatur einblenden und die Fragekarte
+// aus dem Sichtbereich schieben, bevor sie gelesen werden kann.
+const prefersAutoFocus = 'matchMedia' in window && window.matchMedia('(pointer: fine) and (hover: hover)').matches;
+
 let _voices: SpeechSynthesisVoice[] = [];
 if ('speechSynthesis' in window) {
   const loadVoices = () => { _voices = window.speechSynthesis.getVoices(); };
@@ -438,7 +443,7 @@ export default function Learn() {
               {effectiveDirection === 'de-to-foreign' ? langLabel : 'Deutsch'}
             </div>
             <input
-              autoFocus
+              autoFocus={prefersAutoFocus}
               value={typedAnswer}
               onChange={e => { if (typeResult === null) setTypedAnswer(e.target.value); }}
               onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); typeResult === null ? handleTypeSubmit() : advanceCard(typeResult !== 'wrong'); } }}
