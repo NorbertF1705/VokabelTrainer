@@ -574,7 +574,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.5.8 · September 2026</div>
+    <div class="nav-version">Version 1.5.9 · September 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -583,7 +583,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.5.8</span>
+        <span class="badge">v1.5.9</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1639,6 +1639,18 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
       <div class="section-header">
         <div class="section-num">📋</div>
         <h2>Release Notes</h2>
+      </div>
+
+      <!-- v1.5.9 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.5.9</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-09-01</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>Regionalitäts-Entscheidung für <code>vocabulary_es.ts</code>: Spanien-Spanisch als Standard.</strong> Die in v1.5.8 dokumentierte Registerfrage (Spanien vs. Lateinamerika) wurde vom Projektinhaber entschieden. Fünf von den rund 20 identifizierten Kandidaten wichen tatsächlich vom Spanien-Standard ab und wurden angepasst: <code>f030</code> „Süßkartoffel" <code>'camote'</code> → <code>'boniato'</code>; <code>f064</code> „Saft" <code>'jugo'</code> → <code>'zumo'</code>; <code>c008</code> „Pullover" <code>'suéter'</code> → <code>'jersey'</code>; <code>h024</code> „Toilette" <code>'inodoro'</code> (bezeichnet nur die Kloschüssel als Sanitärobjekt) → <code>'váter'</code>; <code>h025</code> „Herd" <code>'estufa'</code> (bedeutet in Spanien „Heizofen", nicht Kochherd) → <code>'cocina'</code> (Homonym-Kollision mit <code>h004</code> „Küche" = <code>'cocina'</code> ist hier bewusst in Kauf genommen, da im Spanien-Spanischen „cocina" tatsächlich sowohl Küche als auch Herd/Kochfeld bezeichnet, analog zu „cuisine" im Französischen). Die übrigen ca. 15 geprüften Wörter entsprachen bereits dem Spanien-Standard (<code>cacahuete</code>, <code>gafas</code>, <code>seta</code>, <code>nevera</code>, <code>coche</code>, <code>autobús</code>, <code>patinete</code>, <code>fontanero</code>, <code>camarero</code>, <code>teléfono móvil</code>, <code>portátil</code>, <code>mando a distancia</code>, <code>conducir</code>) und blieben unverändert.</li>
+        </ul>
       </div>
 
       <!-- v1.5.8 -->

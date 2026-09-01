@@ -2,6 +2,20 @@
 
 ---
 
+## v1.5.9 — 2026-09-01
+
+### Geändert: Spanisch-Grundwortschatz auf Spanien-Spanisch vereinheitlicht
+
+Die in v1.5.8 offengelassene Regionalitäts-Frage (Spanien- vs. lateinamerikanisches
+Spanisch) ist entschieden: Spanien-Spanisch bleibt der Standard der App. Fünf
+Einträge, die davon abwichen, wurden angepasst: „Süßkartoffel" (`camote` →
+`boniato`), „Saft" (`jugo` → `zumo`), „Pullover" (`suéter` → `jersey`), „Toilette"
+(`inodoro`, bezeichnete nur die Kloschüssel, → `váter`) und „Herd" (`estufa`,
+bedeutet in Spanien „Heizofen", → `cocina`). Die übrigen rund 15 geprüften Wörter
+entsprachen bereits dem Spanien-Standard und blieben unverändert.
+
+---
+
 ## v1.5.8 — 2026-09-01
 
 ### Bugfix: Vier Übersetzungen im Spanisch-Grundwortschatz korrigiert
