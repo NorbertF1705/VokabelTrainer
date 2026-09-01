@@ -317,7 +317,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
       const current = s.progress[vocabId];
       const newBox = options?.lockBox
         ? (current?.box ?? 2)
-        : (correct ? Math.min((current?.box ?? 1) + 1, 6) : 1);
+        : (correct ? Math.min((current?.box ?? 1) + 1, 6) : Math.min(current?.box ?? 1, 2));
 
       const today = todayDate();
       const todayStr = localDateStr(today);
