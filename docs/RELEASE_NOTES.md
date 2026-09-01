@@ -2,6 +2,27 @@
 
 ---
 
+## v1.5.7 — 2026-09-01
+
+### Bugfix: 12 Übersetzungen im Türkisch-Grundwortschatz korrigiert
+
+Erste Gegenprüfung aller 500 Einträge des Türkisch-Grundwortschatzes durch Gemini
+(analog zum bereits mehrfach geprüften Französisch-Paket). Korrigiert wurden u. a.
+„rennen" (`yarışmak` = wetteifern, statt `hızlı koşmak`), „Zahnarzt" (`dişçi` →
+standardsprachlich `diş hekimi`), „Richter" (`hakim` → `hâkim` mit Zirkumflex, sonst
+Verwechslung mit „herrschend"), sowie mehrere Wörter mit selteneren oder veralteten
+Begriffen (Dschungel, Wespe, Gewitter, Mütze, Drohne, backen, riechen, Hühnchen,
+Kokosnuss).
+
+Vier von Gemini vorgeschlagene Änderungen wurden bewusst **nicht** übernommen: Bei
+„Hai" (`köpekbalığı`), „Marienkäfer" (`uğurböceği`), „Kakerlake" (`hamamböceği`) und
+„Kürbis" (`balkabağı`) empfahl die Prüfung eine Getrenntschreibung. Nach den
+offiziellen TDK-Rechtschreibregeln werden solche Tier-/Pflanzennamen mit
+Bedeutungsverschiebung als ein Wort geschrieben — die ursprüngliche Schreibweise war
+bereits korrekt.
+
+---
+
 ## v1.5.6 — 2026-09-01
 
 ### Bugfix: Zwei weitere Übersetzungen im Französisch-Grundwortschatz korrigiert
