@@ -81,6 +81,18 @@ export const FILE_CONFIG: Record<FileId, FileManifestEntry> = {
         vocabulary: m.VOCABULARY_TR_BASIC,
       })),
   },
+  'fr-basic-v1': {
+    id: 'fr-basic-v1',
+    language: 'fr',
+    displayName: 'Französisch – Grundwortschatz',
+    shortLabel: '🇫🇷 Französisch · Grundwortschatz',
+    voice: 'fr-FR',
+    contentVersion: 1,
+    loader: () =>
+      import('../data/vocabulary/fr-basic-v1').then((m) => ({
+        vocabulary: m.VOCABULARY_FR_BASIC,
+      })),
+  },
 };
 
 export const ALL_FILE_IDS: ReadonlyArray<FileId> = Object.keys(FILE_CONFIG) as FileId[];
@@ -118,6 +130,7 @@ export const LANGUAGE_LABELS: Record<Language, string> = {
   en: 'Englisch',
   es: 'Spanisch',
   tr: 'Türkisch',
+  fr: 'Französisch',
 };
 
 /** Mapping v1.2-selectedLanguage → v1.3-FileId (nur für Migration). */

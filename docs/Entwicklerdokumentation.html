@@ -574,7 +574,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.5.3 · September 2026</div>
+    <div class="nav-version">Version 1.5.4 · September 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -583,7 +583,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.5.3</span>
+        <span class="badge">v1.5.4</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1608,9 +1608,9 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
       </ol>
 
       <h3>Neue Sprache / neues Lernpaket hinzufügen</h3>
-      <p>Ab v1.3 wird eine neue Sprache als eigenständiges Lernpaket in <code>src/config/file_config.ts</code> registriert. Folgende Schritte sind nötig (Stand v1.4.6, am Beispiel Türkisch/<code>tr</code>):</p>
+      <p>Ab v1.3 wird eine neue Sprache als eigenständiges Lernpaket in <code>src/config/file_config.ts</code> registriert. Folgende Schritte sind nötig (Stand v1.5.4, zuletzt am Beispiel Französisch/<code>fr</code> durchgeführt, davor Türkisch/<code>tr</code> in v1.4.6):</p>
       <ol>
-        <li>Bei einer wirklich neuen Sprache (nicht nur einem neuen Paket für eine bestehende Sprache): den Sprachcode zum <code>Language</code>-Union-Typ in <code>vocabulary_types.ts</code> hinzufügen (z. B. <code>'en' | 'es' | 'tr'</code>).</li>
+        <li>Bei einer wirklich neuen Sprache (nicht nur einem neuen Paket für eine bestehende Sprache): den Sprachcode zum <code>Language</code>-Union-Typ in <code>vocabulary_types.ts</code> hinzufügen (z. B. <code>'en' | 'es' | 'tr' | 'fr'</code>).</li>
         <li>Vokabeldaten in <code>src/data/vocabulary_XX.ts</code> anlegen (Array <code>VOCABULARY_XX</code>). Am einfachsten: eine bestehende Datei wie <code>vocabulary_es.ts</code> 1:1 kopieren (gleiche IDs/<code>german</code>/<code>emoji</code>/<code>category</code>) und nur <code>translation</code> übersetzen.</li>
         <li>Lazy-Wrapper <code>src/data/vocabulary/xx-basic-v1.ts</code> erstellen:<br>
           <code>export { VOCABULARY_XX as VOCABULARY_XX_BASIC } from '../vocabulary_xx';</code></li>
@@ -1639,6 +1639,18 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
       <div class="section-header">
         <div class="section-num">📋</div>
         <h2>Release Notes</h2>
+      </div>
+
+      <!-- v1.5.4 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.5.4</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-09-01</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Neu</h4>
+        <ul>
+          <li><strong>Sprache Französisch (<code>fr</code>)</strong>: <code>Language</code>-Union in <code>vocabulary_types.ts</code> erweitert. Neue Datei <code>src/data/vocabulary_fr.ts</code> (500 Einträge, <code>VOCABULARY_FR</code>) — strukturell 1:1 identisch zu <code>vocabulary_en.ts</code>/<code>vocabulary_es.ts</code> (gleiche IDs/<code>german</code>/<code>emoji</code>/<code>category</code> in derselben Reihenfolge). Verben als Infinitiv ohne Artikel, analog zu <code>vocabulary_es.ts</code> (kein englisches „to"-Präfix). Bei 17 unregelmäßigen Verben zusätzliches <code>inflections</code>-Feld nach ES-Vorbild: Präsens 1. Person Singular · Partizip Perfekt (z.&nbsp;B. <code>lire</code> → <code>'lis · lu'</code>), teils nur eine Form bei reinem Stammwechsel (<code>acheter</code> → <code>'achète'</code>). Wrapper <code>src/data/vocabulary/fr-basic-v1.ts</code> nach dem <code>es-basic-v1.ts</code>-Muster. Neuer <code>FILE_CONFIG</code>-Eintrag <code>fr-basic-v1</code> mit <code>voice: 'fr-FR'</code>, <code>LANGUAGE_LABELS.fr</code> ergänzt. Einzige weitere Codeänderung: <code>transPlaceholder</code>-Ternary in <code>Vocabulary.tsx</code> um einen <code>fr</code>-Zweig (<code>'Mot en français'</code>) erweitert — sonst vollständig sprachagnostisch, kein Routing-/Context-Update nötig. Per Playwright-Smoke-Test verifiziert: Paket erscheint im <code>FirstRun</code>-Screen und <code>FileSelectorModal</code>, 500 Karten laden fehlerfrei, UTF-8-Sonderzeichen (é, è, ê, œ, ç, …) korrekt im Build-Bundle kodiert.</li>
+        </ul>
       </div>
 
       <!-- v1.5.3 -->

@@ -2,6 +2,22 @@
 
 ---
 
+## v1.5.4 — 2026-09-01
+
+### Neue Sprache: Französisch – Grundwortschatz
+
+500 Wörter, strukturell identisch zum Englisch-Grundwortschatz (gleiche deutsche
+Wörter, Emojis, Kategorien) — nur die Übersetzung ist Französisch. Aussprache über
+die Web-Speech-API mit Sprachcode `fr-FR`. Bei 17 unregelmäßigen Verben wird
+zusätzlich eine Beugungsform angezeigt (Präsens 1. Person Singular · Partizip
+Perfekt, z. B. `lire` → `lis · lu`), analog zum Spanisch-Paket.
+
+**Hinweis:** Die Übersetzungen sind ein KI-Erstentwurf und noch nicht von einer
+Muttersprachlerin/einem Muttersprachler gegengelesen (wie beim Türkisch-Paket in
+v1.4.6).
+
+---
+
 ## v1.5.3 — 2026-09-01
 
 ### Neuer Lernmodus: „Neue Karten lernen ohne Quiz"

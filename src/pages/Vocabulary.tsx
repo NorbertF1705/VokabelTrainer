@@ -17,7 +17,9 @@ export default function Vocabulary() {
     ? 'Palabra en español'
     : activeFile?.manifest.language === 'tr'
       ? 'Türkçe kelime'
-      : 'English word';
+      : activeFile?.manifest.language === 'fr'
+        ? 'Mot en français'
+        : 'English word';
 
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'Alle'>('Alle');
