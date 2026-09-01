@@ -2,6 +2,25 @@
 
 ---
 
+## v1.5.8 — 2026-09-01
+
+### Bugfix: Vier Übersetzungen im Spanisch-Grundwortschatz korrigiert
+
+Erste Gegenprüfung des seit Langem produktiven Spanisch-Pakets durch Gemini.
+Korrigiert: „lachen" (Beugungsform `rió` → `rio`, RAE-Rechtschreibreform 2010:
+einsilbige Vergangenheitsformen ohne Akzent), „riechen" (`huele` → `huelo`,
+konsistente 1.-Person-Form), „Kochen" (`cocinar` → `cocina`, Substantiv statt
+Verb, passend zu den übrigen Einträgen der Kategorie „Sport & Freizeit"),
+„Leiter" (`escalera (objeto)` → `escalera de mano`, Klammerzusatz entfernt).
+
+Die Prüfung deckte außerdem auf, dass rund 20 weitere Einträge zwischen
+Spanien-Spanisch und lateinamerikanischem Spanisch schwanken (z. B.
+„coche"/„carro", „gafas"/„lentes", „móvil"/„celular") — die Liste folgt hier
+keiner einheitlichen Konvention. Da das eine Registerentscheidung und kein
+Übersetzungsfehler ist, wurde bewusst noch keine Änderung vorgenommen.
+
+---
+
 ## v1.5.7 — 2026-09-01
 
 ### Bugfix: 12 Übersetzungen im Türkisch-Grundwortschatz korrigiert
