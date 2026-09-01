@@ -2,6 +2,97 @@
 
 ---
 
+## v1.5.9 — 2026-09-01
+
+### Geändert: Spanisch-Grundwortschatz auf Spanien-Spanisch vereinheitlicht
+
+Die in v1.5.8 offengelassene Regionalitäts-Frage (Spanien- vs. lateinamerikanisches
+Spanisch) ist entschieden: Spanien-Spanisch bleibt der Standard der App. Fünf
+Einträge, die davon abwichen, wurden angepasst: „Süßkartoffel" (`camote` →
+`boniato`), „Saft" (`jugo` → `zumo`), „Pullover" (`suéter` → `jersey`), „Toilette"
+(`inodoro`, bezeichnete nur die Kloschüssel, → `váter`) und „Herd" (`estufa`,
+bedeutet in Spanien „Heizofen", → `cocina`). Die übrigen rund 15 geprüften Wörter
+entsprachen bereits dem Spanien-Standard und blieben unverändert.
+
+---
+
+## v1.5.8 — 2026-09-01
+
+### Bugfix: Vier Übersetzungen im Spanisch-Grundwortschatz korrigiert
+
+Erste Gegenprüfung des seit Langem produktiven Spanisch-Pakets durch Gemini.
+Korrigiert: „lachen" (Beugungsform `rió` → `rio`, RAE-Rechtschreibreform 2010:
+einsilbige Vergangenheitsformen ohne Akzent), „riechen" (`huele` → `huelo`,
+konsistente 1.-Person-Form), „Kochen" (`cocinar` → `cocina`, Substantiv statt
+Verb, passend zu den übrigen Einträgen der Kategorie „Sport & Freizeit"),
+„Leiter" (`escalera (objeto)` → `escalera de mano`, Klammerzusatz entfernt).
+
+Die Prüfung deckte außerdem auf, dass rund 20 weitere Einträge zwischen
+Spanien-Spanisch und lateinamerikanischem Spanisch schwanken (z. B.
+„coche"/„carro", „gafas"/„lentes", „móvil"/„celular") — die Liste folgt hier
+keiner einheitlichen Konvention. Da das eine Registerentscheidung und kein
+Übersetzungsfehler ist, wurde bewusst noch keine Änderung vorgenommen.
+
+---
+
+## v1.5.7 — 2026-09-01
+
+### Bugfix: 12 Übersetzungen im Türkisch-Grundwortschatz korrigiert
+
+Erste Gegenprüfung aller 500 Einträge des Türkisch-Grundwortschatzes durch Gemini
+(analog zum bereits mehrfach geprüften Französisch-Paket). Korrigiert wurden u. a.
+„rennen" (`yarışmak` = wetteifern, statt `hızlı koşmak`), „Zahnarzt" (`dişçi` →
+standardsprachlich `diş hekimi`), „Richter" (`hakim` → `hâkim` mit Zirkumflex, sonst
+Verwechslung mit „herrschend"), sowie mehrere Wörter mit selteneren oder veralteten
+Begriffen (Dschungel, Wespe, Gewitter, Mütze, Drohne, backen, riechen, Hühnchen,
+Kokosnuss).
+
+Vier von Gemini vorgeschlagene Änderungen wurden bewusst **nicht** übernommen: Bei
+„Hai" (`köpekbalığı`), „Marienkäfer" (`uğurböceği`), „Kakerlake" (`hamamböceği`) und
+„Kürbis" (`balkabağı`) empfahl die Prüfung eine Getrenntschreibung. Nach den
+offiziellen TDK-Rechtschreibregeln werden solche Tier-/Pflanzennamen mit
+Bedeutungsverschiebung als ein Wort geschrieben — die ursprüngliche Schreibweise war
+bereits korrekt.
+
+---
+
+## v1.5.6 — 2026-09-01
+
+### Bugfix: Zwei weitere Übersetzungen im Französisch-Grundwortschatz korrigiert
+
+Eine zweite Gegenprüfungsrunde durch Gemini — diesmal aller 500 Einträge statt nur
+der zuvor namentlich genannten Einzelfälle — ergab zwei weitere sinnvolle
+Korrekturen: „Kutsche"
+war mit `carrosse` übersetzt (bezeichnet spezifisch die Märchen-/Prunkkutsche),
+korrekt ist die generische `calèche`. „Programmierer" war mit `programmeur`
+übersetzt, in der heutigen Alltags-/Techsprache gebräuchlicher ist `développeur`.
+
+Von 19 in dieser Runde geprüften Einträgen wurden 17 als bereits passend bestätigt
+und bewusst unverändert gelassen — darunter „Krankenschwester" → `infirmière`, was
+trotz gegenteiligem Vorschlag korrekt ist: Anders als die übrigen Berufsbezeichnungen
+in der Liste (im Deutschen grammatisch maskulin, generisch genutzt) ist
+„Krankenschwester" explizit weiblich markiert (Gegenstück wäre „Krankenpfleger"),
+die feminine Übersetzung ist hier also treu zum deutschen Ausgangswort.
+
+---
+
+## v1.5.5 — 2026-09-01
+
+### Bugfix: Zwei Übersetzungen im Französisch-Grundwortschatz korrigiert
+
+Eine erste KI-gestützte Gegenprüfung (Google Gemini) der in v1.5.4 eingeführten
+Übersetzungen ergab zwei echte Korrekturen: „rennen" war fälschlich mit
+`faire la course` („um die Wette laufen") statt `courir vite` übersetzt, und
+„umarmen" mit dem literarisch-gehobenen `étreindre` statt der alltagssprachlichen
+Wendung `serrer dans ses bras`. Beide Einträge korrigiert. Die übrigen von der
+Gegenprüfung als unkritisch eingestuften Wortwahlen (z. B. „Pinguin" → `pingouin`,
+„Oktopus" → `poulpe`, „Eule" → `hibou`) bleiben unverändert — sie sind für den
+Grundwortschatz-Anspruch der App bewusst die gängigeren statt der akademisch
+präziseren Begriffe. Die Anzahl der Verben mit angezeigter Beugungsform sinkt
+dadurch von 17 auf 16.
+
+---
+
 ## v1.5.4 — 2026-09-01
 
 ### Neue Sprache: Französisch – Grundwortschatz

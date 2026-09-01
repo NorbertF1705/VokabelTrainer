@@ -574,7 +574,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.5.4 · September 2026</div>
+    <div class="nav-version">Version 1.5.9 · September 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -583,7 +583,7 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.5.4</span>
+        <span class="badge">v1.5.9</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
@@ -1639,6 +1639,68 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
       <div class="section-header">
         <div class="section-num">📋</div>
         <h2>Release Notes</h2>
+      </div>
+
+      <!-- v1.5.9 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.5.9</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-09-01</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>Regionalitäts-Entscheidung für <code>vocabulary_es.ts</code>: Spanien-Spanisch als Standard.</strong> Die in v1.5.8 dokumentierte Registerfrage (Spanien vs. Lateinamerika) wurde vom Projektinhaber entschieden. Fünf von den rund 20 identifizierten Kandidaten wichen tatsächlich vom Spanien-Standard ab und wurden angepasst: <code>f030</code> „Süßkartoffel" <code>'camote'</code> → <code>'boniato'</code>; <code>f064</code> „Saft" <code>'jugo'</code> → <code>'zumo'</code>; <code>c008</code> „Pullover" <code>'suéter'</code> → <code>'jersey'</code>; <code>h024</code> „Toilette" <code>'inodoro'</code> (bezeichnet nur die Kloschüssel als Sanitärobjekt) → <code>'váter'</code>; <code>h025</code> „Herd" <code>'estufa'</code> (bedeutet in Spanien „Heizofen", nicht Kochherd) → <code>'cocina'</code> (Homonym-Kollision mit <code>h004</code> „Küche" = <code>'cocina'</code> ist hier bewusst in Kauf genommen, da im Spanien-Spanischen „cocina" tatsächlich sowohl Küche als auch Herd/Kochfeld bezeichnet, analog zu „cuisine" im Französischen). Die übrigen ca. 15 geprüften Wörter entsprachen bereits dem Spanien-Standard (<code>cacahuete</code>, <code>gafas</code>, <code>seta</code>, <code>nevera</code>, <code>coche</code>, <code>autobús</code>, <code>patinete</code>, <code>fontanero</code>, <code>camarero</code>, <code>teléfono móvil</code>, <code>portátil</code>, <code>mando a distancia</code>, <code>conducir</code>) und blieben unverändert.</li>
+        </ul>
+      </div>
+
+      <!-- v1.5.8 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.5.8</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-09-01</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Behoben</h4>
+        <ul>
+          <li><strong>Vier Einträge in <code>vocabulary_es.ts</code> korrigiert (erste Gegenprüfung durch Gemini):</strong> <code>v010</code> „lachen": <code>inflections</code> von <code>'río · rió'</code> auf <code>'río · rio'</code> geändert (RAE-Rechtschreibreform 2010: einsilbige Vergangenheitsformen wie <code>rio</code>/<code>vio</code>/<code>dio</code> ohne Akzent). <code>v034</code> „riechen": <code>inflections</code> von <code>'huele'</code> (3. Person) auf <code>'huelo'</code> (1. Person) geändert, konsistent zur sonstigen Konvention im Feld. <code>s007</code> „Kochen": <code>translation</code> von <code>'cocinar'</code> (Verb) auf <code>'cocina'</code> (Substantiv) geändert — alle übrigen Einträge der Kategorie „Sport & Freizeit" sind Substantive (<code>natación</code>, <code>ciclismo</code>, <code>baile</code>, <code>lectura</code>, <code>dibujo</code>). <code>d024</code> „Leiter": <code>translation</code> von <code>'escalera (objeto)'</code> auf <code>'escalera de mano'</code> geändert — der Klammerzusatz wäre wörtlich auf der Karte erschienen, die neue Formulierung disambiguiert sauber ohne Klammer.</li>
+          <li><strong>Regionalitäts-Frage bewusst zurückgestellt:</strong> Die Gegenprüfung ergab, dass rund 20 weitere Einträge zwischen Spanien-Spanisch und lateinamerikanischem Spanisch schwanken (z.&nbsp;B. <code>coche</code>/<code>carro</code>, <code>gafas</code>/<code>lentes</code>/<code>anteojos</code>, <code>móvil</code>/<code>celular</code>). Die Liste folgt aktuell keiner einheitlichen Konvention — beide Register kommen gemischt vor. Da dies eine Registerentscheidung und kein Übersetzungsfehler ist, wurde hierzu keine Entscheidung getroffen; die betroffenen IDs sind im PR/der Session-Historie dokumentiert.</li>
+        </ul>
+      </div>
+
+      <!-- v1.5.7 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.5.7</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-09-01</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Behoben</h4>
+        <ul>
+          <li><strong>12 Einträge in <code>vocabulary_tr.ts</code> korrigiert (erste Gegenprüfung aller 500 Einträge durch Gemini):</strong> <code>v038</code> „rennen": <code>'yarışmak'</code> (= wetteifern/ein Wettrennen machen) → <code>'hızlı koşmak'</code> (differenziert von <code>v001</code> „laufen" = <code>'koşmak'</code>). <code>p018</code> „Zahnarzt": <code>'dişçi'</code> (umgangssprachlich) → <code>'diş hekimi'</code> (Standard). <code>p020</code> „Richter": <code>'hakim'</code> → <code>'hâkim'</code> (Zirkumflex nötig, sonst Verwechslung mit „herrschend/dominant"). <code>e016</code> „Drohne": <code>'drone'</code> → <code>'dron'</code> (eingetürkte TDK-Schreibweise). <code>n033</code> „Dschungel": <code>'cangıl'</code> (seltenes Lehnwort) → <code>'yağmur ormanı'</code>. <code>n009</code> „Gewitter": <code>'fırtına'</code> (allg. Sturm) → <code>'gök gürültülü fırtına'</code> (präzise Gewitter). <code>a056</code> „Wespe": <code>'eşek arısı'</code> (bezeichnet eigentlich Hornisse) → <code>'yaban arısı'</code>. <code>c014</code> „Mütze": <code>'bere'</code> (Beanie, passt nicht zum 🧢-Schirmmützen-Emoji) → <code>'kasket'</code>. <code>v006</code> „backen": <code>'fırınlamak'</code> → <code>'fırında pişirmek'</code>. <code>v034</code> „riechen": <code>'koku almak'</code> (passiv, Geruchssinn) → <code>'koklamak'</code> (aktives Verb). <code>f048</code> „Hühnchen": <code>'tavuk (yemek)'</code> (Klammerzusatz auf der Karte störend) → <code>'tavuk eti'</code> (unterscheidet sauber von <code>a010</code> „Huhn" = <code>'tavuk'</code>). <code>f014</code> „Kokosnuss": <code>'hindistan cevizi'</code> → <code>'Hindistan cevizi'</code> (Großschreibung, da vom Ländernamen abgeleitet, analog zu <code>Antep fıstığı</code>).</li>
+          <li><strong>Vier Vorschläge bewusst nicht übernommen:</strong> Bei <code>a029</code> „Hai" (<code>köpekbalığı</code>), <code>a037</code> „Marienkäfer" (<code>uğurböceği</code>), <code>a058</code> „Kakerlake" (<code>hamamböceği</code>) und <code>f076</code> „Kürbis" (<code>balkabağı</code>) empfahl die Prüfung eine Getrenntschreibung. Nach TDK-Rechtschreibregeln werden isim tamlaması-Komposita mit Bedeutungsverschiebung (hier: Tier-/Pflanzennamen, die nicht wörtlich aus ihren Bestandteilen erschließbar sind) bitişik (zusammen) geschrieben — ein Standard-Lehrbuchbeispiel der türkischen Rechtschreibung; die bestehende Schreibweise war bereits korrekt.</li>
+        </ul>
+      </div>
+
+      <!-- v1.5.6 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.5.6</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-09-01</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Behoben</h4>
+        <ul>
+          <li><strong>Zwei weitere Einträge in <code>vocabulary_fr.ts</code> korrigiert (zweite Gegenprüfungsrunde durch Gemini, diesmal aller 500 Einträge):</strong> <code>t020</code> „Kutsche": <code>translation</code> von <code>'carrosse'</code> (spezifisch Märchen-/Prunkkutsche) auf <code>'calèche'</code> geändert. <code>p016</code> „Programmierer": <code>translation</code> von <code>'programmeur'</code> auf <code>'développeur'</code> geändert (gebräuchlicherer Begriff in der modernen IT-Sprache). Von 19 in dieser Runde geprüften Fällen wurden 17 als bereits passend bewertet und bewusst beibehalten — u. a. „Krankenschwester" → <code>infirmière</code>, was trotz gegenteiligem Vorschlag korrekt ist: Anders als die übrigen (im Deutschen grammatisch maskulinen, generisch genutzten) Berufsbezeichnungen ist „Krankenschwester" explizit weiblich markiert (Gegenstück „Krankenpfleger"), die feminine Form ist hier also treu zum Ausgangswort, keine Inkonsistenz.</li>
+        </ul>
+      </div>
+
+      <!-- v1.5.5 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.5.5</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-09-01</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Behoben</h4>
+        <ul>
+          <li><strong>Zwei Einträge in <code>vocabulary_fr.ts</code> korrigiert (Gegenprüfung durch Gemini):</strong> <code>v038</code> „rennen": <code>translation</code> von <code>'faire la course'</code> (bedeutet „um die Wette laufen", nicht „schnell laufen") auf <code>'courir vite'</code> geändert. <code>v035</code> „umarmen": <code>translation</code> von <code>'étreindre'</code> (literarisches Register) auf <code>'serrer dans ses bras'</code> geändert, das zugehörige <code>inflections</code>-Feld (<code>'étreins · étreint'</code>) entfernt, da die neue Formulierung eine Wendung statt eines konjugierbaren Einzelverbs ist. Anzahl der Verben mit <code>inflections</code>-Feld damit 16 statt 17 (Skript-Gegenprobe: <code>grep -c "inflections:" src/data/vocabulary_fr.ts</code>).</li>
+        </ul>
       </div>
 
       <!-- v1.5.4 -->

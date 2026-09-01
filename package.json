@@ -1,6 +1,6 @@
 {
   "name": "vokabeltrainer-pwa",
-  "version": "1.5.4",
+  "version": "1.5.9",
   "private": true,
   "type": "module",
   "scripts": {
