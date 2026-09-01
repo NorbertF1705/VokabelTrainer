@@ -2,6 +2,17 @@
 
 ---
 
+## v1.5.10 — 2026-09-01
+
+### Geändert: Sanfterer Rückfall bei falscher Antwort
+
+Bisher fiel eine falsch beantwortete Vokabel unabhängig vom aktuellen Fach
+immer auf Fach 1 zurück – auch eine Karte aus Fach 5 landete komplett am
+Anfang. Jetzt fällt eine Karte bei einer falschen Antwort höchstens bis
+Fach 2 zurück; Karten in Fach 1 oder 2 bleiben unverändert.
+
+---
+
 ## v1.5.9 — 2026-09-01
 
 ### Geändert: Spanisch-Grundwortschatz auf Spanien-Spanisch vereinheitlicht
