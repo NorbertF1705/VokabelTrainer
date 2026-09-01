@@ -2,6 +2,24 @@
 
 ---
 
+## v1.5.3 — 2026-09-01
+
+### Neuer Lernmodus: „Neue Karten lernen ohne Quiz"
+
+Fünfter Lernmodus in der Lobby, direkt nach Quiz einsortiert. Nutzt exakt
+dieselbe Fach-2-Pool-Logik wie Quiz (`startQuizPool()`, mindestens 30
+Karten, bei Bedarf dauerhaft aus Fach 1 aufgefüllt, keine Fach-Änderung
+durch die Bewertung dank `lockBox`) — fragt die Karten aber als normale
+Karteikarte mit Umdrehen und Selbstbewertung Richtig/Falsch statt per
+Multiple-Choice ab. Wie im Quiz-Modus erscheinen dabei nie Satzfragen
+(v1.5.0), auch wenn zur Vokabel ein Beispielsatz vorläge.
+
+**Geändert:** Die Lobby-Buttons im Lernen-Tab stehen jetzt in der
+Reihenfolge Quiz, Neue Karten lernen ohne Quiz, Fällige Karten, Eingabe,
+Alle Vokabeln.
+
+---
+
 ## v1.5.2 — 2026-08-31
 
 ### Bugfix: Beugungsformen wurden doppelt vorgelesen und angezeigt
