@@ -62,3 +62,17 @@ interface CardProgress {
   incorrectCount: number
 }
 ```
+
+## Release checklist — required for every user-visible change
+
+This is a hard requirement, not optional cleanup. Any commit that changes app behavior (new feature, changed logic, UI change) MUST include all of the following in the same commit — never defer them to a follow-up:
+
+1. **Bump the version** in both `package.json` and `src/version.ts` (keep them identical). Check the *current* version on `origin/main` first (`git fetch origin main && git show origin/main:src/version.ts`) rather than assuming your local checkout is up to date — a stale local branch is exactly how version numbers collide.
+2. **Update `docs/Benutzerdokumentation.html`** (user-facing): describe the change wherever it's relevant (overview counts/lists, the relevant feature section, FAQ if it affects a common question), and add a dated entry at the top of the `#changelog` section (see existing entries for the exact markup pattern: bordered `div`, `badge` + date, `h4` "Neu"/"Geändert", `ul`).
+3. **Update `docs/Entwicklerdokumentation.html`** (developer-facing): describe the technical implementation where relevant, and add a matching dated entry at the top of its own `#changelog` section.
+4. **Update `docs/RELEASE_NOTES.md`**: add a dated `## vX.Y.Z — YYYY-MM-DD` section at the top, following the existing entries' style.
+5. Only skip a doc file if the change is truly invisible to both users and developers (e.g. a pure typo fix in a comment) — when in doubt, update it.
+
+Do this proactively without being asked — the user should not have to request version bumps or doc updates after the fact.
+
+**Before starting any new work session on this repo**, verify the local branch is actually based on the current `origin/main` tip (`git fetch origin main && git log --oneline HEAD..origin/main`). If `main` has moved on, rebuild your working branch from `origin/main` first — don't build new commits on a stale base, since that reliably produces version-number collisions and documentation that describes the wrong app state.

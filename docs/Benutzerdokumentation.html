@@ -642,7 +642,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.5.0 · August 2026</div>
+    <div class="nav-version">Version 1.5.3 · September 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -651,9 +651,9 @@
     <div class="page-header">
       <h1>Benutzerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.5.0</span>
+        <span class="badge">v1.5.3</span>
         <span>Offline-PWA · iPhone</span>
-        <span>Stand: August 2026</span>
+        <span>Stand: September 2026</span>
       </div>
     </div>
 
@@ -669,7 +669,7 @@
 
       <div class="card-grid">
         <div class="card"><div class="card-icon">🏠</div><div class="card-label">Home</div><div class="card-desc">Tagesübersicht, Lernen starten</div></div>
-        <div class="card"><div class="card-icon">🧠</div><div class="card-label">Lernen</div><div class="card-desc">4 Lernmodi: Karteikarten, Alle, Quiz, Eingabe</div></div>
+        <div class="card"><div class="card-icon">🧠</div><div class="card-label">Lernen</div><div class="card-desc">5 Lernmodi: Quiz, Neue Karten lernen ohne Quiz, Fällige Karten, Eingabe, Alle Vokabeln</div></div>
         <div class="card"><div class="card-icon">📚</div><div class="card-label">Vokabeln</div><div class="card-desc">Suchen, filtern und eigene Wörter hinzufügen</div></div>
         <div class="card"><div class="card-icon">📊</div><div class="card-label">Statistik</div><div class="card-desc">Lernfortschritt und Trainings-Regelmäßigkeit</div></div>
         <div class="card"><div class="card-icon">⚙️</div><div class="card-label">Einstellungen</div><div class="card-desc">Modi, Limits und Audio konfigurieren</div></div>
@@ -793,14 +793,32 @@ npx serve -s dist</code></pre>
         <div class="section-num">5</div>
         <h2>Lernen (🧠)</h2>
       </div>
-      <p>Der Lernen-Tab bietet vier verschiedene Lernmodi. Vor dem Start erscheint ein Auswahlbildschirm mit vier Buttons.</p>
+      <p>Der Lernen-Tab bietet fünf verschiedene Lernmodi. Vor dem Start erscheint ein Auswahlbildschirm mit fünf Buttons, in dieser Reihenfolge: Quiz, Neue Karten lernen ohne Quiz, Fällige Karten, Eingabe, Alle Vokabeln. Ein Button ist ausgegraut, wenn der jeweilige Modus gerade keine Karten anzubieten hat.</p>
 
-      <h3>Die vier Lernmodi im Überblick</h3>
+      <h3>Die fünf Lernmodi im Überblick</h3>
       <div class="mode-grid">
+        <div class="mode-card">
+          <div class="mode-card-icon">🧩</div>
+          <div class="mode-card-title">Quiz</div>
+          <div class="mode-card-desc">Multiple-Choice, gezielt für Fach 2 – bei Bedarf aus Fach 1 auf mindestens 30 Karten aufgefüllt. Das Fach ändert sich dabei nicht mehr.</div>
+          <span class="mode-card-tag" style="background:var(--tag-bg); color:var(--tag-text);">Fach 2, fix</span>
+        </div>
+        <div class="mode-card">
+          <div class="mode-card-icon">🃏</div>
+          <div class="mode-card-title">Neue Karten lernen ohne Quiz</div>
+          <div class="mode-card-desc">Exakt dieselbe Kartenauswahl und Fach-Logik wie Quiz (Fach 2, bei Bedarf aus Fach 1 aufgefüllt) – aber als klassische Karteikarte zum Umdrehen statt Multiple-Choice.</div>
+          <span class="mode-card-tag" style="background:var(--tag-bg); color:var(--tag-text);">Fach 2, fix</span>
+        </div>
         <div class="mode-card">
           <div class="mode-card-icon">🎯</div>
           <div class="mode-card-title">Fällige Karten</div>
           <div class="mode-card-desc">Nur Karten, die laut Wiederholungsplan heute an der Reihe sind – plus neue Karten bis zum Tageslimit. Der Haupt-Lernmodus.</div>
+          <span class="mode-card-tag sr">Fächer aktiv</span>
+        </div>
+        <div class="mode-card">
+          <div class="mode-card-icon">✍️</div>
+          <div class="mode-card-title">Eingabe</div>
+          <div class="mode-card-desc">Antwort frei eintippen. Optionale Tipptoleranz. Zeigt fällige und neue Karten.</div>
           <span class="mode-card-tag sr">Fächer aktiv</span>
         </div>
         <div class="mode-card">
@@ -809,23 +827,25 @@ npx serve -s dist</code></pre>
           <div class="mode-card-desc">Alle Karten des aktiven Lernpakets in zufälliger Reihenfolge als Karteikarten. Gut für freies Üben ohne Tageslimit.</div>
           <span class="mode-card-tag all">Ohne Fortschritt</span>
         </div>
-        <div class="mode-card">
-          <div class="mode-card-icon">🧩</div>
-          <div class="mode-card-title">Quiz</div>
-          <div class="mode-card-desc">Multiple-Choice, gezielt für Fach 2 – bei Bedarf aus Fach 1 auf mindestens 30 Karten aufgefüllt. Das Fach ändert sich dabei nicht mehr.</div>
-          <span class="mode-card-tag" style="background:var(--tag-bg); color:var(--tag-text);">Fach 2, fix</span>
-        </div>
-        <div class="mode-card">
-          <div class="mode-card-icon">✍️</div>
-          <div class="mode-card-title">Eingabe</div>
-          <div class="mode-card-desc">Antwort frei eintippen. Optionale Tipptoleranz. Zeigt fällige und neue Karten.</div>
-          <span class="mode-card-tag sr">Fächer aktiv</span>
-        </div>
       </div>
 
       <div class="callout">
         <strong>Jeder Modus behandelt den Lernfortschritt anders</strong>
-        „Fällige Karten" und „Eingabe" folgen dem normalen Wiederholungsplan: jede Bewertung verschiebt die Karte ein Fach vor oder zurück auf Fach 1, bis hoch zu Fach 6. „Alle Vokabeln" ist bewusst komplett folgenlos: keine Fach-Änderung, keine Trainings-Streak, kein Verbrauch des Tageslimits – ideal zum entspannten Auffrischen ohne Risiko. „Quiz" drillt gezielt Fach 2: Es zeigt ausschließlich Karten aus Fach 2 (aufgefüllt aus Fach 1, falls weniger als 30 vorhanden sind) und ändert das Fach dabei nicht mehr – weder Auf- noch Abstieg. Ein Wort, das per Multiple-Choice richtig beantwortet wurde, gilt damit nicht automatisch als "gelernt"; der weitere Aufstieg bleibt „Fällige Karten" vorbehalten. Quiz zählt außerdem nicht gegen das Tageslimit, wirkt sich aber weiterhin auf die Trainings-Streak aus.
+        „Fällige Karten" und „Eingabe" folgen dem normalen Wiederholungsplan: jede Bewertung verschiebt die Karte ein Fach vor oder zurück auf Fach 1, bis hoch zu Fach 6. „Alle Vokabeln" ist bewusst komplett folgenlos: keine Fach-Änderung, keine Trainings-Streak, kein Verbrauch des Tageslimits – ideal zum entspannten Auffrischen ohne Risiko. „Quiz" und „Neue Karten lernen ohne Quiz" teilen sich exakt dieselbe Fach-2-Logik: Beide zeigen ausschließlich Karten aus Fach 2 (aufgefüllt aus Fach 1, falls weniger als 30 vorhanden sind) und ändern das Fach dabei nicht mehr – weder Auf- noch Abstieg. Eine richtig beantwortete Karte gilt damit in keinem der beiden Modi automatisch als „gelernt"; der weitere Aufstieg bleibt „Fällige Karten" vorbehalten. Beide zählen außerdem nicht gegen das Tageslimit, wirken sich aber weiterhin auf die Trainings-Streak aus. Der einzige Unterschied zwischen den beiden: die Abfrageform (Multiple-Choice vs. Karte umdrehen) – und dass „Neue Karten lernen ohne Quiz" (anders als Fällige Karten/Eingabe) nie eine Satzfrage zeigt, siehe „Satzfragen" weiter unten.
+      </div>
+
+      <h3>Detailvergleich: Kartenauswahl &amp; Auswirkung auf den Fortschritt</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Modus</th><th>Kartenquelle</th><th>Fach ändert sich?</th><th>Tageslimit</th><th>Trainings-Streak</th></tr></thead>
+          <tbody>
+            <tr><td>Quiz</td><td>Fach 2, ggf. aus Fach 1 auf min. 30 aufgefüllt</td><td>Nein (fix)</td><td>Zählt nicht</td><td>Zählt</td></tr>
+            <tr><td>Neue Karten lernen ohne Quiz</td><td>Fach 2, ggf. aus Fach 1 auf min. 30 aufgefüllt (identisch zu Quiz)</td><td>Nein (fix)</td><td>Zählt nicht</td><td>Zählt</td></tr>
+            <tr><td>Fällige Karten</td><td>Fällige Karten + neue Karten bis Tageslimit</td><td>Ja, regulär</td><td>Zählt</td><td>Zählt</td></tr>
+            <tr><td>Eingabe</td><td>Fällige Karten + neue Karten bis Tageslimit</td><td>Ja, regulär</td><td>Zählt</td><td>Zählt</td></tr>
+            <tr><td>Alle Vokabeln</td><td>Alle Karten des aktiven Lernpakets</td><td>Nein</td><td>Zählt nicht</td><td>Zählt nicht</td></tr>
+          </tbody>
+        </table>
       </div>
 
       <h3>Karteikarten-Modus (Fällige Karten / Alle Vokabeln)</h3>
@@ -876,6 +896,37 @@ npx serve -s dist</code></pre>
         </div>
       </div>
 
+      <h3>Neue Karten lernen ohne Quiz</h3>
+      <p>Dieser Modus nutzt exakt dieselbe Kartenauswahl wie Quiz: Es werden ausschließlich Karten aus Fach 2 abgefragt, bei Bedarf zu Sitzungsbeginn dauerhaft aus Fach 1 auf mindestens 30 Karten aufgefüllt. Auch die Fach-Logik ist identisch – weder eine richtige noch eine falsche Bewertung verschiebt die Karte, sie bleibt in Fach 2 und taucht in der nächsten Sitzung (Quiz oder diesem Modus) erneut auf. Der einzige Unterschied zu Quiz ist die Abfrageform: Statt vier Antwortmöglichkeiten anzutippen, wird die Karte wie im normalen Karteikarten-Modus umgedreht und selbst mit Richtig/Falsch bewertet – und zwar immer als reine Flip-Karte, auch wenn zur Vokabel eigentlich eine Satzfrage vorläge (siehe „Satzfragen" weiter unten).</p>
+      <p>Gedacht ist der Modus für alle, die neu eingeführte bzw. noch unsichere Fach-2-Wörter lieber in Ruhe als Karteikarte wiederholen möchten, statt sie im schnelleren Multiple-Choice-Tempo des Quiz-Modus zu erraten.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Vorderseite: Frage lesen</div>
+            <div class="step-desc">Das Wort aus dem Fach-2-Pool wird gemäß gewählter Abfragerichtung angezeigt – identisch zum Karteikarten-Modus.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Antwort überlegen und Karte aufdecken</div>
+            <div class="step-desc">Karte antippen oder <kbd>Enter</kbd> drücken – die Rückseite klappt auf.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-body">
+            <div class="step-title">Selbst ehrlich bewerten</div>
+            <div class="step-desc">
+              <strong>✓ Richtig</strong> antippen (oder <kbd>Shift</kbd> + <kbd>→</kbd>) – die Karte bleibt trotzdem in Fach 2.<br>
+              <strong>✗ Falsch</strong> antippen (oder <kbd>Shift</kbd> + <kbd>←</kbd>) – auch hier bleibt die Karte in Fach 2, fällt also <strong>nicht</strong> auf Fach 1 zurück wie im normalen Karteikarten-Modus.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="callout tip">
+        <strong>Warum fällt eine falsch bewertete Karte hier nicht zurück?</strong>
+        Weil die Bewertung nur für die eigene Selbsteinschätzung und die Auswertung am Sitzungsende zählt, aber – genau wie im Quiz-Modus – keinen Einfluss auf das Fach hat. So bleibt der Fach-2-Pool über mehrere Sitzungen stabil, bis die Karten regulär über „Fällige Karten" weiter aufsteigen.
+      </div>
+
       <h3>Eingabe-Modus</h3>
       <div class="steps">
         <div class="step">
@@ -910,7 +961,7 @@ npx serve -s dist</code></pre>
 
       <div class="callout tip">
         <strong>Satzfragen (ab v1.5)</strong>
-        Statt der einzelnen Vokabel kann gelegentlich ein Lückensatz erscheinen: ein Beispielsatz in der Zielsprache mit einer Lücke anstelle der gesuchten Vokabel, darunter der deutsche Satz zur Orientierung mit hervorgehobenem Wort. Satzfragen erscheinen nur zu bereits mindestens einmal abgefragten Vokabeln und aktuell nur für <strong>Englisch – Grundwortschatz (Klett)</strong> (476 Beispielsätze zu 351 der 2056 Vokabeln, aus dem Lehrbuch übernommen); für die übrigen Lernpakete liegen noch keine Beispielsätze vor. Über <strong>Einstellungen → Eingabe-Modus → Beispielsätze einstreuen</strong> lässt sich diese Beimischung abschalten.
+        Statt der einzelnen Vokabel kann gelegentlich ein Lückensatz erscheinen: ein Beispielsatz in der Zielsprache mit einer Lücke anstelle der gesuchten Vokabel, darunter der deutsche Satz zur Orientierung mit hervorgehobenem Wort. Hat die aktuelle Karte einen hinterlegten Beispielsatz, erscheint diese Lückensatz-Eingabe in <strong>Fällige Karten</strong>, <strong>Alle Vokabeln</strong> und <strong>Eingabe</strong> gleichermaßen – ohne Beispielsatz bleibt es bei der gewohnten Flip-Karte bzw. dem leeren Eingabefeld. In <strong>Quiz</strong> und <strong>Neue Karten lernen ohne Quiz</strong> gibt es dagegen grundsätzlich keine Satzfragen. Satzfragen erscheinen nur zu bereits mindestens einmal abgefragten Vokabeln und aktuell nur für <strong>Englisch – Grundwortschatz (Klett)</strong> (476 Beispielsätze zu 351 der 2056 Vokabeln, aus dem Lehrbuch übernommen); für die übrigen Lernpakete liegen noch keine Beispielsätze vor. Über <strong>Einstellungen → Eingabe-Modus → Beispielsätze einstreuen</strong> lässt sich diese Beimischung abschalten.
       </div>
 
       <h3>Tastatur-Kurzreferenz</h3>
@@ -919,8 +970,8 @@ npx serve -s dist</code></pre>
           <thead><tr><th>Taste</th><th>Funktion</th><th>Verfügbar in</th></tr></thead>
           <tbody>
             <tr><td class="keys"><kbd>Enter</kbd></td><td>Karte aufdecken / Antwort prüfen / Weiter</td><td>Allen Modi</td></tr>
-            <tr><td class="keys"><kbd>Shift</kbd> + <kbd>→</kbd></td><td>Richtig bewerten</td><td>Karteikarten</td></tr>
-            <tr><td class="keys"><kbd>Shift</kbd> + <kbd>←</kbd></td><td>Falsch bewerten</td><td>Karteikarten</td></tr>
+            <tr><td class="keys"><kbd>Shift</kbd> + <kbd>→</kbd></td><td>Richtig bewerten</td><td>Karteikarten, Neue Karten lernen ohne Quiz</td></tr>
+            <tr><td class="keys"><kbd>Shift</kbd> + <kbd>←</kbd></td><td>Falsch bewerten</td><td>Karteikarten, Neue Karten lernen ohne Quiz</td></tr>
             <tr><td class="keys"><kbd>1</kbd> – <kbd>4</kbd></td><td>Quiz-Antwort auswählen</td><td>Quiz</td></tr>
             <tr><td class="keys"><kbd>Leertaste</kbd></td><td>Weiter zur nächsten Karte</td><td>Quiz</td></tr>
           </tbody>
@@ -928,7 +979,7 @@ npx serve -s dist</code></pre>
       </div>
 
       <h3>Audio</h3>
-      <p>In allen Lernmodi ist oben rechts der 🔈-Button verfügbar, der das aktuell angezeigte Wort vorliest. Alternativ kann das automatische Vorlesen nach dem Aufdecken der Antwort in den Einstellungen aktiviert werden (getrennt für Karteikarten und Quiz).</p>
+      <p>In allen Lernmodi ist oben rechts der 🔈-Button verfügbar, der das aktuell angezeigte Wort vorliest. Alternativ kann das automatische Vorlesen nach dem Aufdecken der Antwort in den Einstellungen aktiviert werden (getrennt für Karteikarten und Quiz; „Neue Karten lernen ohne Quiz" nutzt dabei die Karteikarten-Einstellung, da es dieselbe Flip-Karten-Ansicht verwendet).</p>
       <p>Die App wählt automatisch die passende Systemstimme für die jeweilige Sprache aus (Deutsch, Englisch oder Spanisch). Die Qualität der Aussprache hängt von den auf dem Gerät installierten Stimmen ab – je mehr Sprachpakete in den iOS-Einstellungen installiert sind, desto natürlicher klingt die Ausgabe.</p>
 
       <h3>Sitzungsende</h3>
@@ -1082,7 +1133,7 @@ npx serve -s dist</code></pre>
 
       <ul>
         <li><strong>Lernkartei – Fächer:</strong> Balkendiagramm mit der Verteilung der Karten auf Fach 1–6. Ein hoher Balken bei Fach 6 bedeutet: viel gelernt.</li>
-        <li><strong>Trainings-Regelmäßigkeit:</strong> Kalenderansicht der letzten Tage (grüne Punkte = trainiert) und Prozentwerte für 7, 30 und 90 Tage. Wird nur nach abgeschlossenen Fällig-Karten-Sitzungen aktualisiert.</li>
+        <li><strong>Trainings-Regelmäßigkeit:</strong> Kalenderansicht der letzten Tage (grüne Punkte = trainiert) und Prozentwerte für 7, 30 und 90 Tage. Wird nach jeder abgeschlossenen Sitzung aktualisiert – außer im Modus „Alle Vokabeln", der bewusst keine Trainings-Streak zählt.</li>
         <li><strong>Fortschritt nach Kategorie:</strong> Für jede Kategorie zeigt ein Fortschrittsbalken den Anteil fertiger (Fach 6) und in Bearbeitung befindlicher Karten.</li>
       </ul>
 
@@ -1131,7 +1182,7 @@ npx serve -s dist</code></pre>
         </div>
         <div class="settings-row">
           <div class="settings-label">Karteikarten – Lösung vorlesen</div>
-          <div class="settings-desc">Spricht die Rückseite automatisch vor, sobald die Karte aufgedeckt wird.</div>
+          <div class="settings-desc">Spricht die Rückseite automatisch vor, sobald die Karte aufgedeckt wird. Gilt für „Fällige Karten", „Alle Vokabeln" und „Neue Karten lernen ohne Quiz" – alle drei nutzen dieselbe Karteikarten-Ansicht.</div>
         </div>
       </div>
 
@@ -1294,6 +1345,16 @@ npx serve -s dist</code></pre>
         </div>
       </div>
 
+      <div class="faq-item">
+        <div class="faq-q">
+          Was ist der Unterschied zwischen „Quiz" und „Neue Karten lernen ohne Quiz"?
+          <i class="faq-arrow">▾</i>
+        </div>
+        <div class="faq-a">
+          Bei der Kartenauswahl und der Fach-Logik: keiner – beide zeigen exakt denselben Fach-2-Pool (bei Bedarf aus Fach 1 aufgefüllt) und lassen das Fach unverändert. Der Unterschied liegt allein in der Abfrageform: „Quiz" zeigt vier Antwortmöglichkeiten zum Antippen (Multiple-Choice), „Neue Karten lernen ohne Quiz" zeigt dieselben Karten stattdessen als normale Karteikarte zum Umdrehen mit Selbstbewertung Richtig/Falsch — und anders als bei „Fällige Karten"/„Eingabe" erscheint dabei nie eine Satzfrage, selbst wenn zur Vokabel ein Beispielsatz vorläge. Wer neue Fach-2-Wörter lieber in Ruhe statt im Multiple-Choice-Tempo wiederholen möchte, ist mit diesem Modus besser bedient.
+        </div>
+      </div>
+
     </section>
 
     <!-- ── CHANGELOG ── -->
@@ -1301,6 +1362,60 @@ npx serve -s dist</code></pre>
       <div class="section-header">
         <div class="section-num">📋</div>
         <h2>Release Notes</h2>
+      </div>
+
+      <!-- v1.5.3 -->
+      <div style="border-left: 3px solid var(--accent2); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge">v1.5.3</span>
+          <span style="color:var(--muted); font-size:0.82rem;">1. September 2026</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Neu</h4>
+        <ul>
+          <li><strong>Neuer Lernmodus „Neue Karten lernen ohne Quiz":</strong> Nutzt dieselbe Fach-2-Pool-Logik wie Quiz (mindestens 30 Karten, bei Bedarf dauerhaft aus Fach 1 aufgefüllt, keine Fach-Änderung durch die Bewertung), fragt die Karten aber als normale Karteikarte mit Umdrehen und Richtig/Falsch statt per Multiple-Choice ab. Anders als bei „Fällige Karten"/„Alle Vokabeln" erscheinen dabei nie Satzfragen.</li>
+        </ul>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>Reihenfolge der Lernmodi-Buttons:</strong> Der Auswahlbildschirm im Lernen-Tab zeigt die Modi jetzt in der Reihenfolge Quiz, Neue Karten lernen ohne Quiz, Fällige Karten, Eingabe, Alle Vokabeln.</li>
+        </ul>
+      </div>
+
+      <!-- v1.5.2 -->
+      <div style="border-left: 3px solid var(--accent2); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge">v1.5.2</span>
+          <span style="color:var(--muted); font-size:0.82rem;">31. August 2026</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Behoben</h4>
+        <ul>
+          <li><strong>Beugungsformen erschienen doppelt:</strong> Bei 103 unregelmäßigen Verben in „Englisch – Grundwortschatz (Klett)" (z.&nbsp;B. „to hold") stand die Beugungsform gleich zweimal in den Daten – einmal in Klammern direkt hinter der Vokabel, einmal separat im Beugungsformen-Feld. Sie erschien dadurch doppelt auf der Karte und wurde doppelt vorgelesen. Die redundante Klammer wurde entfernt; eigenständige Zusatzangaben in Klammern (z.&nbsp;B. „to think (of)") sind davon nicht betroffen.</li>
+        </ul>
+      </div>
+
+      <!-- v1.5.1 -->
+      <div style="border-left: 3px solid var(--accent2); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge">v1.5.1</span>
+          <span style="color:var(--muted); font-size:0.82rem;">31. August 2026</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Behoben</h4>
+        <ul>
+          <li><strong>Kein ungewollter Tastatur-Sprung im Eingabe-Modus:</strong> Auf Mobilgeräten öffnete sich beim Erscheinen jeder Karte im Eingabe-Modus (auch bei Satzfragen) sofort die virtuelle Tastatur, wodurch die Fragekarte aus dem sichtbaren Bereich geschoben wurde, bevor sie gelesen werden konnte. Der Auto-Fokus wird jetzt nur noch auf Geräten mit Maus/physischer Tastatur gesetzt.</li>
+        </ul>
+      </div>
+
+      <!-- v1.4.13 -->
+      <div style="border-left: 3px solid var(--accent2); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.6rem;">
+          <span class="badge">v1.4.13</span>
+          <span style="color:var(--muted); font-size:0.82rem;">30. August 2026</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Behoben</h4>
+        <ul>
+          <li><strong>Beugungsformen werden mitgesprochen:</strong> Die Sprachausgabe las bisher nur die Übersetzung vor, obwohl unregelmäßige Verbformen (z.&nbsp;B. „held · held") auf der Karte sichtbar waren. Sie werden jetzt direkt im Anschluss mitgesprochen.</li>
+          <li><strong>Quiz-Karte nicht mehr abgeschnitten:</strong> Die Karte im Quizmodus hatte eine feste, nur an der Bildschirmhöhe orientierte Größe, die den tatsächlich verfügbaren Platz neben den Antwortoptionen ignorierte. Größe und Emoji skalieren jetzt mit dem tatsächlich verfügbaren Platz mit.</li>
+          <li><strong>Abfragerichtung-Auswahl besser erkennbar:</strong> Der ausgewählte Button auf der Startseite wirkte durch einen blassen Pastell-Hintergrund eher wie deaktiviert. Er zeigt jetzt denselben kräftigen Farbverlauf wie andere aktive Elemente der App.</li>
+        </ul>
       </div>
 
       <!-- v1.5.0 -->

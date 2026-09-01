@@ -7,7 +7,7 @@ import { Colors } from '../constants/theme';
 import { LANGUAGE_LABELS } from '../config/file_config';
 import { VocabularyItem } from '../data/vocabulary';
 
-type SessionMode = 'due' | 'all' | 'quiz' | 'type';
+type SessionMode = 'due' | 'all' | 'quiz' | 'quizCards' | 'type';
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -144,8 +144,9 @@ export default function Learn() {
   const currentCard = sessionCards?.[currentIndex];
   // Satzkarte (v1.5): in 'type' immer aktiv sofern verfügbar; in 'due'/'all' pro
   // Karte, wenn ein Beispielsatz existiert — sonst normale Karteikarte. Im
-  // Quiz-Modus (Multiple-Choice) gibt es grundsätzlich keine Satzkarten.
-  const currentExample = currentCard && sessionMode !== 'quiz' ? getExampleFor(currentCard.id) : null;
+  // Quiz-Modus (Multiple-Choice) und in 'quizCards' (dessen einziger Zweck die
+  // reine Flip-Karte mit Richtig/Falsch ist) gibt es grundsätzlich keine Satzkarten.
+  const currentExample = currentCard && sessionMode !== 'quiz' && sessionMode !== 'quizCards' ? getExampleFor(currentCard.id) : null;
   const isSentenceCard = currentExample !== null;
 
   useEffect(() => {
@@ -186,7 +187,7 @@ export default function Learn() {
       newCount = newC.length;
       cards = [...revCards, ...newC];
       if (cards.length === 0) return;
-    } else if (mode === 'quiz') {
+    } else if (mode === 'quiz' || mode === 'quizCards') {
       const { cards: pool, promotedCount } = startQuizPool();
       if (pool.length === 0) return;
       newCount = promotedCount;
@@ -262,7 +263,7 @@ export default function Learn() {
 
   const advanceCard = (correct: boolean) => {
     if (!currentCard || !sessionCards) return;
-    if (sessionMode === 'quiz') {
+    if (sessionMode === 'quiz' || sessionMode === 'quizCards') {
       markCard(currentCard.id, correct, { skipDailyStats: true, lockBox: true });
     } else if (sessionMode !== 'all') {
       markCard(currentCard.id, correct);
@@ -317,14 +318,15 @@ export default function Learn() {
           <h2 style={{ fontSize: 26, fontWeight: 900, color: Colors.text, marginBottom: 24 }}>Sitzung starten</h2>
 
           {([
-            { mode: 'due' as SessionMode, colors: ['#FF6B6B', '#FF8E53'], emoji: '🎯', title: 'Fällige Karten', sub: `${dueCards.length} Karten heute fällig`, disabledSub: 'Keine Karten heute fällig' },
-            { mode: 'all' as SessionMode, colors: ['#A78BFA', '#7C3AED'], emoji: '🔁', title: 'Alle Vokabeln', sub: `Alle ${allVocabulary.length} Karten üben`, disabledSub: 'Keine Vokabeln in diesem Paket' },
             { mode: 'quiz' as SessionMode, colors: ['#4ECDC4', '#2ECC71'], emoji: '🧩', title: 'Quiz', sub: 'Mindestens 30 Vokabeln in Fach 2 werden im Quizmodus abgefragt', disabledSub: 'Noch keine 30 Vokabeln in Fach 2' },
+            { mode: 'quizCards' as SessionMode, colors: ['#38BDF8', '#2563EB'], emoji: '🃏', title: 'Neue Karten lernen ohne Quiz', sub: 'Gleiche Auswahl wie im Quiz, aber als Karteikarte mit Richtig/Falsch', disabledSub: 'Noch keine 30 Vokabeln in Fach 2' },
+            { mode: 'due' as SessionMode, colors: ['#FF6B6B', '#FF8E53'], emoji: '🎯', title: 'Fällige Karten', sub: `${dueCards.length} Karten heute fällig`, disabledSub: 'Keine Karten heute fällig' },
             { mode: 'type' as SessionMode, colors: ['#F59E0B', '#D97706'], emoji: '✍️', title: 'Eingabe-Modus', sub: 'Antworte durch Tippen', disabledSub: 'Keine fälligen oder neuen Karten übrig' },
+            { mode: 'all' as SessionMode, colors: ['#A78BFA', '#7C3AED'], emoji: '🔁', title: 'Alle Vokabeln', sub: `Alle ${allVocabulary.length} Karten üben`, disabledSub: 'Keine Vokabeln in diesem Paket' },
           ] as const).map(({ mode, colors, emoji, title, sub, disabledSub }) => {
             const disabled = (mode === 'due' || mode === 'type') ? dueOrNewCount === 0
               : mode === 'all' ? allVocabulary.length === 0
-              : false; // 'quiz' meldet einen leeren Pool selbst beim Klick (startQuizPool)
+              : false; // 'quiz'/'quizCards' melden einen leeren Pool selbst beim Klick (startQuizPool)
             return (
             <button
               key={mode}

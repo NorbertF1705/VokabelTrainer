@@ -574,7 +574,7 @@
       <li><a href="#changelog"><span class="nav-icon">📋</span> Release Notes</a></li>
     </ul>
 
-    <div class="nav-version">Version 1.5.0 · August 2026</div>
+    <div class="nav-version">Version 1.5.3 · September 2026</div>
   </nav>
 
   <!-- ── MAIN ── -->
@@ -583,11 +583,11 @@
     <div class="page-header">
       <h1>Entwicklerdokumentation</h1>
       <div class="meta">
-        <span class="badge">v1.5.2</span>
+        <span class="badge">v1.5.3</span>
         <span class="badge purple">React 19</span>
         <span class="badge purple">TypeScript</span>
         <span class="badge purple">Vite + PWA</span>
-        <span>Stand: August 2026</span>
+        <span>Stand: September 2026</span>
       </div>
     </div>
 
@@ -1349,21 +1349,21 @@ export { VOCABULARY_EN as VOCABULARY_EN_BASIC } from '../vocabulary_en';</code><
           <div class="algo-step-num">①</div>
           <div class="algo-step-body">
             <strong>Lobby</strong> – Kein aktiver Session-State.<br>
-            Zeigt die vier Modus-Buttons: <em>Fällige Karten</em>, <em>Alle Karten</em>, <em>Quiz</em>, <em>Tippen</em>. Jeder Button kennt seine Kartenquelle (<code>getDueCards</code>+<code>getNewCards</code> / alle / <code>startQuizPool</code> / <code>getDueCards</code>+<code>getNewCards</code>).
+            Zeigt die fünf Modus-Buttons in dieser Reihenfolge (ab v1.5.3): <em>Quiz</em>, <em>Neue Karten lernen ohne Quiz</em> (<code>'quizCards'</code>), <em>Fällige Karten</em>, <em>Tippen</em>, <em>Alle Karten</em>. Jeder Button kennt seine Kartenquelle (<code>startQuizPool</code> / <code>startQuizPool</code> / <code>getDueCards</code>+<code>getNewCards</code> / <code>getDueCards</code>+<code>getNewCards</code> / alle) sowie ein <code>disabledSub</code> für den deaktivierten Zustand, wenn der Modus gerade keine Karten anzubieten hat.
           </div>
         </div>
         <div class="algo-step branch">
           <div class="algo-step-num">②</div>
           <div class="algo-step-body">
             <strong>startSession(mode)</strong> – Übergang Lobby → aktive Sitzung.<br>
-            Lädt die Kartenliste je nach Modus. Bei <em>Fällige Karten</em> und <em>Tippen</em>: <code>getDueCards()</code> + <code>getNewCards()</code>, gemischt. Bei <em>Alle Karten</em>: alle Vokabeln der Sprache. Bei <em>Quiz</em> (ab v1.4.12): <code>startQuizPool()</code> – liefert alle Karten mit <code>box === 2</code>, aufgefüllt aus Fach 1 (<code>box === 1</code> oder <code>lastReviewed === null</code>) auf mindestens <code>QUIZ_MIN_POOL = 30</code>. Die aufgefüllten Karten werden dabei sofort (innerhalb desselben Aufrufs, per <code>mutateActiveFile</code>) dauerhaft auf <code>box: 2</code> gesetzt – <code>startQuizPool()</code> ist damit bewusst keine reine <code>get*</code>-Funktion und darf nur einmalig beim Sitzungsstart aufgerufen werden, nicht bei jedem Render. Setzt <code>sessionCards</code>, <code>currentIndex = 0</code>.
+            Lädt die Kartenliste je nach Modus. Bei <em>Fällige Karten</em> und <em>Tippen</em>: <code>getDueCards()</code> + <code>getNewCards()</code>, gemischt. Bei <em>Alle Karten</em>: alle Vokabeln der Sprache. Bei <em>Quiz</em> und <em>Neue Karten lernen ohne Quiz</em> (<code>mode === 'quiz' || mode === 'quizCards'</code>, seit v1.5.3 derselbe Codezweig): <code>startQuizPool()</code> – liefert alle Karten mit <code>box === 2</code>, aufgefüllt aus Fach 1 (<code>box === 1</code> oder <code>lastReviewed === null</code>) auf mindestens <code>QUIZ_MIN_POOL = 30</code>. Die aufgefüllten Karten werden dabei sofort (innerhalb desselben Aufrufs, per <code>mutateActiveFile</code>) dauerhaft auf <code>box: 2</code> gesetzt – <code>startQuizPool()</code> ist damit bewusst keine reine <code>get*</code>-Funktion und darf nur einmalig beim Sitzungsstart aufgerufen werden, nicht bei jedem Render. Setzt <code>sessionCards</code>, <code>currentIndex = 0</code>.
           </div>
         </div>
         <div class="algo-step">
           <div class="algo-step-num">③</div>
           <div class="algo-step-body">
             <strong>Aktive Sitzung – Kartendurchlauf</strong><br>
-            Drei Render-Zweige je nach Modus: Karteikarten-Flip (FlashCard.tsx), Multiple-Choice-Quiz (4 Optionen, 1 richtige), Tippen (Freitexteingabe + optionale Tipptoleranz via Levenshtein).<br>
+            Render-Zweige je nach Modus: Tippen/Satzfrage (<code>sessionMode === 'type' || isSentenceCard</code> – Freitexteingabe bzw. Lückensatz-Eingabe via <code>SentenceCard.tsx</code>, optionale Tipptoleranz via Levenshtein), Multiple-Choice-Quiz (<code>sessionMode === 'quiz'</code>, 4 Optionen, 1 richtige), sonst als Fallback Karteikarten-Flip (FlashCard.tsx) für alle übrigen Modi – also <code>'due'</code>, <code>'all'</code> und seit v1.5.3 auch <code>'quizCards'</code>. <code>currentExample</code> (und damit <code>isSentenceCard</code>) ist für <code>'quiz'</code> und <code>'quizCards'</code> fest auf <code>null</code> gesetzt, sodass <code>'quizCards'</code> ohne eigenen Render-Zweig immer als reine Flip-Karte erscheint, obwohl Kartenauswahl (Schritt ②) und <code>markCard</code>-Behandlung (Schritt ④) mit <em>Quiz</em> identisch sind.<br>
             Tastatur-Shortcuts werden über einen globalen <code>keydown</code>-Listener implementiert (Enter = Karte umdrehen / bestätigen, Pfeiltasten = richtig/falsch). Der Listener wird beim Sitzungsende entfernt.
           </div>
         </div>
@@ -1371,7 +1371,7 @@ export { VOCABULARY_EN as VOCABULARY_EN_BASIC } from '../vocabulary_en';</code><
           <div class="algo-step-num">④</div>
           <div class="algo-step-body">
             <strong>Karte bewerten: <code>markCard()</code></strong><br>
-            Nach jeder Bewertung wird <code>markCard(id, correct)</code> im Context aufgerufen – <strong>außer im Modus „Alle Vokabeln"</strong> (<code>sessionMode === 'all'</code>): dort ist <code>advanceCard()</code> bewusst folgenlos, es findet keine Fach-Änderung statt. Im Modus <strong>„Quiz"</strong> (ab v1.4.12) wird <code>markCard(id, correct, { skipDailyStats: true, lockBox: true })</code> aufgerufen: <code>lockBox</code> hält <code>box</code> und <code>nextDate</code> unverändert fest (weder Auf- noch Abstieg), nur <code>lastReviewed</code>/<code>correctCount</code>/<code>incorrectCount</code> werden wie gewohnt aktualisiert; <code>dailyStats</code>/<code>dailyNewStats</code> (Tageslimit-Zähler) bleiben wegen <code>skipDailyStats</code> ebenfalls unangetastet. Da <code>startQuizPool()</code> ausschließlich Fach-2-Karten liefert und <code>lockBox</code> jede Fach-Änderung im Quiz-Modus unterbindet, werden dieselben Karten Sitzung für Sitzung erneut abgefragt, bis sie über „Fällige Karten" regulär weiter aufsteigen. <code>sessionStats</code> (richtig/falsch für die Auswertungsansicht) wird in jedem Modus aktualisiert. Der nächste <code>currentIndex++</code>-Schritt blendet die nächste Karte ein.
+            Nach jeder Bewertung wird <code>markCard(id, correct)</code> im Context aufgerufen – <strong>außer im Modus „Alle Vokabeln"</strong> (<code>sessionMode === 'all'</code>): dort ist <code>advanceCard()</code> bewusst folgenlos, es findet keine Fach-Änderung statt. In den Modi <strong>„Quiz" und „Neue Karten lernen ohne Quiz"</strong> (<code>sessionMode === 'quiz' || sessionMode === 'quizCards'</code>, seit v1.5.3 derselbe Codezweig) wird <code>markCard(id, correct, { skipDailyStats: true, lockBox: true })</code> aufgerufen: <code>lockBox</code> hält <code>box</code> und <code>nextDate</code> unverändert fest (weder Auf- noch Abstieg), nur <code>lastReviewed</code>/<code>correctCount</code>/<code>incorrectCount</code> werden wie gewohnt aktualisiert; <code>dailyStats</code>/<code>dailyNewStats</code> (Tageslimit-Zähler) bleiben wegen <code>skipDailyStats</code> ebenfalls unangetastet. Da <code>startQuizPool()</code> ausschließlich Fach-2-Karten liefert und <code>lockBox</code> jede Fach-Änderung in beiden Modi unterbindet, werden dieselben Karten Sitzung für Sitzung erneut abgefragt, bis sie über „Fällige Karten" regulär weiter aufsteigen – unabhängig davon, ob die Sitzung als Multiple-Choice (<code>'quiz'</code>) oder als Flip-Karte (<code>'quizCards'</code>) lief. <code>sessionStats</code> (richtig/falsch für die Auswertungsansicht) wird in jedem Modus aktualisiert. Der nächste <code>currentIndex++</code>-Schritt blendet die nächste Karte ein.
           </div>
         </div>
         <div class="algo-step result-ok">
@@ -1639,6 +1639,22 @@ curl -s https://vokabeltrainer-beta.vercel.app/assets/index-&lt;hash&gt;.js | gr
       <div class="section-header">
         <div class="section-num">📋</div>
         <h2>Release Notes</h2>
+      </div>
+
+      <!-- v1.5.3 -->
+      <div style="border-left: 3px solid var(--accent3); padding-left: 1.2rem; margin-bottom: 2rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+          <span class="badge">v1.5.3</span>
+          <span style="color:var(--muted); font-size:0.82rem;">2026-09-01</span>
+        </div>
+        <h4 style="margin-bottom:0.4rem;">Neu</h4>
+        <ul>
+          <li><strong>Neuer <code>SessionMode</code>-Wert <code>'quizCards'</code> ("Neue Karten lernen ohne Quiz"):</strong> Teilt sich mit <code>'quiz'</code> denselben Codezweig in <code>startSession()</code> (<code>mode === 'quiz' || mode === 'quizCards'</code> → <code>startQuizPool()</code> + <code>shuffle()</code>) und in <code>advanceCard()</code> (<code>sessionMode === 'quiz' || sessionMode === 'quizCards'</code> → <code>markCard(id, correct, { skipDailyStats: true, lockBox: true })</code>). <code>currentExample</code> ist für beide Modi fest auf <code>null</code> gesetzt (<code>sessionMode !== 'quiz' && sessionMode !== 'quizCards'</code>), sodass <code>'quizCards'</code> nie eine Satzfrage (v1.5.0) zeigt. Da <code>'quizCards'</code> weder in der <code>quizOptions</code>-<code>useEffect</code> (bleibt an <code>sessionMode !== 'quiz'</code> geknüpft) noch im Tastatur-Handler noch im Render einen eigenen Zweig bekommt, fällt der Modus automatisch auf den Karteikarten-Fallback (FlashCard-Flip + Shift-Links/Rechts) durch – identische Kartenauswahl und Fach-Logik wie Quiz, aber ohne Multiple-Choice-UI und ohne Satzfragen.</li>
+        </ul>
+        <h4 style="margin-bottom:0.4rem;">Geändert</h4>
+        <ul>
+          <li><strong>Reihenfolge der Lobby-Buttons:</strong> Das Array in der Lobby wurde umsortiert auf Quiz, <code>quizCards</code>, Fällige Karten, Tippen, Alle Karten.</li>
+        </ul>
       </div>
 
       <!-- v1.5.2 -->
