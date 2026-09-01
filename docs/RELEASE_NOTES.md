@@ -2,6 +2,26 @@
 
 ---
 
+## v1.5.6 — 2026-09-01
+
+### Bugfix: Zwei weitere Übersetzungen im Französisch-Grundwortschatz korrigiert
+
+Eine zweite Gegenprüfungsrunde durch Gemini — diesmal aller 500 Einträge statt nur
+der zuvor namentlich genannten Einzelfälle — ergab zwei weitere sinnvolle
+Korrekturen: „Kutsche"
+war mit `carrosse` übersetzt (bezeichnet spezifisch die Märchen-/Prunkkutsche),
+korrekt ist die generische `calèche`. „Programmierer" war mit `programmeur`
+übersetzt, in der heutigen Alltags-/Techsprache gebräuchlicher ist `développeur`.
+
+Von 19 in dieser Runde geprüften Einträgen wurden 17 als bereits passend bestätigt
+und bewusst unverändert gelassen — darunter „Krankenschwester" → `infirmière`, was
+trotz gegenteiligem Vorschlag korrekt ist: Anders als die übrigen Berufsbezeichnungen
+in der Liste (im Deutschen grammatisch maskulin, generisch genutzt) ist
+„Krankenschwester" explizit weiblich markiert (Gegenstück wäre „Krankenpfleger"),
+die feminine Übersetzung ist hier also treu zum deutschen Ausgangswort.
+
+---
+
 ## v1.5.5 — 2026-09-01
 
 ### Bugfix: Zwei Übersetzungen im Französisch-Grundwortschatz korrigiert

@@ -308,7 +308,7 @@ export const VOCABULARY_FR: VocabularyItem[] = [
   { id: 't017', german: 'Ambulanz', translation: 'ambulance', emoji: '🚑', category: 'Transport' },
   { id: 't018', german: 'Feuerwehrauto', translation: 'camion de pompiers', emoji: '🚒', category: 'Transport' },
   { id: 't019', german: 'Traktor', translation: 'tracteur', emoji: '🚜', category: 'Transport' },
-  { id: 't020', german: 'Kutsche', translation: 'carrosse', emoji: '🎠', category: 'Transport' },
+  { id: 't020', german: 'Kutsche', translation: 'calèche', emoji: '🎠', category: 'Transport' },
 
   // ── SPORT & FREIZEIT (25) ────────────────────────────────
   { id: 's001', german: 'Fußball', translation: 'football', emoji: '⚽', category: 'Sport & Freizeit' },
@@ -353,7 +353,7 @@ export const VOCABULARY_FR: VocabularyItem[] = [
   { id: 'p013', german: 'Schauspieler', translation: 'acteur', emoji: '🎭', category: 'Berufe' },
   { id: 'p014', german: 'Journalist', translation: 'journaliste', emoji: '📰', category: 'Berufe' },
   { id: 'p015', german: 'Fotograf', translation: 'photographe', emoji: '📷', category: 'Berufe' },
-  { id: 'p016', german: 'Programmierer', translation: 'programmeur', emoji: '👨‍💻', category: 'Berufe' },
+  { id: 'p016', german: 'Programmierer', translation: 'développeur', emoji: '👨‍💻', category: 'Berufe' },
   { id: 'p017', german: 'Tierarzt', translation: 'vétérinaire', emoji: '🐾', category: 'Berufe' },
   { id: 'p018', german: 'Zahnarzt', translation: 'dentiste', emoji: '🦷', category: 'Berufe' },
   { id: 'p019', german: 'Apotheker', translation: 'pharmacien', emoji: '💊', category: 'Berufe' },
