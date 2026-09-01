@@ -49,7 +49,7 @@ export interface CardProgress {
 // ── v1.3: neu ────────────────────────────────────────────────────────────────
 
 /** Sprachcode in BCP-47-Kurzform. */
-export type Language = 'en' | 'es' | 'tr';
+export type Language = 'en' | 'es' | 'tr' | 'fr';
 
 /** Identifier einer Vokabeldatei, z. B. "en-basic-v1". Stabil über Updates. */
 export type FileId = string;
