@@ -2,6 +2,23 @@
 
 ---
 
+## v1.5.5 — 2026-09-01
+
+### Bugfix: Zwei Übersetzungen im Französisch-Grundwortschatz korrigiert
+
+Eine erste KI-gestützte Gegenprüfung (Google Gemini) der in v1.5.4 eingeführten
+Übersetzungen ergab zwei echte Korrekturen: „rennen" war fälschlich mit
+`faire la course` („um die Wette laufen") statt `courir vite` übersetzt, und
+„umarmen" mit dem literarisch-gehobenen `étreindre` statt der alltagssprachlichen
+Wendung `serrer dans ses bras`. Beide Einträge korrigiert. Die übrigen von der
+Gegenprüfung als unkritisch eingestuften Wortwahlen (z. B. „Pinguin" → `pingouin`,
+„Oktopus" → `poulpe`, „Eule" → `hibou`) bleiben unverändert — sie sind für den
+Grundwortschatz-Anspruch der App bewusst die gängigeren statt der akademisch
+präziseren Begriffe. Die Anzahl der Verben mit angezeigter Beugungsform sinkt
+dadurch von 17 auf 16.
+
+---
+
 ## v1.5.4 — 2026-09-01
 
 ### Neue Sprache: Französisch – Grundwortschatz
